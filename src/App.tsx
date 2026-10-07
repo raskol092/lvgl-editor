@@ -40,6 +40,7 @@ import { useAppStore, parseFontSize } from './store/appStore';
 import { useProjectStore } from './store/projectStore';
 import type { LvglComponent, Page } from './types';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useZipExport } from './hooks/useZipExport';
 import { getComponentDefinition } from './utils/componentDefinitions';
 import { t } from './i18n';
 import ToolIcon from './components/icons/ToolIcon';
@@ -209,6 +210,8 @@ const EditorView: React.FC<EditorViewProps> = ({
   }, [currentProjectId, pages, images, fonts, saveProjectData, setLastSaveTime]);
 
   // Project management handlers
+  const { download: downloadZip, busy: zipBusy } = useZipExport();
+
   const handleSaveProject = useCallback(async () => {
     if (!currentProjectId) return;
     try {
@@ -561,6 +564,7 @@ const EditorView: React.FC<EditorViewProps> = ({
           <ToolbarButton icon="💾" label={t('Save')} onClick={handleSaveProject} shortcut="Ctrl+S" />
           <ToolbarButton icon="📤" label={t('Export')} onClick={handleExportProject} />
           <ToolbarButton icon="📥" label={t('Import')} onClick={handleImportProject} />
+          <ToolbarButton icon="🗜️" label={zipBusy ? t('Exporting...') : t('Download ZIP')} onClick={downloadZip} disabled={zipBusy} />
           <div className="toolbar-divider" />
           <ToolbarButton icon="↩️" label={t('Undo')} onClick={() => useEditorStore.getState().undo()} shortcut="Ctrl+Z" />
           <ToolbarButton icon="↪️" label={t('Redo')} onClick={() => useEditorStore.getState().redo()} shortcut="Ctrl+Y" />

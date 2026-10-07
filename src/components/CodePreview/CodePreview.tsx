@@ -6,8 +6,9 @@ import { useLogicEditorStore } from '../LogicEditor';
 import { useResourceStore } from '../../resources/resourceStore';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
-import { generateCode, getGeneratedFileNames, downloadAsZip, convertAssets } from '../../codegen/lisp';
+import { generateCode, getGeneratedFileNames, convertAssets } from '../../codegen/lisp';
 import type { LispGenOptions, LispFileName } from '../../codegen/lisp';
+import { useZipExport } from '../../hooks/useZipExport';
 import { toast } from '../Toast';
 import { t } from '../../i18n';
 import './CodePreview.css';
@@ -52,6 +53,8 @@ const CodePreview: React.FC = () => {
     namingStyle,
   }), [namingStyle]);
 
+  const { download } = useZipExport(codeGenOptions);
+
   const generatedCode = useMemo(() => {
     try {
       return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, imagePalettes);
@@ -85,14 +88,7 @@ const CodePreview: React.FC = () => {
     toast.success(t('{0} downloaded', selectedFile));
   };
 
-  const handleDownloadAll = async () => {
-    try {
-      await downloadAsZip(pages, codeGenOptions, logicGraphs, 'lvgl_ui.zip', currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize);
-      toast.success(t('All files downloaded'));
-    } catch {
-      toast.error(t('Download failed'));
-    }
-  };
+  const handleDownloadAll = download;
 
   return (
     <div className="code-preview">
@@ -124,8 +120,8 @@ const CodePreview: React.FC = () => {
           <button className="code-action-btn" onClick={handleDownload} title={t('Download current file')}>
             {t('💾 Download')}
           </button>
-          <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download all files')}>
-            {t('📦 Download all')}
+          <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download project as ZIP')}>
+            {t('🗜️ Download ZIP')}
           </button>
         </div>
       </div>
