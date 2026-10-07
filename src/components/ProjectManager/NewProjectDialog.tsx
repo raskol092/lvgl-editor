@@ -10,12 +10,7 @@ interface NewProjectDialogProps {
 }
 
 const RESOLUTION_PRESETS: { label: string; w: number; h: number }[] = [
-  { label: '240×320 (QVGA)', w: 240, h: 320 },
-  { label: '320×480 (HVGA)', w: 320, h: 480 },
-  { label: '480×320 (TFT)', w: 480, h: 320 },
-  { label: '480×272', w: 480, h: 272 },
   { label: '800×480 (WVGA)', w: 800, h: 480 },
-  { label: '1024×600', w: 1024, h: 600 },
 ];
 
 const FONT_OPTIONS = [
