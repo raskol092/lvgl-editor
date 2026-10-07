@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest'
 import { generateCode } from '../index'
-import { createComponent, createPage, createLogicNode, createLogicPort, createLogicGraph, createLogicConnection, createLogicVariable } from '../../__tests__/helpers'
+import { createComponent, createPage, createAnimation, createLogicNode, createLogicPort, createLogicGraph, createLogicConnection, createLogicVariable } from '../../__tests__/helpers'
 
 const ex = (id: string, name = 'Exec') => createLogicPort({ id, name, type: 'execution' })
 const val = (id: string, name: string, type = 'any', d?: unknown) => createLogicPort({ id, name, type, defaultValue: d } as never)
@@ -66,7 +66,7 @@ it('every logic node type generates the expected Lisp', () => {
 })
 
 it('Set text picks the setter by widget type; animations zoom any widget', () => {
-  const btn = createComponent('btn', { id: 'b1', name: 'go' })
+  const btn = createComponent('btn', { id: 'b1', name: 'go', animations: [createAnimation({ id: 'z1', type: 'zoom_in', property: 'transform_zoom', startValue: 128, endValue: 256 })] })
   const area = createComponent('textarea', { id: 'a1', name: 'note' })
   const pages = [createPage({ id: 'p1', name: 'main', components: [btn, area] })]
   const mk = (id: string, target: string) => createLogicNode('set_text', { id, params: { targetComponent: target }, inputs: [ex(`${id}i`), val(`${id}t`, 'Text', 'string', 'x')], outputs: [ex(`${id}o`, 'Done')] })
