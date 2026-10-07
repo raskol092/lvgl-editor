@@ -306,6 +306,9 @@ function clonePages(pages: Page[]): Page[] {
 // Initial page
 const initialPage = createDefaultPage();
 
+/** Types that are created with width/height = content */
+const CONTENT_SIZED_TYPES = new Set(['checkbox']);
+
 export const useEditorStore = create<EditorState>((set, get) => ({
   // Initial state - Multi-page
   pages: [initialPage],
@@ -439,6 +442,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       styles: {
         default: { ...definition.defaultStyles.default },
       },
+      // text widgets size themselves to their text (LV_SIZE_CONTENT), like in LVGL
+      ...(CONTENT_SIZED_TYPES.has(type) ? { widthMode: 'content' as const, heightMode: 'content' as const } : {}),
       events: [],
       animations: [],
       parentId,

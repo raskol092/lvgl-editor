@@ -168,7 +168,8 @@
 }
 
 .lvgl-inline-edit {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   min-width: 20px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #2563eb;
