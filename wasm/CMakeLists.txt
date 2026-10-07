@@ -4,7 +4,11 @@ project(lvgl_wasm C)
 set(CMAKE_C_STANDARD 99)
 
 # LVGL source path
-set(LVGL_DIR "/home/xcssa/.openclaw/workspace/tools/lvgl")
+if(DEFINED ENV{LVGL_DIR})
+  set(LVGL_DIR "$ENV{LVGL_DIR}")
+else()
+  set(LVGL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lvgl")
+endif()
 
 # Include paths
 include_directories(

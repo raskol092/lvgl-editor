@@ -13,7 +13,7 @@ import { mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 
 // Font data sent from the client for server-side conversion
 interface FontRequest {
@@ -32,10 +32,12 @@ interface LvglConfigRequest {
   memSize: number; // KB
 }
 
-// Paths
-const EMSDK_ENV = '/home/xcssa/.openclaw/workspace/tools/emsdk/emsdk_env.sh';
-const LVGL_PARENT_DIR = '/home/xcssa/.openclaw/workspace/tools';
-const PROJECT_DIR = '/home/xcssa/.openclaw/workspace/projects/lvgl-editor';
+// Paths (override with environment variables; defaults assume emsdk in ~/emsdk and LVGL next to this project)
+const PROJECT_DIR = process.cwd();
+const EMSDK_ENV = process.env.EMSDK_ENV
+  || (process.env.EMSDK ? join(process.env.EMSDK, 'emsdk_env.sh') : join(homedir(), 'emsdk', 'emsdk_env.sh'));
+// directory that contains the `lvgl` checkout (so that "lvgl/lvgl.h" resolves)
+const LVGL_PARENT_DIR = process.env.LVGL_PARENT_DIR || join(PROJECT_DIR, '..');
 const LV_CONF_DIR = join(PROJECT_DIR, 'wasm');
 const LIBLVGL_PATH = join(PROJECT_DIR, 'wasm/build/liblvgl_emcc.a');
 const LV_CONF_TEMPLATE_PATH = join(PROJECT_DIR, 'wasm/lv_conf.h');
@@ -424,6 +426,17 @@ export default function compilePlugin(): Plugin {
         const buildId = randomUUID();
         const buildDir = join(tmpdir(), `lvgl-build-${buildId}`);
 
+        // The preview needs Emscripten and an LVGL checkout on the machine running `vite`
+        const missing: string[] = [];
+        if (!existsSync(EMSDK_ENV)) missing.push(`Emscripten not found (${EMSDK_ENV}). Install emsdk and set EMSDK_ENV=/path/to/emsdk_env.sh`);
+        if (!existsSync(join(LVGL_PARENT_DIR, 'lvgl', 'lvgl.h'))) missing.push(`LVGL sources not found (${join(LVGL_PARENT_DIR, 'lvgl')}). Clone lvgl there or set LVGL_PARENT_DIR`);
+        if (missing.length > 0) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: false, error: missing.join('\n'), buildId: '' }));
+          return;
+        }
+
         try {
           await mkdir(buildDir, { recursive: true });
 
@@ -447,7 +460,7 @@ export default function compilePlugin(): Plugin {
 
           // Check lib exists
           if (!existsSync(libPath)) {
-            res.statusCode = 500;
+            res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({
               success: false,

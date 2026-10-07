@@ -4,7 +4,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-source /home/xcssa/.openclaw/workspace/tools/emsdk/emsdk_env.sh
+source "${EMSDK_ENV:-${EMSDK:-$HOME/emsdk}/emsdk_env.sh}"
 
 mkdir -p build
 cd build
