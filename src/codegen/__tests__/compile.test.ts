@@ -5,9 +5,9 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { execSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { generateCCode as generateCode } from '../generator';
 import {
   defaultOptions,
@@ -26,11 +26,16 @@ import {
   resetIdCounter,
 } from './helpers';
 
-// Paths
-const EMSDK_ENV = '/home/xcssa/.openclaw/workspace/tools/emsdk/emsdk_env.sh';
-const LVGL_ROOT = '/home/xcssa/.openclaw/workspace/tools/lvgl';
-const LVGL_LIB = '/home/xcssa/.openclaw/workspace/projects/lvgl-editor/wasm/build/liblvgl_emcc.a';
-const LV_CONF_DIR = '/home/xcssa/.openclaw/workspace/projects/lvgl-editor/wasm';
+// Paths: override with EMSDK_ENV / LVGL_DIR; the LVGL static library comes from wasm/build_lvgl_lib.sh
+const PROJECT_DIR = process.cwd();
+const EMSDK_ENV = process.env.EMSDK_ENV
+  || (process.env.EMSDK ? join(process.env.EMSDK, 'emsdk_env.sh') : join(homedir(), 'emsdk', 'emsdk_env.sh'));
+const LVGL_ROOT = process.env.LVGL_DIR || join(PROJECT_DIR, '..', 'lvgl');
+const LVGL_LIB = join(PROJECT_DIR, 'wasm/build/liblvgl_emcc.a');
+const LV_CONF_DIR = join(PROJECT_DIR, 'wasm');
+
+// These tests compile the generated C with emcc, so they need Emscripten, an LVGL checkout and the built library
+const TOOLCHAIN_AVAILABLE = existsSync(EMSDK_ENV) && existsSync(join(LVGL_ROOT, 'lvgl.h')) && existsSync(LVGL_LIB);
 
 const MAIN_C = `
 #include "ui.h"
@@ -68,7 +73,7 @@ function compileGenerated(
       `source ${EMSDK_ENV} 2>/dev/null &&`,
       `emcc ${sourceFiles.join(' ')}`,
       `-O0 -DLV_CONF_INCLUDE_SIMPLE`,
-      `-I/home/xcssa/.openclaw/workspace/tools`,
+      `-I${join(LVGL_ROOT, '..')}`,
       `-I${LVGL_ROOT}`,
       `-I${LVGL_ROOT}/src`,
       `-I${LV_CONF_DIR}`,
@@ -99,7 +104,7 @@ function compileGenerated(
   }
 }
 
-describe('Compile verification', { timeout: 300_000 }, () => {
+describe.skipIf(!TOOLCHAIN_AVAILABLE)('Compile verification', { timeout: 300_000 }, () => {
   // ── 1. Empty project (no pages) ──
   it('compiles empty project', { timeout: 30_000 }, () => {
     const code = generateCode([], defaultOptions());

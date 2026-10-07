@@ -80,7 +80,8 @@ describe('generateCode', () => {
 
   it('passes font resources to ui.h', () => {
     const font = createFontResource({ cFontName: 'font_custom', sizes: [12] });
-    const code = generateCode([], {}, [], undefined, [], [font]);
+    const pages = [createPage({ components: [createComponent('label', { props: { fontResource: 'font_custom', fontSize: 12 } })] })];
+    const code = generateCode(pages, {}, [], undefined, [], [font]);
     expect(code['ui.h']).toContain('LV_FONT_DECLARE(font_custom_12);');
   });
 

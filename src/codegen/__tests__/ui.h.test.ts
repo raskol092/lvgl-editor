@@ -85,15 +85,21 @@ describe('generateUiHeader', () => {
   });
 
   it('generates font declarations', () => {
+    // only fonts that components actually use are declared
     const font = createFontResource({ cFontName: 'font_roboto', sizes: [16, 24] });
-    const result = generateUiHeader([], defaultOptions(), [font]);
+    const pages = [createPage({ components: [
+      createComponent('label', { props: { fontResource: 'font_roboto', fontSize: 16 } }),
+      createComponent('label', { props: { fontResource: 'font_roboto', fontSize: 24 } }),
+    ] })];
+    const result = generateUiHeader(pages, defaultOptions(), [font]);
     expect(result).toContain('LV_FONT_DECLARE(font_roboto_16);');
     expect(result).toContain('LV_FONT_DECLARE(font_roboto_24);');
   });
 
   it('generates font section header when comments enabled', () => {
     const font = createFontResource();
-    const result = generateUiHeader([], defaultOptions({ generateComments: true }), [font]);
+    const pages = [createPage({ components: [createComponent('label', { props: { fontResource: font.cFontName, fontSize: 16 } })] })];
+    const result = generateUiHeader(pages, defaultOptions({ generateComments: true }), [font]);
     expect(result).toContain('Font Declarations');
   });
 

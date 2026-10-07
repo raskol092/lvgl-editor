@@ -522,7 +522,7 @@ describe('generateUiSource', () => {
       });
       const pages = [createPage({ name: 'main', components: [obj] })];
       const result = generateUiSource(pages, defaultOptions());
-      expect(result).toContain('lv_obj_set_style_text_font(ui_box, &font_my_custom_font, 0);');
+      expect(result).toContain('lv_obj_set_style_text_font(ui_box, &my_custom_font_16, 0);');
     });
 
     it('generates textLetterSpace and textLineSpace', () => {
