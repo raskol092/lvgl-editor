@@ -661,12 +661,26 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       }
       
       case 'arc': {
+        // same geometry as LVGL: angles in degrees, 0 = 3 o'clock, clockwise
         const arc = getArcStyle(component);
         const size = Math.max(1, Math.min(component.width, component.height));
         const stroke = Math.min(48, (arc.width * 100) / size);
         const r = 50 - stroke / 2;
-        const circumference = 2 * Math.PI * r;
-        const sweep = Math.max(0, Math.min(100, Number(props.value ?? 60)));
+        const start = Number(props.startAngle ?? 135);
+        const end = Number(props.endAngle ?? 45);
+        const total = (((end - start) % 360) + 360) % 360 || 360;
+        const min = Number(props.min ?? 0);
+        const max = Number(props.max ?? 100);
+        const frac = max > min ? Math.max(0, Math.min(1, (Number(props.value ?? 60) - min) / (max - min))) : 0;
+        const pt = (deg: number): [number, number] => [50 + r * Math.cos((deg * Math.PI) / 180), 50 + r * Math.sin((deg * Math.PI) / 180)];
+        const arcPath = (sweep: number) => {
+          if (sweep <= 0.01) return '';
+          if (sweep >= 359.99) return `M ${50 + r} 50 A ${r} ${r} 0 1 1 ${50 - r} 50 A ${r} ${r} 0 1 1 ${50 + r} 50`;
+          const [x0, y0] = pt(start);
+          const [x1, y1] = pt(start + sweep);
+          return `M ${x0} ${y0} A ${r} ${r} 0 ${sweep > 180 ? 1 : 0} 1 ${x1} ${y1}`;
+        };
+        const [kx, ky] = pt(start + total * frac);
         return (
           <div className="lvgl-arc" style={{
             width: '100%',
@@ -676,18 +690,9 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             justifyContent: 'center',
           }}>
             <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-              <circle cx="50" cy="50" r={r} fill="none" stroke={arc.track} strokeWidth={stroke} />
-              <circle
-                cx="50"
-                cy="50"
-                r={r}
-                fill="none"
-                stroke={arc.color}
-                strokeWidth={stroke}
-                strokeDasharray={`${(sweep / 100) * circumference} ${circumference}`}
-                strokeLinecap="round"
-                transform="rotate(-90 50 50)"
-              />
+              <path d={arcPath(total)} fill="none" stroke={arc.track} strokeWidth={stroke} strokeLinecap="round" />
+              {frac > 0 && <path d={arcPath(total * frac)} fill="none" stroke={arc.color} strokeWidth={stroke} strokeLinecap="round" />}
+              <circle cx={kx} cy={ky} r={stroke * 0.7} fill={arc.color} />
             </svg>
           </div>
         );
@@ -726,33 +731,67 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       
       case 'chart': {
         const series = props.series || (props.data ? [{ data: props.data, color: props.lineColor || th.primary }] : [{ data: [10, 20, 30, 25, 40], color: th.primary }]);
-        const chartData = series[0]?.data || [10, 20, 30, 25, 40];
-        const chartColor = series[0]?.color || th.primary;
-        const maxVal = Math.max(...chartData, 1);
+        const isBar = props.type === 'bar';
+        const yMin = Number(props.yAxisMin ?? 0);
+        const yMax = Number(props.yAxisMax ?? 100);
+        const span = yMax > yMin ? yMax - yMin : 1;
+        const pos = (v: number, i: number, n: number): [number, number] => [
+          isBar ? ((i + 0.5) / n) * 100 : n > 1 ? (i / (n - 1)) * 100 : 50,
+          100 - Math.max(0, Math.min(1, (v - yMin) / span)) * 100,
+        ];
+        type Ser = { data?: number[]; color?: string };
         return (
           <div className="lvgl-chart" style={{
             width: '100%',
             height: '100%',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-around',
-            padding: '8px',
+            position: 'relative',
+            boxSizing: 'border-box',
+            padding: defaultStyle.paddingTop ?? 10,
             backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
             border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             borderRadius: defaultStyle.borderRadius || 4,
-            boxSizing: 'border-box',
           }}>
-            {chartData.map((val: number, i: number) => (
-              <div
-                key={i}
-                style={{
-                  width: `${Math.max(8, 80 / chartData.length)}%`,
-                  height: `${Math.max(2, (val / maxVal) * 100)}%`,
-                  backgroundColor: chartColor,
-                  borderRadius: '2px 2px 0 0',
-                }}
-              />
-            ))}
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+              {/* LVGL draws a 5 x 3 division grid */}
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
+                {[0, 1, 2, 3, 4, 5].map(i => (
+                  <line key={`v${i}`} x1={i * 20} y1="0" x2={i * 20} y2="100" stroke={th.border} strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                ))}
+                {[0, 1, 2, 3].map(i => (
+                  <line key={`h${i}`} x1="0" y1={(i * 100) / 3} x2="100" y2={(i * 100) / 3} stroke={th.border} strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                ))}
+                {!isBar && (series as Ser[]).map((sr, si) => {
+                  const d = sr.data || [];
+                  return (
+                    <polyline
+                      key={si}
+                      fill="none"
+                      stroke={sr.color || th.primary}
+                      strokeWidth="2"
+                      vectorEffect="non-scaling-stroke"
+                      points={d.map((v, i) => pos(v, i, d.length).join(',')).join(' ')}
+                    />
+                  );
+                })}
+              </svg>
+              {(series as Ser[]).map((sr, si) =>
+                (sr.data || []).map((v, i, arr) => {
+                  const [x, y] = pos(v, i, arr.length);
+                  return isBar ? (
+                    <div key={`${si}-${i}`} style={{
+                      position: 'absolute', left: `${x}%`, width: `${Math.max(3, 60 / arr.length / series.length)}%`,
+                      top: `${y}%`, bottom: 0, transform: 'translateX(-50%)',
+                      backgroundColor: sr.color || th.primary,
+                    }} />
+                  ) : (
+                    <div key={`${si}-${i}`} style={{
+                      position: 'absolute', left: `${x}%`, top: `${y}%`, width: 8, height: 8, borderRadius: '50%',
+                      transform: 'translate(-50%, -50%)', backgroundColor: sr.color || th.primary,
+                    }} />
+                  );
+                })
+              )}
+            </div>
           </div>
         );
       }
@@ -779,13 +818,25 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
                 fontWeight: i < (props.cols || 3) && props.headerRow !== false ? 600 : 400,
                 color: th.text,
               }}>
-                {props.cellData?.[Math.floor(i / (props.cols || 3))]?.[i % (props.cols || 3)] || (i + 1)}
+                {props.cellData?.[Math.floor(i / (props.cols || 3))]?.[i % (props.cols || 3)] || ''}
               </div>
             ))}
           </div>
         );
       
-      case 'calendar':
+      case 'calendar': {
+        // like LVGL: weekday row + full month grid, neighbouring months dimmed, "today" boxed
+        const year = Number(props.year ?? 2024);
+        const month = Number(props.month ?? 1);
+        const first = new Date(year, month - 1, 1).getDay();
+        const daysIn = new Date(year, month, 0).getDate();
+        const prevDays = new Date(year, month - 1, 0).getDate();
+        const cells = Array.from({ length: 42 }).map((_, i) => {
+          const dn = i - first + 1;
+          if (dn < 1) return { n: prevDays + dn, other: true };
+          if (dn > daysIn) return { n: dn - daysIn, other: true };
+          return { n: dn, other: false };
+        }).slice(0, first + daysIn > 35 ? 42 : 35);
         return (
           <div className="lvgl-calendar" style={{
             width: '100%',
@@ -800,19 +851,21 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             overflow: 'hidden',
             color: th.text,
           }}>
-            <div style={{ textAlign: 'center', padding: '6px 4px', fontWeight: 'bold', borderBottom: `1px solid ${th.border}`, backgroundColor: tint }}>
-              {props.year || 2024} / {props.month || 1}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', flex: 1, padding: '2px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '1fr', gap: '1px', flex: 1, padding: '2px' }}>
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', color: muted, padding: '2px 0' }}>{d}</div>
+                <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', alignSelf: 'center' }}>{d}</div>
               ))}
-              {Array.from({ length: 28 }).map((_, i) => (
-                <div key={i} style={{ textAlign: 'center', padding: '1px 0' }}>{i + 1}</div>
+              {cells.map((c, i) => (
+                <div key={i} style={{
+                  textAlign: 'center', alignSelf: 'center', padding: '1px 0',
+                  opacity: c.other ? 0.45 : 1,
+                  outline: !c.other && props.showToday && c.n === 1 ? `1px solid ${th.primary}` : undefined,
+                }}>{c.n}</div>
               ))}
             </div>
           </div>
         );
+      }
       
       case 'tileview':
         return (

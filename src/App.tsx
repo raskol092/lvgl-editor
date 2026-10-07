@@ -24,7 +24,6 @@ import Toast, { useToast } from './components/Toast';
 import Modal, { modal } from './components/Modal';
 import CodePreview from './components/CodePreview';
 import { LogicEditor } from './components/LogicEditor';
-import PreviewPanel from './components/Preview';
 import WasmPreview from './components/WasmPreview';
 import { HierarchyPanel } from './components/HierarchyPanel';
 import { UiThemeSelect } from './components/ThemeSelector';
@@ -165,7 +164,6 @@ const EditorView: React.FC<EditorViewProps> = ({
   const animH = useSplit('animations-height', 150, 60, 500, 'y', -1);
   const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('design');
-  const [previewMode, setPreviewMode] = useState<'simple' | 'wasm'>('simple');
   const [projectName, setProjectName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -547,22 +545,8 @@ const EditorView: React.FC<EditorViewProps> = ({
       case 'preview':
         return (
           <div className="app-body full-panel">
-            <div className="preview-sub-tabs">
-              <button
-                className={`preview-sub-tab ${previewMode === 'simple' ? 'active' : ''}`}
-                onClick={() => setPreviewMode('simple')}
-              >
-                {ti('📱 Simple preview')}
-              </button>
-              <button
-                className={`preview-sub-tab ${previewMode === 'wasm' ? 'active' : ''}`}
-                onClick={() => setPreviewMode('wasm')}
-              >
-                {ti('🖥️ LVGL preview')}
-              </button>
-            </div>
             <div className="preview-sub-content">
-              {previewMode === 'simple' ? <PreviewPanel /> : <WasmPreview />}
+              <WasmPreview />
             </div>
           </div>
         );

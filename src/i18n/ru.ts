@@ -692,7 +692,6 @@ export const ru: Record<string, string> = {
   '📦 Resource manager': '📦 Менеджер ресурсов',
   '📱 Live preview': '📱 Живой предпросмотр',
   '📱 Preview': '📱 Предпросмотр',
-  '📱 Simple preview': '📱 Простой предпросмотр',
   '🔄 Refresh': '🔄 Обновить',
   '🔗 Logic': '🔗 Логика',
   '🔧 Generate conversion command': '🔧 Сгенерировать команду конвертации',
