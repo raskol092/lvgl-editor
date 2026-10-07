@@ -39,12 +39,31 @@ interface ThemeState {
   customThemes: Theme[];
   setTheme: (preset: ThemePreset, customId?: string) => void;
   createCustomTheme: (name: string, colors: ThemeColors) => Theme;
+  updateCustomTheme: (id: string, patch: { name?: string; colors?: Partial<ThemeColors> }) => void;
+  deleteCustomTheme: (id: string) => void;
+}
+
+export const builtinThemes: Theme[] = [lightTheme, darkTheme];
+
+const STORAGE_KEY = 'lvgl-editor-themes';
+
+function loadSaved(): { customThemes: Theme[]; currentTheme: Theme; preset: ThemePreset } {
+  const fallback = { customThemes: [] as Theme[], currentTheme: lightTheme, preset: 'light' as ThemePreset };
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if (!raw || !Array.isArray(raw.customThemes)) return fallback;
+    const customThemes: Theme[] = raw.customThemes.filter((x: Theme) => x && x.id && x.name && x.colors);
+    if (raw.currentId === 'dark') return { customThemes, currentTheme: darkTheme, preset: 'dark' };
+    const custom = customThemes.find(x => x.id === raw.currentId);
+    if (custom) return { customThemes, currentTheme: custom, preset: 'custom' };
+    return { ...fallback, customThemes };
+  } catch {
+    return fallback;
+  }
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  currentTheme: lightTheme,
-  preset: 'light',
-  customThemes: [],
+  ...loadSaved(),
 
   setTheme: (preset, customId) => {
     if (preset === 'custom' && customId) {
@@ -62,7 +81,34 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     set(state => ({ customThemes: [...state.customThemes, theme] }));
     return theme;
   },
+
+  updateCustomTheme: (id, patch) => {
+    set(state => {
+      const customThemes = state.customThemes.map(x =>
+        x.id === id ? { ...x, name: patch.name ?? x.name, colors: { ...x.colors, ...patch.colors } } : x);
+      const updated = customThemes.find(x => x.id === id);
+      return {
+        customThemes,
+        currentTheme: state.currentTheme.id === id && updated ? updated : state.currentTheme,
+      };
+    });
+  },
+
+  deleteCustomTheme: (id) => {
+    set(state => {
+      const customThemes = state.customThemes.filter(x => x.id !== id);
+      return state.currentTheme.id === id
+        ? { customThemes, currentTheme: lightTheme, preset: 'light' as ThemePreset }
+        : { customThemes };
+    });
+  },
 }));
+
+useThemeStore.subscribe(state => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ customThemes: state.customThemes, currentId: state.currentTheme.id }));
+  } catch { /* storage unavailable */ }
+});
 
 /**
  * Returns default style overrides for newly created components based on the current theme

@@ -27,7 +27,8 @@ import { LogicEditor } from './components/LogicEditor';
 import PreviewPanel from './components/Preview';
 import WasmPreview from './components/WasmPreview';
 import { HierarchyPanel } from './components/HierarchyPanel';
-import { ThemeSelector } from './components/ThemeSelector';
+import { UiThemeSelect } from './components/ThemeSelector';
+import { ThemeManager } from './components/ThemeManager';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ResourcePanel, useResourceStore } from './resources';
 import { useLogicEditorStore } from './components/LogicEditor';
@@ -154,6 +155,7 @@ const EditorView: React.FC<EditorViewProps> = ({
 
   // UI State
   const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [showThemes, setShowThemes] = useState(false);
 
   // Resizable panels (sizes are remembered)
   const leftW = useSplit('left-width', 260, 180, 520, 'x', 1);
@@ -624,6 +626,7 @@ const EditorView: React.FC<EditorViewProps> = ({
             onClick={() => setShowResourcePanel(!showResourcePanel)}
             active={showResourcePanel}
           />
+          <ToolbarButton icon="🎨" label={t('Themes')} onClick={() => setShowThemes(true)} active={showThemes} />
           <ToolbarButton
             icon="⚙️"
             label={t('Settings')}
@@ -631,7 +634,7 @@ const EditorView: React.FC<EditorViewProps> = ({
           />
           <div className="toolbar-divider" />
           <LanguageSwitcher />
-          <ThemeSelector />
+          <UiThemeSelect />
           <div className="toolbar-divider" />
           <ToolbarButton
             icon="❓"
@@ -658,6 +661,7 @@ const EditorView: React.FC<EditorViewProps> = ({
 
       {/* Project Settings */}
       {showProjectSettings && <ProjectSettings />}
+      {showThemes && <ThemeManager onClose={() => setShowThemes(false)} />}
 
       {/* Toast notifications */}
       <Toast messages={messages} onRemove={removeToast} />
