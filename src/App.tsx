@@ -26,7 +26,6 @@ import CodePreview from './components/CodePreview';
 import { LogicEditor } from './components/LogicEditor';
 import PreviewPanel from './components/Preview';
 import WasmPreview from './components/WasmPreview';
-import CompilePreview from 'virtual:compile-preview';
 import { HierarchyPanel } from './components/HierarchyPanel';
 import { ThemeSelector } from './components/ThemeSelector';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
@@ -52,7 +51,6 @@ import ToolIcon from './components/icons/ToolIcon';
 import './App.css';
 
 type TabType = 'design' | 'logic' | 'code' | 'preview';
-const isCompilePreviewEnabled = import.meta.env.VITE_ENABLE_COMPILE_PREVIEW !== 'false';
 
 const App: React.FC = () => {
   const { currentView, currentProjectId, showProjectSettings, openProject, goToProjectList, setShowProjectSettings, setLastSaveTime, setDefaultFontSize } = useAppStore();
@@ -156,10 +154,7 @@ const EditorView: React.FC<EditorViewProps> = ({
   const [showResourcePanel, setShowResourcePanel] = useState(false);
   const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('design');
-  const [previewMode, setPreviewMode] = useState<'simple' | 'wasm' | 'compile'>('simple');
-  const resolvedPreviewMode = !isCompilePreviewEnabled && previewMode === 'compile'
-    ? 'simple'
-    : previewMode;
+  const [previewMode, setPreviewMode] = useState<'simple' | 'wasm'>('simple');
   const [projectName, setProjectName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -514,32 +509,20 @@ const EditorView: React.FC<EditorViewProps> = ({
           <div className="app-body full-panel">
             <div className="preview-sub-tabs">
               <button
-                className={`preview-sub-tab ${resolvedPreviewMode === 'simple' ? 'active' : ''}`}
+                className={`preview-sub-tab ${previewMode === 'simple' ? 'active' : ''}`}
                 onClick={() => setPreviewMode('simple')}
               >
                 {ti('📱 Simple preview')}
               </button>
               <button
-                className={`preview-sub-tab ${resolvedPreviewMode === 'wasm' ? 'active' : ''}`}
+                className={`preview-sub-tab ${previewMode === 'wasm' ? 'active' : ''}`}
                 onClick={() => setPreviewMode('wasm')}
               >
                 {ti('🖥️ LVGL preview')}
               </button>
-              {isCompilePreviewEnabled && (
-                <button
-                  className={`preview-sub-tab ${resolvedPreviewMode === 'compile' ? 'active' : ''}`}
-                  onClick={() => setPreviewMode('compile')}
-                >
-                  {ti('🔨 Compile & run')}
-                </button>
-              )}
             </div>
             <div className="preview-sub-content">
-              {resolvedPreviewMode === 'simple'
-                ? <PreviewPanel />
-                : resolvedPreviewMode === 'wasm'
-                  ? <WasmPreview />
-                  : <CompilePreview />}
+              {previewMode === 'simple' ? <PreviewPanel /> : <WasmPreview />}
             </div>
           </div>
         );

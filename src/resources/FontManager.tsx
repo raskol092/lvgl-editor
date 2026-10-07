@@ -2,7 +2,7 @@ import Emoji from '../components/icons/Emoji';
 import { ti } from '../i18n/ti';
 // Font Manager Component
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useResourceStore } from './resourceStore';
 import type { FontResource, CharsetType } from './types';
 import { toast } from '../components/Toast';
@@ -10,9 +10,6 @@ import { modal } from '../components/Modal';
 import { 
   FONT_PREVIEW_TEXT,
   FONT_PREVIEW_TEXT_CJK,
-  generateFontConvCommand,
-  generateFontSourceTemplate,
-  generateFontCCodeHeader,
   extractCharsFromText,
   getCharsetRanges,
   countGlyphs,
@@ -60,11 +57,6 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
   const fonts = getFilteredFonts();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showCommandModal, setShowCommandModal] = useState(false);
-  const [showHeaderModal, setShowHeaderModal] = useState(false);
-  const [generatedCommand, setGeneratedCommand] = useState('');
-  const [generatedHeader, setGeneratedHeader] = useState('');
-  const [generatedSource, setGeneratedSource] = useState('');
   const [customCharsInput, setCustomCharsInput] = useState('');
   // Map font id → CSS font-family name
   const [fontFaceMap, setFontFaceMap] = useState<Record<string, string>>({});
@@ -119,36 +111,6 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
     }
   };
   
-  const buildConvOptions = useCallback((font: FontResource) => ({
-    sizes: font.sizes,
-    charset: font.charset,
-    customChars: font.charset === 'custom' ? (font.customChars || customCharsInput) : undefined,
-    bpp: font.bpp,
-    compress: false,
-  }), [customCharsInput]);
-  
-  const handleGenerateCommand = (font: FontResource) => {
-    const ext = font.data.startsWith('data:font/opentype') ? '.otf' : '.ttf';
-    const command = generateFontConvCommand(
-      font.name + ext,
-      font.cFontName,
-      buildConvOptions(font),
-    );
-    setGeneratedCommand(command);
-    setShowCommandModal(true);
-  };
-
-  const handleGenerateHeader = (font: FontResource) => {
-    const opts = buildConvOptions(font);
-    // Generate header for the first selected size
-    const primarySize = font.sizes[0] || 16;
-    const header = generateFontCCodeHeader(font.cFontName, font.family, primarySize, opts);
-    const source = generateFontSourceTemplate(font.cFontName, font.family, font.style, primarySize, opts);
-    setGeneratedHeader(header);
-    setGeneratedSource(source);
-    setShowHeaderModal(true);
-  };
-  
   const handleExtractChars = () => {
     const input = selectedFont?.customChars ?? customCharsInput;
     const chars = extractCharsFromText(input);
@@ -158,11 +120,6 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
     }
   };
   
-  const handleCopyText = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(t('Copied to clipboard'));
-  };
-
   const getFormatLabel = (font: FontResource): string => {
     if (font.data.startsWith('data:font/opentype') || font.name.toLowerCase().endsWith('.otf')) return 'OTF';
     return 'TTF';
@@ -363,65 +320,6 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
                   {FONT_PREVIEW_TEXT_CJK}
                 </p>
               )}
-            </div>
-          </div>
-          
-          <div className="detail-actions">
-            <button onClick={() => handleGenerateCommand(selectedFont)}>
-              {ti('🔧 Generate conversion command')}
-            </button>
-            <button onClick={() => handleGenerateHeader(selectedFont)}>
-              {ti('📄 Generate header template')}
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Command Modal */}
-      {showCommandModal && (
-        <div className="modal-overlay" onClick={() => setShowCommandModal(false)}>
-          <div className="modal-content command-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{t('lv_font_conv conversion command')}</h3>
-              <button className="close-btn" onClick={() => setShowCommandModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <p className="command-hint">
-                {t('Use the following command to convert the font to LVGL format. lv_font_conv must be installed first:')}
-                <code>npm install -g lv_font_conv</code>
-              </p>
-              <pre className="command-preview">{generatedCommand}</pre>
-            </div>
-            <div className="modal-footer">
-              <button onClick={() => handleCopyText(generatedCommand)}>{ti('📋 Copy command')}</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Header Template Modal */}
-      {showHeaderModal && (
-        <div className="modal-overlay" onClick={() => setShowHeaderModal(false)}>
-          <div className="modal-content command-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{t('Font file templates')}</h3>
-              <button className="close-btn" onClick={() => setShowHeaderModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <p className="command-hint">{t('Header file (.h):')}</p>
-              <pre className="command-preview">{generatedHeader}</pre>
-              <div className="template-copy-row">
-                <button onClick={() => handleCopyText(generatedHeader)}>{ti('📋 Copy header')}</button>
-              </div>
-
-              <p className="command-hint" style={{ marginTop: 16 }}>{t('Source file template (.c):')}</p>
-              <pre className="command-preview">{generatedSource}</pre>
-              <div className="template-copy-row">
-                <button onClick={() => handleCopyText(generatedSource)}>{ti('📋 Copy source')}</button>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button onClick={() => setShowHeaderModal(false)}>{t('Off')}</button>
             </div>
           </div>
         </div>

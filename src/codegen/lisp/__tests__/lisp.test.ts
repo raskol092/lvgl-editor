@@ -27,8 +27,8 @@ function checkSyntax(src: string): string | null {
   return depth === 0 ? null : `${depth} unclosed '('`;
 }
 
-function expectValid(files: Record<string, string>) {
-  for (const [name, text] of Object.entries(files)) {
+function expectValid(files: object) {
+  for (const [name, text] of Object.entries(files) as Array<[string, string]>) {
     expect(checkSyntax(text), name).toBeNull();
   }
 }

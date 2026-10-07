@@ -1,10 +1,8 @@
 // Test helpers and factory functions for codegen tests
 
 import type { Page, LvglComponent, EventBinding, Animation, StyleProps, Theme, BuiltinAction, LvglAlign, LvglFlags } from '../../types';
-import type { CodeGenOptions } from '../types';
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LogicGraph, LogicNode, LogicConnection, LogicVariable, LogicNodeCategory, LogicNodeSubType, LogicPort, ConnectionType, VariableType, PortDataType } from '../../components/LogicEditor/types';
-import { DEFAULT_CODEGEN_OPTIONS } from '../types';
 
 let _idCounter = 0;
 function uid(): string {
@@ -13,10 +11,6 @@ function uid(): string {
 
 export function resetIdCounter(): void {
   _idCounter = 0;
-}
-
-export function defaultOptions(overrides: Partial<CodeGenOptions> = {}): CodeGenOptions {
-  return { ...DEFAULT_CODEGEN_OPTIONS, ...overrides };
 }
 
 export function createStyleProps(overrides: Partial<StyleProps> = {}): StyleProps {

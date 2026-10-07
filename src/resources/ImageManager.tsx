@@ -4,7 +4,7 @@ import { ti } from '../i18n/ti';
 
 import React, { useState, useRef } from 'react';
 import { useResourceStore } from './resourceStore';
-import type { ImageResource, ImageFormat } from './types';
+import type { ImageFormat } from './types';
 import { toast } from '../components/Toast';
 import { modal } from '../components/Modal';
 import { t } from '../i18n';
@@ -21,7 +21,6 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
     addImage,
     deleteImage,
     updateImage,
-    generateImageCode,
     selectedResourceId,
     setSelectedResource,
   } = useResourceStore();
@@ -29,9 +28,6 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
   const images = getFilteredImages();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showCodeModal, setShowCodeModal] = useState(false);
-  const [generatedCode, setGeneratedCode] = useState('');
-  const [codeFormat, setCodeFormat] = useState<ImageFormat>('ARGB8888');
   
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -69,34 +65,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
     }
   };
   
-  const handleGenerateCode = async (image: ImageResource) => {
-    try {
-      const code = await generateImageCode(image.id, codeFormat);
-      setGeneratedCode(code);
-      setShowCodeModal(true);
-    } catch (error) {
-      console.error('Failed to generate code:', error);
-      toast.error(t('Failed to generate code'));
-    }
-  };
   
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(generatedCode);
-    toast.success(t('Code copied to clipboard'));
-  };
   
-  const handleDownloadCode = () => {
-    const selectedImage = images.find(img => img.id === selectedResourceId);
-    const filename = selectedImage ? `${selectedImage.cArrayName}.c` : 'image.c';
-    
-    const blob = new Blob([generatedCode], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
   
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -202,45 +172,6 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
               <option value="RGB888">RGB888 (24-bit)</option>
               <option value="ARGB8888">ARGB8888 (32-bit)</option>
             </select>
-          </div>
-          
-          <div className="detail-actions">
-            <button onClick={() => handleGenerateCode(selectedImage)}>
-              {ti('📝 Generate C code')}
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Code Modal */}
-      {showCodeModal && (
-        <div className="modal-overlay" onClick={() => setShowCodeModal(false)}>
-          <div className="modal-content code-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{t('Generated C code')}</h3>
-              <button className="close-btn" onClick={() => setShowCodeModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="code-options">
-                <label>{t('Color format:')}</label>
-                <select
-                  value={codeFormat}
-                  onChange={(e) => setCodeFormat(e.target.value as ImageFormat)}
-                >
-                  <option value="RGB565">RGB565</option>
-                  <option value="RGB888">RGB888</option>
-                  <option value="ARGB8888">ARGB8888</option>
-                </select>
-                <button onClick={() => selectedImage && handleGenerateCode(selectedImage)}>
-                  {t('Regenerate')}
-                </button>
-              </div>
-              <pre className="code-preview">{generatedCode}</pre>
-            </div>
-            <div className="modal-footer">
-              <button onClick={handleCopyCode}>{ti('📋 Copy code')}</button>
-              <button onClick={handleDownloadCode}>{ti('💾 Download file')}</button>
-            </div>
           </div>
         </div>
       )}
