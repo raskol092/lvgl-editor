@@ -296,7 +296,7 @@ const LogicEditorInner: React.FC = () => {
                   className="graph-dropdown-btn"
                   onClick={() => setShowGraphList(!showGraphList)}
                 >
-                  <Emoji c="📊" /> {currentGraph?.name || t('Select logic graph')}
+                  <Emoji c="📊" /> {(currentGraph ? displayGraphName(currentGraph.name) : null) || t('Select logic graph')}
                   <span className="dropdown-arrow"><Emoji c="▼" /></span>
                 </button>
                 {showGraphList && (

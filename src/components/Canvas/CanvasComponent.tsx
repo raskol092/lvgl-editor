@@ -67,6 +67,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       className="lvgl-inline-edit"
       autoFocus
       defaultValue={component.props.text ?? ''}
+      size={Math.max(4, (component.props.text ?? '').length + 1)}
+      onInput={(e) => { e.currentTarget.size = Math.max(4, e.currentTarget.value.length + 1); }}
       style={{ color, fontSize }}
       onFocus={(e) => e.currentTarget.select()}
       onBlur={(e) => commitText(e.currentTarget.value)}
@@ -472,7 +474,9 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             }}>
               {props.checked && <span style={{ color: '#fff', fontSize: '12px', lineHeight: 1 }}>✓</span>}
             </div>
-            <span style={{ fontSize: defaultFontSize }}>{props.text || 'Checkbox'}</span>
+            {editing
+              ? textEditor(defaultStyle.textColor || '#333', props.fontSize || defaultFontSize)
+              : <span style={{ fontSize: defaultFontSize }}>{props.text || 'Checkbox'}</span>}
           </div>
         );
       

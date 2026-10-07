@@ -12,7 +12,7 @@ import type {
   DebugState,
 } from './types';
 import { getNodeDefinition } from './nodeDefinitions';
-import { hasCjk, legacyCustomCode } from '../../i18n/legacy';
+import { hasCjk, legacyCustomCode, displayGraphName } from '../../i18n/legacy';
 
 interface LogicEditorStore {
   // State
@@ -99,6 +99,7 @@ const initialDebugState: DebugState = {
  * Port ids (and therefore connections) are stable, so the names are replaced by the node definition's.
  */
 function migrateLegacyGraph(graph: LogicGraph): LogicGraph {
+  if (hasCjk(graph.name)) graph = { ...graph, name: displayGraphName(graph.name) };
   const needs = graph.nodes.some(
     n => hasCjk(n.label) || n.inputs.some(p => hasCjk(p.name)) || n.outputs.some(p => hasCjk(p.name))
   );
