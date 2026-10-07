@@ -61,12 +61,16 @@ export class NameResolver {
 
   /** Variable of a component looked up by user-visible name (prefers the given page). */
   varByName(name: string, page?: string): string {
+    const byId = this.byId.get(name);
+    if (byId) return byId.varName;
     const list = this.byName.get(name);
     if (!list || list.length === 0) return sym(this.options, 'ui', name);
     return (list.find(e => e.page === page) ?? list[0]).varName;
   }
 
   compByName(name: string, page?: string): LvglComponent | undefined {
+    const byId = this.byId.get(name);
+    if (byId) return byId.comp;
     const list = this.byName.get(name);
     if (!list || list.length === 0) return undefined;
     return (list.find(e => e.page === page) ?? list[0]).comp;
