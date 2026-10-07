@@ -29,6 +29,11 @@ function mainProperty(type: string): string {
   }
 }
 
+/** Widgets the user (or the board) changes: their value can be read. Display widgets (bar, label, chart...) only receive values. */
+function canReadValue(type: string): boolean {
+  return ['slider', 'arc', 'switch', 'checkbox', 'dropdown', 'textarea'].includes(type);
+}
+
 const PROPERTY_LABEL: Record<string, string> = { value: 'Value', checked: 'Checked state', text: 'Text', visible: 'Visibility' };
 
 function flatten(list: LvglComponent[], out: LvglComponent[] = []): LvglComponent[] {
@@ -117,7 +122,9 @@ const VariablePanel: React.FC = () => {
                 <span className="var-type">{t(PROPERTY_LABEL[mainProperty(comp.type)])}</span>
               </div>
               <div className="var-actions">
-                <button className="btn-element" disabled={!currentGraph} onClick={() => addElementNode(comp, 'read')} title={t('Add a node that reads it')}>↓</button>
+                {canReadValue(comp.type) && (
+                  <button className="btn-element" disabled={!currentGraph} onClick={() => addElementNode(comp, 'read')} title={t('Add a node that reads it')}>↓</button>
+                )}
                 <button className="btn-element" disabled={!currentGraph} onClick={() => addElementNode(comp, 'write')} title={t('Add a node that writes it')}>↑</button>
               </div>
             </div>

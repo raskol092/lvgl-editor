@@ -14,6 +14,9 @@ interface NodeEditDialogProps {
   onClose: () => void;
 }
 
+/** Widgets whose value can be read (display widgets such as bar or label only receive values) */
+const READABLE_TYPES = ['slider', 'arc', 'switch', 'checkbox', 'dropdown', 'textarea'];
+
 const COMPARE_OPERATORS: { value: CompareOperator; label: string }[] = [
   { value: '==', label: t('Equal (==)') },
   { value: '!=', label: t('Not equal (!=)') },
@@ -269,7 +272,7 @@ const NodeEditDialog: React.FC<NodeEditDialogProps> = ({ nodeId, onClose }) => {
                 onChange={e => handleParamChange('targetComponent', e.target.value)}
               >
                 <option value="">{t('Select component...')}</option>
-                {allComponents.map(comp => (
+                {(node.subType === 'get_property' ? allComponents.filter(comp => READABLE_TYPES.includes(comp.type)) : allComponents).map(comp => (
                   <option key={comp.id} value={comp.id}>
                     {comp.name} ({comp.type})
                   </option>

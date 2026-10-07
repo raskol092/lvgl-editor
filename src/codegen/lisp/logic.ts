@@ -341,6 +341,24 @@ function functionBody(g: LogicGraph, c: Ctx): string[] {
   return lines;
 }
 
+/** Graphs without any trigger node run "live": started once and re-run whenever a wired value changes. */
+function isLiveGraph(g: LogicGraph): boolean {
+  return !g.nodes.some(n => n.type === 'trigger') && g.nodes.some(n => n.type === 'action' || n.type === 'custom');
+}
+
+/** Expressions of every wired data input of the graph's action nodes (what the live graph reacts to). */
+function liveSources(g: LogicGraph, c: Ctx): string[] {
+  const out: string[] = [];
+  for (const n of g.nodes) {
+    if (n.type !== 'action' && n.type !== 'custom') continue;
+    for (const port of n.inputs) {
+      if (port.type === 'execution') continue;
+      if (c.graph.connections.some(k => k.targetNode === n.id && k.targetInput === port.id)) out.push(inputValue(n, port.name, c));
+    }
+  }
+  return out;
+}
+
 export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, options: LispGenOptions): string {
   const o = options;
   const i = indent(o);
@@ -396,6 +414,28 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
       init.push(`(def ${base} (systime))`, `(def ${base}-done nil)`);
     });
   }
+  // live graphs: no trigger -> run once at start, then whenever a wired value changes (checked 20x per second)
+  const live: string[] = [];
+  const liveBlock: string[] = [];
+  for (const g of graphs.filter(isLiveGraph)) {
+    const c: Ctx = { graph: g, names, options: o };
+    const fn = graphFn(g, o);
+    const srcs = liveSources(g, c);
+    if (srcs.length === 0) {
+      init.push(`(${fn})`);
+      continue;
+    }
+    live.push(`(${fn}-live)`);
+    liveBlock.push(
+      `(def ${fn}-sig nil)`,
+      `(defun ${fn}-live ()`,
+      `${i}(let ((s (list ${srcs.join(' ')})))`,
+      `${i}${i}(if (eq s ${fn}-sig)`,
+      `${i}${i}${i}nil`,
+      `${i}${i}${i}(progn (setq ${fn}-sig s) (${fn})))))`,
+      '',
+    );
+  }
   if (o.generateComments) L.push(...banner('Init and timers'));
   L.push(`(defun ui-logic-init ()`, `${i}(progn`);
   L.push(...shift(init.length ? init : [comment('No triggers to register')], o.indentSize * 2));
@@ -405,6 +445,7 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
   if (o.generateComments) L.push(...banner('Deferred calls (Delay nodes)'));
   L.push(
     '(def ui-defer-queue nil)',
+    '(def ui-live-t (systime))',
     '',
     '(defun ui-defer (secs f)',
     `${i}(setq ui-defer-queue (cons (list (systime) secs f) ui-defer-queue)))`,
@@ -424,8 +465,15 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
     '',
   );
 
+  if (liveBlock.length) {
+    if (o.generateComments) L.push(...banner('Live graphs (no trigger)'));
+    L.push(...liveBlock);
+  }
   L.push(`(defun ui-logic-tick ()`, `${i}(progn`);
   const tick: string[] = ['(ui-defer-tick)'];
+  if (live.length) {
+    tick.push('(if (>= (secs-since ui-live-t) 0.05)', `    (progn (setq ui-live-t (systime)) ${live.join(' ')}))`);
+  }
   for (const t of timers) {
     if (t.once) {
       tick.push(`(if (and (not ${t.done}) (>= (secs-since ${t.clock}) ${t.seconds}))`, `    (progn (setq ${t.done} t) (${t.fn})))`);
