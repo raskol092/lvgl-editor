@@ -25,3 +25,13 @@ describe('every widget type', () => {
     expect(Object.keys(out)).toContain('main.lisp')
   })
 })
+
+import { NameResolver } from '../names'
+describe('NameResolver', () => {
+  it('resolves a component by id as well as by name', () => {
+    const c = createComponent('label' as never, { id: '138d3865-afec', name: 'title' })
+    const names = new NameResolver([createPage({ components: [c] } as never)], { namingStyle: 'kebab-case' } as never)
+    expect(names.varByName('138d3865-afec')).toBe(names.varByName('title'))
+    expect(names.compByName('138d3865-afec')).toBe(c)
+  })
+})
