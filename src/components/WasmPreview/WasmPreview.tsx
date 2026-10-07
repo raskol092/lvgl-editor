@@ -2,6 +2,10 @@ import { richText } from '../../i18n/ti';
 import { ti } from '../../i18n/ti';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
+import { useThemeStore } from '../../store/themeStore';
+import { encodeImagesForWasm } from './imageData';
+import { useResourceStore } from '../../resources/resourceStore';
+import type { LvglComponent } from '../../types';
 import { editorStateToJson } from './editorStateToJson';
 import { t } from '../../i18n';
 import './WasmPreview.css';
@@ -16,14 +20,25 @@ const WasmPreviewInner: React.FC = () => {
   const pages = useEditorStore((s) => s.pages);
   const currentPageId = useEditorStore((s) => s.currentPageId);
   const canvas = useEditorStore((s) => s.canvas);
+  const theme = useThemeStore((s) => s.currentTheme);
 
   // Send UI JSON to iframe
   const sendToWasm = useCallback(() => {
     const iframe = iframeRef.current;
     if (!iframe?.contentWindow || status !== 'ready') return;
-    const json = editorStateToJson(pages, currentPageId, canvas);
-    iframe.contentWindow.postMessage({ type: 'load-ui', json }, '*');
-  }, [pages, currentPageId, canvas, status]);
+    const page = pages.find((p) => p.id === currentPageId);
+    const used = new Set<string>();
+    const walk = (list: LvglComponent[]) => list.forEach((c) => {
+      if (c.type === 'img' && c.props.src) used.add(String(c.props.src));
+      walk(c.children);
+    });
+    if (page) walk(page.components);
+    const resources = useResourceStore.getState().images.filter((i) => used.has(i.id) || used.has(i.name) || used.has(i.cArrayName));
+    encodeImagesForWasm(resources).then((images) => {
+      const json = editorStateToJson(pages, currentPageId, canvas, theme, images);
+      iframe.contentWindow?.postMessage({ type: 'load-ui', json }, '*');
+    });
+  }, [pages, currentPageId, canvas, theme, status]);
 
   // Listen for lvgl-ready from iframe
   useEffect(() => {

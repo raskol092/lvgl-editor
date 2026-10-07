@@ -265,3 +265,12 @@ describe('theme', () => {
     expect(out['ui/ui.lisp']).toContain('(lv-theme-set 0x90CAF9 0x4FC3F7 t)')
   })
 })
+
+describe('icon recolor', () => {
+  it('paints library icons with the theme text color', () => {
+    const img = createImageResource({ id: 'i1', name: 'icon_home', originalName: 'icon_home.png' })
+    const c = createComponent('img' as never, { id: 'a', name: 'ico', props: { src: 'i1' } } as never)
+    const out = generateCode([createPage({ components: [c] } as never)], undefined, [], createTheme({ id: 'dark', colors: { primary: '#90CAF9', secondary: '#4FC3F7', background: '#121212', surface: '#1e1e1e', text: '#E0E0E0', border: '#333333' } }), [img], [], '', 14)
+    expect(out['ui/ui.lisp']).toContain('(lv-obj-set-style-image-recolor ui-ico 0xE0E0E0 LV_PART_MAIN)')
+  })
+})

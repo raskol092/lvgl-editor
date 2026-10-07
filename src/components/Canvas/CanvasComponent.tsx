@@ -407,7 +407,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         );
       
       case 'img':
-        return <CanvasImageContent src={props.src} />;
+        return <CanvasImageContent src={props.src} recolor={defaultStyle.imageRecolor} iconColor={th.text} />;
       
       case 'line':
         return (
@@ -510,41 +510,34 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           </div>
         );
       
-      case 'slider':
+      case 'slider': {
+        // like the LVGL default theme: the whole object is the track (its own background), the indicator
+        // fills from the left in the primary color, the knob is a primary circle slightly taller than the track
+        const sMin = props.min ?? 0;
+        const sMax = props.max ?? 100;
+        const sPct = sMax > sMin ? Math.max(0, Math.min(100, ((props.value ?? 50) - sMin) / (sMax - sMin) * 100)) : 0;
+        const knob = component.height * 1.3;
         return (
-          <div className="lvgl-slider" style={{
-            width: '100%',
-            height: '100%',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-          }}>
+          <div className="lvgl-slider" style={{ width: '100%', height: '100%', position: 'relative' }}>
             <div style={{
-              width: '100%',
-              height: '4px',
-              backgroundColor: th.border,
-              borderRadius: '2px',
-              position: 'relative',
-            }}>
-              <div style={{
-                width: `${Math.max(0, Math.min(100, ((props.value ?? 50) - (props.min ?? 0)) / ((props.max ?? 100) - (props.min ?? 0)) * 100))}%`,
-                height: '100%',
-                backgroundColor: th.primary,
-                borderRadius: '2px',
-              }} />
-            </div>
+              width: `${sPct}%`,
+              height: '100%',
+              backgroundColor: th.primary,
+              borderRadius: defaultStyle.borderRadius ?? 9999,
+            }} />
             <div style={{
               position: 'absolute',
-              left: `calc(${Math.max(0, Math.min(100, ((props.value ?? 50) - (props.min ?? 0)) / ((props.max ?? 100) - (props.min ?? 0)) * 100))}% - 8px)`,
-              width: '16px',
-              height: '16px',
+              top: '50%',
+              left: `calc(${sPct}% - ${knob / 2}px)`,
+              width: knob,
+              height: knob,
+              transform: 'translateY(-50%)',
               borderRadius: '50%',
               backgroundColor: th.primary,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
             }} />
           </div>
         );
-      
+      }
       case 'obj': {
         // Build layout styles for the container based on props.layout
         const layoutStyle: React.CSSProperties = {};
@@ -645,7 +638,6 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           <div className="lvgl-bar" style={{
             width: '100%',
             height: '100%',
-            backgroundColor: th.border,
             borderRadius: defaultStyle.borderRadius,
             overflow: 'hidden',
           }}>
@@ -951,13 +943,33 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
 };
 
 // Separate component to subscribe to resource store only for img type
-const CanvasImageContent: React.FC<{ src?: string }> = React.memo(({ src }) => {
+const CanvasImageContent: React.FC<{ src?: string; recolor?: string; iconColor?: string }> = React.memo(({ src, recolor, iconColor }) => {
   const images = useResourceStore((s) => s.images);
   const matched = src
     ? images.find((img) => img.id === src || img.name === src)
     : undefined;
 
   if (matched) {
+    // icons (and images with an explicit recolor) are painted with a color through the image's alpha mask
+    const tint = recolor || (matched.originalName.startsWith('icon_') ? iconColor : undefined);
+    if (tint) {
+      return (
+        <div
+          className="lvgl-img"
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: tint,
+            WebkitMaskImage: `url(${matched.data})`,
+            maskImage: `url(${matched.data})`,
+            WebkitMaskSize: '100% 100%',
+            maskSize: '100% 100%',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+          }}
+        />
+      );
+    }
     return (
       <div
         className="lvgl-img"
