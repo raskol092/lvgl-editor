@@ -295,35 +295,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Preview sub-tabs */
-.preview-sub-tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border-color, #333);
-  background: var(--bg-secondary, var(--c-900));
-  flex-shrink: 0;
-}
-
-.preview-sub-tab {
-  padding: 8px 20px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--text-secondary, var(--c-400));
-  cursor: pointer;
-  font-size: 13px;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.preview-sub-tab:hover {
-  color: var(--text-primary, var(--c-300));
-}
-
-.preview-sub-tab.active {
-  color: var(--text-primary, #fff);
-  border-bottom-color: #4fc3f7;
-}
-
 .preview-sub-content {
   flex: 1;
   min-height: 0;
