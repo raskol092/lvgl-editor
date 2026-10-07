@@ -79,3 +79,18 @@ it('Set text picks the setter by widget type; animations zoom any widget', () =>
   expect(ui).toContain('lv-obj-set-style-transform-scale-x')
   expect(ui).not.toContain('lv-image-set-scale')
 })
+
+it('Set value uses the real type of the target (arc value -> bar)', () => {
+  const arc = createComponent('arc', { id: 'a1', name: 'knob' })
+  const bar = createComponent('bar', { id: 'b1', name: 'level' })
+  const pages = [createPage({ id: 'p1', name: 'main', components: [arc, bar] })]
+  const trig = createLogicNode('event_trigger', { id: 't', params: { eventType: 'LV_EVENT_VALUE_CHANGED', targetComponent: 'a1' }, outputs: [ex('to')] })
+  const get = createLogicNode('get_property', { id: 'g', params: { targetComponent: 'a1', property: 'value' }, outputs: [val('go', 'Value')] })
+  const set = createLogicNode('set_value', { id: 's', params: { targetComponent: 'b1' }, inputs: [ex('si'), val('sn', 'Number', 'int', 0)], outputs: [ex('so', 'Done')] })
+  const g = createLogicGraph({ id: 'g1', name: 'link', nodes: [trig, get, set], connections: [
+    conn('t', 'to', 's', 'si'),
+    conn('g', 'go', 's', 'sn', 'data'),
+  ] })
+  const out = generateCode(pages, undefined, [g], undefined, [], [], '', 14)
+  expect(out['ui/ui_logic.lisp']).toContain('(lv-bar-set-value ui-level (lv-arc-get-value ui-knob) LV_ANIM_ON)')
+})

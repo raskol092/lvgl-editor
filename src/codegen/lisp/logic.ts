@@ -283,9 +283,14 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
     case 'set_value': {
       const target = c.names.varByName(p.targetComponent || 'slider', c.pageHint);
       const value = inputValue(node, 'Number', c);
-      switch (p.componentType || 'slider') {
+      // the setter follows the real type of the target (the node itself has no type setting)
+      const type = c.names.compByName(p.targetComponent || '', c.pageHint)?.type ?? p.componentType ?? 'slider';
+      switch (type) {
         case 'bar': return [`(lv-bar-set-value ${target} ${value} LV_ANIM_ON)`];
         case 'arc': return [`(lv-arc-set-value ${target} ${value})`];
+        case 'dropdown': return [`(lv-dropdown-set-selected ${target} ${value})`];
+        case 'switch':
+        case 'checkbox': return [`(if (and ${value} (not (eq ${value} 0))) (lv-obj-add-state ${target} LV_STATE_CHECKED) (lv-obj-remove-state ${target} LV_STATE_CHECKED))`];
         case 'spinner': return [comment('A spinner value cannot be set directly')];
         default: return [`(lv-slider-set-value ${target} ${value} LV_ANIM_ON)`];
       }
