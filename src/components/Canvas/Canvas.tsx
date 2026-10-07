@@ -174,18 +174,34 @@ const Canvas: React.FC = () => {
     };
   }, []);
 
-  // Handle wheel zoom — read canvas.zoom from getState to avoid dep
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const { canvas: c } = useEditorStore.getState();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1;
-        setZoom(c.zoom + delta);
-      }
-    },
-    [setZoom]
-  );
+  // Mouse wheel zooms around the cursor. Registered natively (non-passive) so the browser's own
+  // page zoom on Ctrl+wheel is cancelled and preventDefault works.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const st = useEditorStore.getState();
+      const c = st.canvas;
+      const z2 = Math.max(0.1, Math.min(3, c.zoom * (e.deltaY > 0 ? 1 / 1.1 : 1.1)));
+      if (z2 === c.zoom) return;
+      const rect = el.getBoundingClientRect();
+      const canvasEl = canvasRef.current?.getBoundingClientRect();
+      if (!canvasEl) { st.setZoom(z2); return; }
+      // canvas point under the cursor stays under the cursor
+      const px = (e.clientX - canvasEl.left) / c.zoom;
+      const py = (e.clientY - canvasEl.top) / c.zoom;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      st.setZoom(z2);
+      st.setPan(
+        e.clientX - px * z2 - cx + (c.width * z2) / 2,
+        e.clientY - py * z2 - cy + (c.height * z2) / 2,
+      );
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   // Handle mouse down for panning, selection, or box selection
   const handleMouseDown = useCallback(
@@ -949,7 +965,6 @@ const Canvas: React.FC = () => {
     <div
       ref={containerRef}
       className={`canvas-container ${spacePressed ? 'panning-mode' : ''} ${isOver ? 'drop-target' : ''}`}
-      onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -960,6 +975,8 @@ const Canvas: React.FC = () => {
         className="canvas-viewport"
         style={{
           transform: `translate(${canvas.panX}px, ${canvas.panY}px)`,
+          marginLeft: -(canvas.width * canvas.zoom) / 2,
+          marginTop: -(canvas.height * canvas.zoom) / 2,
         }}
       >
         <div
