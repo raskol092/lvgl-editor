@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ProjectListItem } from '../../store/projectStore';
 import { formatFileSize } from '../../resources/projectManager';
+import { t } from '../../i18n';
 import './ProjectCard.css';
 
 interface ProjectCardProps {
@@ -27,7 +28,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ item, onOpen, onDelete }) => 
       </div>
       <button
         className="project-card-delete"
-        title="删除项目"
+        title={t('Delete project')}
         onClick={e => { e.stopPropagation(); onDelete(config.id); }}
       >
         🗑️

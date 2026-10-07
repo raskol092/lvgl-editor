@@ -1,6 +1,6 @@
 .page-manager {
-  background: #f8f9fa;
-  border-top: 1px solid #e0e0e0;
+  background: #1e293b;
+  border-top: 1px solid #334155;
   display: flex;
   align-items: center;
   padding: 0 8px;
@@ -22,7 +22,7 @@
 }
 
 .page-tabs::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #475569;
   border-radius: 2px;
 }
 
@@ -31,25 +31,25 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   white-space: nowrap;
   transition: all 0.2s;
   user-select: none;
 }
 
 .page-tab:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .page-tab.active {
-  background: #fff;
+  background: #0f172a;
   border-bottom-color: #fff;
-  color: #333;
+  color: #e2e8f0;
   font-weight: 500;
   position: relative;
 }
@@ -61,7 +61,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #2196F3;
+  background: #2563eb;
 }
 
 .page-icon {
@@ -77,7 +77,7 @@
 .page-name-input {
   width: 80px;
   padding: 2px 6px;
-  border: 1px solid #2196F3;
+  border: 1px solid #3b82f6;
   border-radius: 3px;
   font-size: 12px;
   outline: none;
@@ -86,12 +86,12 @@
 .add-page-btn {
   width: 28px;
   height: 28px;
-  border: 1px dashed #ccc;
+  border: 1px dashed #475569;
   background: transparent;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  color: #999;
+  color: #94a3b8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,9 +100,9 @@
 }
 
 .add-page-btn:hover {
-  border-color: #2196F3;
-  color: #2196F3;
-  background: #e3f2fd;
+  border-color: #3b82f6;
+  color: #60a5fa;
+  background: rgba(37,99,235,0.22);
 }
 
 .page-properties {
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 8px;
   padding-left: 12px;
-  border-left: 1px solid #e0e0e0;
+  border-left: 1px solid #334155;
 }
 
 .page-prop-row {
@@ -121,14 +121,14 @@
 
 .page-prop-row label {
   font-size: 11px;
-  color: #888;
+  color: #94a3b8;
 }
 
 .page-prop-row input[type="color"] {
   width: 24px;
   height: 24px;
   padding: 0;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
   background: none;
@@ -146,8 +146,8 @@
 /* Context Menu */
 .page-context-menu {
   position: fixed;
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 4px 0;
@@ -168,11 +168,11 @@
 }
 
 .page-context-menu button:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .page-context-menu button.disabled {
-  color: #ccc;
+  color: #cbd5e1;
   cursor: not-allowed;
 }
 

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import { useEditorStore } from '../../store/editorStore';
 import { useResourceStore } from '../../resources/resourceStore';
 import type { LvglComponent, Animation } from '../../types';
+import { t } from '../../i18n';
 import './PreviewPanel.css';
 
 // Image cache to avoid reloading images
@@ -707,16 +708,16 @@ const PreviewPanel: React.FC = () => {
   return (
     <div className="preview-panel">
       <div className="preview-header">
-        <h3>📱 实时预览</h3>
+        <h3>{t('📱 Live preview')}</h3>
         <div className="preview-controls">
           {!animPlaying ? (
-            <button className="preview-btn" onClick={startAnimation} title="播放动画">▶</button>
+            <button className="preview-btn" onClick={startAnimation} title={t('Play animation')}>▶</button>
           ) : animPaused ? (
-            <button className="preview-btn" onClick={resumeAnimation} title="继续">▶</button>
+            <button className="preview-btn" onClick={resumeAnimation} title={t('Resume')}>▶</button>
           ) : (
-            <button className="preview-btn" onClick={pauseAnimation} title="暂停">⏸</button>
+            <button className="preview-btn" onClick={pauseAnimation} title={t('Pause')}>⏸</button>
           )}
-          <button className="preview-btn" onClick={resetAnimation} title="重置" disabled={!animPlaying && animStates.size === 0}>⏹</button>
+          <button className="preview-btn" onClick={resetAnimation} title={t('Reset')} disabled={!animPlaying && animStates.size === 0}>⏹</button>
           <span className="preview-divider" />
           <button onClick={() => setScale(s => Math.max(0.5, s - 0.25))}>−</button>
           <span>{Math.round(scale * 100)}%</span>
@@ -752,7 +753,7 @@ const PreviewPanel: React.FC = () => {
           ))}
         </div>
         <span>{canvas.width} × {canvas.height}</span>
-        {hoveredComponent && <span>悬停: {hoveredComponent.slice(0, 8)}...</span>}
+        {hoveredComponent && <span>{t('Hover:')} {hoveredComponent.slice(0, 8)}...</span>}
       </div>
     </div>
   );
@@ -1347,15 +1348,15 @@ function drawCalendar(
   // Fix bottom corners of header
   ctx.fillRect(x, y + headerH - 4, w, 4);
 
-  const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 13px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`${opts.year}年 ${monthNames[opts.month - 1] || '1月'}`, x + w / 2, y + headerH / 2);
+  ctx.fillText(`${monthNames[opts.month - 1] || 'Jan'} ${opts.year}`, x + w / 2, y + headerH / 2);
 
   // Day headers
-  const days = ['日', '一', '二', '三', '四', '五', '六'];
+  const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   const cellW = w / 7;
   ctx.fillStyle = '#666';
   ctx.font = '10px sans-serif';

@@ -32,7 +32,7 @@
   display: flex;
   flex-direction: column;
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #334155;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -41,13 +41,13 @@
 }
 
 .font-list.grid .font-item:hover {
-  border-color: #4a90d9;
+  border-color: #3b82f6;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .font-list.grid .font-item.selected {
-  border-color: #4a90d9;
-  background: #f0f7ff;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.15);
 }
 
 .font-list.grid .font-preview {
@@ -56,12 +56,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 }
 
 .font-list.grid .preview-text {
   font-size: 32px;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .font-list.grid .font-info {
@@ -81,12 +81,12 @@
 
 .font-list.grid .font-family {
   font-size: 10px;
-  color: #666;
+  color: #94a3b8;
 }
 
 .font-list.grid .font-sizes {
   font-size: 10px;
-  color: #888;
+  color: #94a3b8;
 }
 
 /* Font Item - List View */
@@ -96,20 +96,20 @@
   gap: 12px;
   padding: 10px 12px;
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #334155;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .font-list.list .font-item:hover {
-  border-color: #4a90d9;
-  background: #fafafa;
+  border-color: #3b82f6;
+  background: #1e293b;
 }
 
 .font-list.list .font-item.selected {
-  border-color: #4a90d9;
-  background: #f0f7ff;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.15);
 }
 
 .font-list.list .font-preview {
@@ -119,13 +119,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 6px;
 }
 
 .font-list.list .preview-text {
   font-size: 24px;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .font-list.list .font-info {
@@ -144,13 +144,13 @@
 
 .font-list.list .font-family {
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   display: block;
 }
 
 .font-list.list .font-sizes {
   font-size: 11px;
-  color: #888;
+  color: #94a3b8;
   display: block;
 }
 
@@ -163,9 +163,9 @@
 /* Font Details Panel */
 .font-details {
   padding: 12px;
-  background: #f8f8f8;
+  background: #1e293b;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #334155;
   max-height: 500px;
   overflow-y: auto;
 }
@@ -173,7 +173,7 @@
 .font-details h4 {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #333;
+  color: #e2e8f0;
 }
 
 /* Font Metadata Grid */
@@ -184,7 +184,7 @@
   margin-bottom: 12px;
   padding: 10px;
   background: white;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #334155;
   border-radius: 6px;
 }
 
@@ -196,14 +196,14 @@
 
 .meta-label {
   font-size: 10px;
-  color: #999;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .meta-value {
   font-size: 12px;
-  color: #333;
+  color: #e2e8f0;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -219,14 +219,14 @@
 
 .bpp-hint {
   font-size: 11px;
-  color: #888;
+  color: #94a3b8;
 }
 
 /* Preview size tag */
 .preview-size-tag {
   display: inline-block;
   font-size: 10px !important;
-  color: #999;
+  color: #94a3b8;
   min-width: 36px;
   font-family: system-ui, sans-serif !important;
 }
@@ -240,15 +240,15 @@
 
 .template-copy-row button {
   padding: 6px 14px;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
 }
 
 .template-copy-row button:hover {
-  background: #e0e0e0;
+  background: #334155;
 }
 
 .detail-section {
@@ -258,14 +258,14 @@
 .detail-section > label {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   margin-bottom: 6px;
 }
 
 .detail-section select {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   font-size: 13px;
 }
@@ -273,7 +273,7 @@
 .detail-section textarea {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   font-size: 12px;
   font-family: monospace;
@@ -283,7 +283,7 @@
 
 .detail-section textarea:focus {
   outline: none;
-  border-color: #4a90d9;
+  border-color: #3b82f6;
 }
 
 /* Size Grid */
@@ -297,7 +297,7 @@
   min-width: 36px;
   padding: 6px 8px;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
@@ -305,29 +305,29 @@
 }
 
 .size-btn:hover {
-  border-color: #4a90d9;
-  background: #f0f7ff;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.15);
 }
 
 .size-btn.active {
-  background: #4a90d9;
+  background: #3b82f6;
   color: white;
-  border-color: #4a90d9;
+  border-color: #3b82f6;
 }
 
 /* Extract Button */
 .extract-btn {
   margin-top: 6px;
   padding: 6px 12px;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
 }
 
 .extract-btn:hover {
-  background: #e0e0e0;
+  background: #334155;
 }
 
 /* Font Preview Section */
@@ -338,13 +338,13 @@
 .font-preview-section > label {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   margin-bottom: 6px;
 }
 
 .preview-box {
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 6px;
   padding: 12px;
   min-height: 60px;
@@ -367,7 +367,7 @@
 
 .command-hint {
   font-size: 13px;
-  color: #666;
+  color: #94a3b8;
   margin: 0 0 12px 0;
   line-height: 1.6;
 }
@@ -376,15 +376,15 @@
   display: block;
   margin-top: 8px;
   padding: 8px 12px;
-  background: #f0f0f0;
+  background: #1e293b;
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 12px;
 }
 
 .command-preview {
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: #020617;
+  color: #cbd5e1;
   padding: 16px;
   border-radius: 8px;
   font-family: 'Consolas', 'Monaco', monospace;

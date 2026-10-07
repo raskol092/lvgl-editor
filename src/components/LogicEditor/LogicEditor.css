@@ -2,7 +2,7 @@
   display: flex;
   height: 100%;
   width: 100%;
-  background: #1a1a2e;
+  background: #0f172a;
   min-height: 0;
 }
 
@@ -23,37 +23,37 @@
   justify-content: center;
   height: 100%;
   gap: 12px;
-  color: #888;
+  color: #94a3b8;
 }
 
 .no-graph-message h3 {
   margin: 0;
   font-size: 18px;
-  color: #ccc;
+  color: #cbd5e1;
   font-weight: 600;
 }
 
 .no-graph-message p {
   margin: 0;
   font-size: 13px;
-  color: #666;
+  color: #94a3b8;
 }
 
 .no-graph-message button {
   margin-top: 8px;
   padding: 10px 20px;
-  border: 1px dashed #555;
+  border: 1px dashed #475569;
   border-radius: 6px;
   background: transparent;
-  color: #aaa;
+  color: #64748b;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .no-graph-message button:hover {
-  border-color: #2196f3;
-  color: #2196f3;
+  border-color: #3b82f6;
+  color: #60a5fa;
 }
 
 /* Top Panel - Graph Selector */
@@ -72,10 +72,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 6px;
-  background: #2d2d2d;
-  color: #ddd;
+  background: #0f172a;
+  color: #cbd5e1;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -83,12 +83,12 @@
 
 .graph-dropdown-btn:hover {
   background: #383838;
-  border-color: #555;
+  border-color: #475569;
 }
 
 .dropdown-arrow {
   font-size: 10px;
-  color: #888;
+  color: #94a3b8;
   margin-left: 4px;
 }
 
@@ -98,8 +98,8 @@
   left: 0;
   margin-top: 4px;
   min-width: 180px;
-  background: #2d2d2d;
-  border: 1px solid #444;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 100;
@@ -109,7 +109,7 @@
 .graph-item {
   padding: 8px 14px;
   font-size: 13px;
-  color: #ccc;
+  color: #cbd5e1;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -120,23 +120,23 @@
 
 .graph-item.active {
   background: rgba(33, 150, 243, 0.2);
-  color: #6bb3ff;
+  color: #93c5fd;
 }
 
 .graph-item.create {
-  border-top: 1px solid #444;
-  color: #888;
+  border-top: 1px solid #334155;
+  color: #94a3b8;
 }
 
 .graph-item.create:hover {
-  color: #2196f3;
+  color: #60a5fa;
 }
 
 .delete-graph-btn {
   padding: 6px 10px;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 6px;
-  background: #2d2d2d;
+  background: #0f172a;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
@@ -159,10 +159,10 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 6px;
-  background: #2d2d2d;
-  color: #ddd;
+  background: #0f172a;
+  color: #cbd5e1;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
@@ -178,8 +178,8 @@
 }
 
 .debug-btn.start {
-  border-color: #4caf50;
-  color: #4caf50;
+  border-color: #22c55e;
+  color: #4ade80;
 }
 
 .debug-btn.start:hover {
@@ -188,7 +188,7 @@
 
 .debug-btn.stop {
   border-color: #f44336;
-  color: #f44336;
+  color: #f87171;
 }
 
 .debug-btn.stop:hover {
@@ -197,7 +197,7 @@
 
 .debug-btn.step {
   border-color: #ff9800;
-  color: #ff9800;
+  color: #fbbf24;
 }
 
 .debug-btn.step:hover {
@@ -206,23 +206,23 @@
 
 .debug-status {
   font-size: 12px;
-  color: #aaa;
+  color: #64748b;
   padding: 0 8px;
 }
 
 /* React Flow dark theme overrides */
 .logic-canvas .react-flow__controls {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 6px;
   overflow: hidden;
 }
 
 .logic-canvas .react-flow__controls-button {
-  background: #2d2d2d;
-  border-bottom: 1px solid #444;
-  fill: #ccc;
-  color: #ccc;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+  fill: #cbd5e1;
+  color: #cbd5e1;
 }
 
 .logic-canvas .react-flow__controls-button:hover {

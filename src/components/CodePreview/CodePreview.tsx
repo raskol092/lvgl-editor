@@ -6,9 +6,10 @@ import { useLogicEditorStore } from '../LogicEditor';
 import { useResourceStore } from '../../resources/resourceStore';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
-import { generateCode, getGeneratedFileNames } from '../../codegen/generator';
-import type { CodeGenOptions, GeneratedCode } from '../../codegen/types';
+import { generateCode, getGeneratedFileNames, downloadAsZip, convertAssets } from '../../codegen/lisp';
+import type { LispGenOptions, LispFileName } from '../../codegen/lisp';
 import { toast } from '../Toast';
+import { t } from '../../i18n';
 import './CodePreview.css';
 
 const CodePreview: React.FC = () => {
@@ -19,13 +20,11 @@ const CodePreview: React.FC = () => {
   const fontResources = useResourceStore((s) => s.fonts);
   const currentProjectId = useAppStore((s) => s.currentProjectId);
   const getProjectConfig = useProjectStore((s) => s.getProjectConfig);
-  const [selectedFile, setSelectedFile] = useState<keyof GeneratedCode>('ui.c');
+  const [selectedFile, setSelectedFile] = useState<LispFileName>('main.lisp');
   const [isLoading, setIsLoading] = useState(true);
-  const [lvglVersion, setLvglVersion] = useState<CodeGenOptions['lvglVersion']>('9');
+  const [namingStyle, setNamingStyle] = useState<LispGenOptions['namingStyle']>('kebab-case');
   const [projectDefaultFont, setProjectDefaultFont] = useState<string | undefined>();
   const [projectDefaultFontSize, setProjectDefaultFontSize] = useState<number | undefined>();
-  const [projectUseBuiltinSymbols, setProjectUseBuiltinSymbols] = useState<boolean>(true);
-  const [projectSymbolFont, setProjectSymbolFont] = useState<string | undefined>();
 
   useEffect(() => {
     if (!currentProjectId) return;
@@ -33,35 +32,43 @@ const CodePreview: React.FC = () => {
       if (cfg) {
         setProjectDefaultFont(cfg.lvglConfig.defaultFont);
         setProjectDefaultFontSize(cfg.lvglConfig.defaultFontSize);
-        setProjectUseBuiltinSymbols(cfg.lvglConfig.useBuiltinSymbols !== false);
-        setProjectSymbolFont(cfg.lvglConfig.symbolFont);
       }
     });
   }, [currentProjectId, getProjectConfig]);
 
   const fileNames = getGeneratedFileNames();
 
-  const codeGenOptions: Partial<CodeGenOptions> = useMemo(() => ({
-    lvglVersion,
-  }), [lvglVersion]);
+  // images are quantised in the browser; the palettes end up in ui.lisp
+  const [imagePalettes, setImagePalettes] = useState<Record<string, Array<number | null>>>({});
+  useEffect(() => {
+    let cancelled = false;
+    convertAssets(pages, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize)
+      .then(r => { if (!cancelled) setImagePalettes(r.imagePalettes); })
+      .catch(() => { /* conversion problems are reported when exporting */ });
+    return () => { cancelled = true; };
+  }, [pages, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize]);
+
+  const codeGenOptions: Partial<LispGenOptions> = useMemo(() => ({
+    namingStyle,
+  }), [namingStyle]);
 
   const generatedCode = useMemo(() => {
     try {
-      return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont);
+      return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, imagePalettes);
     } catch {
       console.error('Code generation error');
       return null;
     }
-  }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont]);
+  }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, imagePalettes]);
 
-  const currentCode = generatedCode?.[selectedFile] || '// 代码生成失败';
+  const currentCode = generatedCode?.[selectedFile] || ';; Code generation failed';
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(currentCode);
-      toast.success('代码已复制到剪贴板');
+      toast.success(t('Code copied to clipboard'));
     } catch {
-      toast.error('复制失败');
+      toast.error(t('Copy failed'));
     }
   };
 
@@ -70,35 +77,20 @@ const CodePreview: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = selectedFile;
+    a.download = selectedFile.split('/').pop() || selectedFile;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success(`${selectedFile} 已下载`);
+    toast.success(t('{0} downloaded', selectedFile));
   };
 
   const handleDownloadAll = async () => {
-    if (!generatedCode) return;
-    
     try {
-      // Create a simple zip-like download by downloading each file
-      for (const [fileName, content] of Object.entries(generatedCode)) {
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        // Small delay between downloads
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      toast.success('所有文件已下载');
+      await downloadAsZip(pages, codeGenOptions, logicGraphs, 'lvgl_ui.zip', currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize);
+      toast.success(t('All files downloaded'));
     } catch {
-      toast.error('下载失败');
+      toast.error(t('Download failed'));
     }
   };
 
@@ -119,21 +111,21 @@ const CodePreview: React.FC = () => {
         <div className="code-preview-actions">
           <select
             className="code-version-select"
-            value={lvglVersion}
-            onChange={(e) => setLvglVersion(e.target.value as CodeGenOptions['lvglVersion'])}
-            title="LVGL 版本"
+            value={namingStyle}
+            onChange={(e) => setNamingStyle(e.target.value as LispGenOptions['namingStyle'])}
+            title={t('Naming style')}
           >
-            <option value="8">LVGL v8</option>
-            <option value="9">LVGL v9</option>
+            <option value="kebab-case">kebab-case</option>
+            <option value="snake_case">snake_case</option>
           </select>
-          <button className="code-action-btn" onClick={handleCopy} title="复制代码">
-            📋 复制
+          <button className="code-action-btn" onClick={handleCopy} title={t('Copy code')}>
+            {t('📋 Copy')}
           </button>
-          <button className="code-action-btn" onClick={handleDownload} title="下载当前文件">
-            💾 下载
+          <button className="code-action-btn" onClick={handleDownload} title={t('Download current file')}>
+            {t('💾 Download')}
           </button>
-          <button className="code-action-btn primary" onClick={handleDownloadAll} title="下载所有文件">
-            📦 全部下载
+          <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download all files')}>
+            {t('📦 Download all')}
           </button>
         </div>
       </div>
@@ -142,8 +134,8 @@ const CodePreview: React.FC = () => {
           <Editor
             width="100%"
             height="100%"
-            language="c"
-            theme="vs-light"
+            language="scheme"
+            theme="vs-dark"
             value={currentCode}
             options={{
               readOnly: true,
@@ -163,20 +155,20 @@ const CodePreview: React.FC = () => {
             onMount={() => setIsLoading(false)}
             loading={
               <div className="code-preview-loading">
-                <span>加载编辑器...</span>
+                <span>{t('Loading editor...')}</span>
               </div>
             }
           />
         </div>
         {isLoading && (
           <div className="code-preview-loading">
-            <span>加载编辑器...</span>
+            <span>{t('Loading editor...')}</span>
           </div>
         )}
       </div>
       <div className="code-preview-footer">
         <span className="code-stats">
-          {currentCode.split('\n').length} 行 | {new Blob([currentCode]).size} 字节
+          {currentCode.split('\n').length} {t('lines |')} {new Blob([currentCode]).size} {t('bytes')}
         </span>
       </div>
     </div>

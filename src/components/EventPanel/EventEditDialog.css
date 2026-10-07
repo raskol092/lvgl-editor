@@ -12,7 +12,7 @@
 }
 
 .event-dialog {
-  background: #fff;
+  background: #0f172a;
   border-radius: 8px;
   width: 560px;
   max-width: 90vw;
@@ -27,14 +27,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #334155;
 }
 
 .dialog-header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .close-btn {
@@ -43,7 +43,7 @@
   border: none;
   background: transparent;
   font-size: 20px;
-  color: #999;
+  color: #94a3b8;
   cursor: pointer;
   border-radius: 4px;
   display: flex;
@@ -53,8 +53,8 @@
 }
 
 .close-btn:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: #1e293b;
+  color: #e2e8f0;
 }
 
 .dialog-content {
@@ -75,13 +75,13 @@
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: #e2e8f0;
   margin-bottom: 8px;
 }
 
 .field-hint {
   font-size: 12px;
-  color: #888;
+  color: #94a3b8;
   margin: 6px 0 0 0;
 }
 
@@ -89,18 +89,18 @@
 .action-type-select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 6px;
   font-size: 13px;
   outline: none;
-  background: #fff;
+  background: #0f172a;
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .event-type-select:focus,
 .action-type-select:focus {
-  border-color: #2196F3;
+  border-color: #3b82f6;
 }
 
 .handler-type-tabs {
@@ -111,8 +111,8 @@
 .tab-btn {
   flex: 1;
   padding: 10px 16px;
-  border: 1px solid #ddd;
-  background: #f8f9fa;
+  border: 1px solid #334155;
+  background: #1e293b;
   border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
@@ -120,19 +120,19 @@
 }
 
 .tab-btn:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .tab-btn.active {
-  background: #2196F3;
-  border-color: #2196F3;
+  background: #2563eb;
+  border-color: #3b82f6;
   color: #fff;
 }
 
 .action-config {
   margin-top: 16px;
   padding: 16px;
-  background: #f8f9fa;
+  background: #1e293b;
   border-radius: 6px;
 }
 
@@ -147,7 +147,7 @@
 .config-row label {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   margin-bottom: 6px;
 }
 
@@ -156,18 +156,18 @@
 .config-row input[type="number"] {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   font-size: 13px;
   outline: none;
-  background: #fff;
+  background: #0f172a;
   box-sizing: border-box;
   transition: border-color 0.2s;
 }
 
 .config-row select:focus,
 .config-row input:focus {
-  border-color: #2196F3;
+  border-color: #3b82f6;
 }
 
 .preview-header {
@@ -183,8 +183,8 @@
 
 .toggle-preview-btn {
   padding: 4px 12px;
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid #334155;
+  background: #0f172a;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
@@ -192,12 +192,12 @@
 }
 
 .toggle-preview-btn:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .code-preview {
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: #020617;
+  color: #cbd5e1;
   padding: 16px;
   border-radius: 6px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -213,8 +213,8 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 20px;
-  border-top: 1px solid #e0e0e0;
-  background: #f8f9fa;
+  border-top: 1px solid #334155;
+  background: #1e293b;
   border-radius: 0 0 8px 8px;
 }
 
@@ -228,21 +228,21 @@
 }
 
 .cancel-btn {
-  border: 1px solid #ddd;
-  background: #fff;
-  color: #666;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #94a3b8;
 }
 
 .cancel-btn:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .save-btn {
   border: none;
-  background: #2196F3;
+  background: #2563eb;
   color: #fff;
 }
 
 .save-btn:hover {
-  background: #1976D2;
+  background: #1d4ed8;
 }

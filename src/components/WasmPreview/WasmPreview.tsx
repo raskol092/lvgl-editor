@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { editorStateToJson } from './editorStateToJson';
+import { t } from '../../i18n';
 import './WasmPreview.css';
 
 type Status = 'loading' | 'ready' | 'error';
@@ -64,10 +65,10 @@ const WasmPreview: React.FC = () => {
 
   const statusLabel =
     status === 'ready'
-      ? '✅ 就绪'
+      ? t('✅ Ready')
       : status === 'loading'
-        ? '⏳ LVGL 运行时加载中...'
-        : '❌ 加载失败';
+        ? t('⏳ Loading LVGL runtime...')
+        : t('❌ Failed to load');
 
   return (
     <div className="wasm-preview">
@@ -76,7 +77,7 @@ const WasmPreview: React.FC = () => {
           {statusLabel}
         </span>
         <button className="wasm-preview-refresh" onClick={handleRefresh}>
-          🔄 刷新
+          {t('🔄 Refresh')}
         </button>
       </div>
 
@@ -86,18 +87,18 @@ const WasmPreview: React.FC = () => {
           style={{ width: canvas.width, height: canvas.height }}
         >
           {status === 'loading' && (
-            <div className="wasm-preview-overlay">LVGL 运行时加载中...</div>
+            <div className="wasm-preview-overlay">{t('Loading LVGL runtime...')}</div>
           )}
           {status === 'error' && (
             <div className="wasm-preview-overlay wasm-preview-overlay--error">
-              WASM 加载失败，请点击刷新重试
+              {t('WASM failed to load, click Refresh to retry')}
             </div>
           )}
           <iframe
             ref={iframeRef}
             className="wasm-preview-iframe"
             src="/wasm/lvgl_wasm.html"
-            title="LVGL WASM 预览"
+            title={t('LVGL WASM preview')}
             width={canvas.width}
             height={canvas.height}
           />
@@ -105,7 +106,7 @@ const WasmPreview: React.FC = () => {
       </div>
 
       <div className="wasm-preview-footer">
-        使用 LVGL WASM 运行时渲染，与真实设备效果一致
+        {t('Rendered with the LVGL WASM runtime, matching real device output')}
       </div>
     </div>
   );

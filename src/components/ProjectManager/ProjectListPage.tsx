@@ -11,6 +11,8 @@ import { toast } from '../Toast';
 import ProjectCard from './ProjectCard';
 import NewProjectDialog from './NewProjectDialog';
 import type { Page } from '../../types';
+import { t } from '../../i18n';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 import './ProjectListPage.css';
 
 const ProjectListPage: React.FC = () => {
@@ -36,15 +38,15 @@ const ProjectListPage: React.FC = () => {
 
     const autoSaved = loadAutoSavedProject();
     if (autoSaved && autoSaved.pages && autoSaved.pages.length > 0) {
-      modal.confirm('发现旧版自动保存数据，是否导入为新项目？').then(async (yes) => {
+      modal.confirm(t('Legacy auto-saved data found. Import it as a new project?')).then(async (yes) => {
         if (yes) {
           try {
-            const id = await importProject(autoSaved, autoSaved.name || '迁移项目');
+            const id = await importProject(autoSaved, autoSaved.name || t('Migrated project'));
             clearAutoSave();
-            toast.success('旧数据已导入为新项目');
+            toast.success(t('Legacy data imported as a new project'));
             handleOpenProject(id);
           } catch (err) {
-            toast.error('导入失败: ' + String(err));
+            toast.error(t('Import failed') + ': ' + String(err));
           }
         } else {
           clearAutoSave();
@@ -57,7 +59,7 @@ const ProjectListPage: React.FC = () => {
   const handleOpenProject = async (id: string) => {
     try {
       const config = await getProjectConfig(id);
-      if (!config) { toast.error('项目不存在'); return; }
+      if (!config) { toast.error(t('Project does not exist')); return; }
 
       const { data, images, fonts } = await loadProjectData(id);
       setPages(data.pages as Page[]);
@@ -68,7 +70,7 @@ const ProjectListPage: React.FC = () => {
       }
       openProject(id);
     } catch (err) {
-      toast.error('打开项目失败: ' + String(err));
+      toast.error(t('Failed to open project') + ': ' + String(err));
     }
   };
 
@@ -78,17 +80,17 @@ const ProjectListPage: React.FC = () => {
       setShowNewDialog(false);
       await handleOpenProject(id);
     } catch (err) {
-      console.error('创建项目失败:', err);
-      toast.error('创建项目失败: ' + String(err));
+      console.error('Failed to create project:', err);
+      toast.error(t('Failed to create project') + ': ' + String(err));
     }
   };
 
   const handleDelete = async (id: string) => {
     const config = await getProjectConfig(id);
-    const confirmed = await modal.confirm(`确定删除项目「${config?.name || id}」吗？此操作不可恢复。`);
+    const confirmed = await modal.confirm(t('Delete project "{0}"? This cannot be undone.', config?.name || id));
     if (confirmed) {
       await deleteProject(id);
-      toast.success('项目已删除');
+      toast.success(t('Project deleted'));
     }
   };
 
@@ -98,10 +100,10 @@ const ProjectListPage: React.FC = () => {
     try {
       const project = await loadProjectFromFile(file);
       const id = await importProject(project, project.name);
-      toast.success(`项目「${project.name}」导入成功`);
+      toast.success(t('Project "{0}" imported successfully', project.name));
       handleOpenProject(id);
     } catch (err) {
-      toast.error('导入失败: ' + String(err));
+      toast.error(t('Import failed') + ': ' + String(err));
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -117,6 +119,9 @@ const ProjectListPage: React.FC = () => {
           <span className="plp-logo-icon">📐</span>
           <span className="plp-logo-text">LVGL UI Editor</span>
         </div>
+        <div style={{ marginLeft: 'auto' }}>
+          <LanguageSwitcher />
+        </div>
       </div>
 
       <div className="plp-content">
@@ -124,25 +129,25 @@ const ProjectListPage: React.FC = () => {
           <input
             className="plp-search"
             type="text"
-            placeholder="搜索项目..."
+            placeholder={t('Search projects...')}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
           <div className="plp-actions">
             <button className="plp-btn plp-btn-primary" onClick={() => setShowNewDialog(true)}>
-              ＋ 新建项目
+              {t('+ New project')}
             </button>
             <button className="plp-btn" onClick={() => fileInputRef.current?.click()}>
-              📂 导入项目
+              {t('📂 Import project')}
             </button>
           </div>
         </div>
 
         {loading ? (
-          <div className="plp-empty">加载中...</div>
+          <div className="plp-empty">{t('Loading...')}</div>
         ) : filtered.length === 0 ? (
           <div className="plp-empty">
-            {search ? '没有匹配的项目' : '还没有项目，点击「新建项目」开始'}
+            {search ? t('No matching projects') : t('No projects yet. Click "New project" to start')}
           </div>
         ) : (
           <div className="plp-grid">

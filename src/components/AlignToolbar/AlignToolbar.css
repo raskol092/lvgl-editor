@@ -3,8 +3,8 @@
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
 }
 
 .align-toolbar-group {
@@ -15,7 +15,7 @@
 .align-toolbar-divider {
   width: 1px;
   height: 20px;
-  background: #e0e0e0;
+  background: #334155;
   margin: 0 4px;
 }
 
@@ -29,17 +29,17 @@
   background: transparent;
   border-radius: 4px;
   cursor: pointer;
-  color: #666;
+  color: #94a3b8;
   transition: all 0.15s;
 }
 
 .align-btn:hover:not(:disabled) {
-  background: #f0f0f0;
-  color: #333;
+  background: #1e293b;
+  color: #e2e8f0;
 }
 
 .align-btn:active:not(:disabled) {
-  background: #e0e0e0;
+  background: #334155;
 }
 
 .align-btn:disabled {

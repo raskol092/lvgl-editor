@@ -1,6 +1,7 @@
 // Logic Node Definitions - All available node types
 
 import type { LogicNodeDefinition } from './types';
+import { t } from '../../i18n';
 
 // Color scheme for node categories
 export const NODE_COLORS = {
@@ -17,8 +18,8 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
   {
     type: 'trigger',
     subType: 'event_trigger',
-    label: '事件触发',
-    description: '接收来自组件的事件',
+    label: t('Event trigger'),
+    description: t('Receives events from components'),
     icon: '⚡',
     color: NODE_COLORS.trigger,
     defaultParams: {
@@ -26,15 +27,15 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     },
     inputs: [],
     outputs: [
-      { name: '执行', type: 'execution' },
-      { name: '事件对象', type: 'any' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Event', type: 'any' },
     ],
   },
   {
     type: 'trigger',
     subType: 'timer_trigger',
-    label: '定时器触发',
-    description: '延时或周期执行',
+    label: t('Timer trigger'),
+    description: t('Delayed or periodic execution'),
     icon: '⏱️',
     color: NODE_COLORS.trigger,
     defaultParams: {
@@ -42,11 +43,11 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       duration: 1000, // ms
     },
     inputs: [
-      { name: '启动', type: 'execution' },
+      { name: 'Start', type: 'execution' },
     ],
     outputs: [
-      { name: '执行', type: 'execution' },
-      { name: '计数', type: 'int' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Count', type: 'int' },
     ],
   },
 
@@ -55,13 +56,13 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     type: 'condition',
     subType: 'if_else',
     label: 'If/Else',
-    description: '条件分支',
+    description: t('Condition branch'),
     icon: '🔀',
     color: NODE_COLORS.condition,
     defaultParams: {},
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '条件', type: 'bool' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Condition', type: 'bool' },
     ],
     outputs: [
       { name: 'True', type: 'execution' },
@@ -72,15 +73,15 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     type: 'condition',
     subType: 'switch',
     label: 'Switch',
-    description: '多分支选择',
+    description: t('Multi-branch select'),
     icon: '🔃',
     color: NODE_COLORS.condition,
     defaultParams: {
       cases: [0, 1, 2],
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '值', type: 'int' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Value', type: 'int' },
     ],
     outputs: [
       { name: 'Case 0', type: 'execution' },
@@ -92,8 +93,8 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
   {
     type: 'condition',
     subType: 'compare',
-    label: '比较',
-    description: '比较两个值',
+    label: t('Compare'),
+    description: t('Compare two values'),
     icon: '⚖️',
     color: NODE_COLORS.condition,
     defaultParams: {
@@ -104,13 +105,13 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       { name: 'B', type: 'any' },
     ],
     outputs: [
-      { name: '结果', type: 'bool' },
+      { name: 'Result', type: 'bool' },
     ],
   },
   {
     type: 'condition',
     subType: 'logic_op',
-    label: '逻辑运算',
+    label: t('Logic operation'),
     description: 'AND, OR, NOT',
     icon: '🔗',
     color: NODE_COLORS.condition,
@@ -122,7 +123,7 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       { name: 'B', type: 'bool' },
     ],
     outputs: [
-      { name: '结果', type: 'bool' },
+      { name: 'Result', type: 'bool' },
     ],
   },
 
@@ -130,8 +131,8 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
   {
     type: 'action',
     subType: 'set_property',
-    label: '设置属性',
-    description: '修改组件属性',
+    label: t('Set property'),
+    description: t('Modify component property'),
     icon: '🎨',
     color: NODE_COLORS.action,
     defaultParams: {
@@ -139,18 +140,18 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       property: '',
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '值', type: 'any' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Value', type: 'any' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
   {
     type: 'action',
     subType: 'navigate_page',
-    label: '导航页面',
-    description: '切换到指定页面',
+    label: t('Navigate page'),
+    description: t('Switch to the specified page'),
     icon: '📄',
     color: NODE_COLORS.action,
     defaultParams: {
@@ -158,17 +159,17 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       animation: 'none',
     },
     inputs: [
-      { name: '执行', type: 'execution' },
+      { name: 'Exec', type: 'execution' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
   {
     type: 'action',
     subType: 'show_hide',
-    label: '显示/隐藏',
-    description: '控制组件可见性',
+    label: t('Show/Hide'),
+    description: t('Control component visibility'),
     icon: '👁️',
     color: NODE_COLORS.action,
     defaultParams: {
@@ -176,53 +177,53 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       action: 'toggle', // 'show' | 'hide' | 'toggle'
     },
     inputs: [
-      { name: '执行', type: 'execution' },
+      { name: 'Exec', type: 'execution' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
   {
     type: 'action',
     subType: 'set_text',
-    label: '设置文本',
-    description: '修改文本内容',
+    label: t('Set text'),
+    description: t('Modify text content'),
     icon: '📝',
     color: NODE_COLORS.action,
     defaultParams: {
       targetComponent: '',
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '文本', type: 'string' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Text', type: 'string' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
   {
     type: 'action',
     subType: 'set_value',
-    label: '设置数值',
-    description: '修改数值属性',
+    label: t('Set value'),
+    description: t('Modify numeric property'),
     icon: '🔢',
     color: NODE_COLORS.action,
     defaultParams: {
       targetComponent: '',
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '数值', type: 'int' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Number', type: 'int' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
   {
     type: 'action',
     subType: 'call_function',
-    label: '调用函数',
-    description: '调用自定义 C 函数',
+    label: t('Call function'),
+    description: t('Call a custom Lisp function'),
     icon: '📞',
     color: NODE_COLORS.action,
     defaultParams: {
@@ -230,29 +231,29 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       arguments: [],
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '参数1', type: 'any' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Arg1', type: 'any' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
-      { name: '返回值', type: 'any' },
+      { name: 'Done', type: 'execution' },
+      { name: 'Return', type: 'any' },
     ],
   },
   {
     type: 'action',
     subType: 'delay',
-    label: '延时',
-    description: '等待指定时间',
+    label: t('Delay'),
+    description: t('Wait for the specified time'),
     icon: '⏳',
     color: NODE_COLORS.action,
     defaultParams: {
       duration: 1000, // ms
     },
     inputs: [
-      { name: '执行', type: 'execution' },
+      { name: 'Exec', type: 'execution' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
 
@@ -260,8 +261,8 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
   {
     type: 'data',
     subType: 'var_read',
-    label: '读取变量',
-    description: '读取全局/局部变量',
+    label: t('Read variable'),
+    description: t('Read global/local variable'),
     icon: '📖',
     color: NODE_COLORS.data,
     defaultParams: {
@@ -269,32 +270,32 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     },
     inputs: [],
     outputs: [
-      { name: '值', type: 'any' },
+      { name: 'Value', type: 'any' },
     ],
   },
   {
     type: 'data',
     subType: 'var_write',
-    label: '写入变量',
-    description: '设置变量值',
+    label: t('Write variable'),
+    description: t('Set variable value'),
     icon: '✏️',
     color: NODE_COLORS.data,
     defaultParams: {
       variableId: '',
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '值', type: 'any' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Value', type: 'any' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
+      { name: 'Done', type: 'execution' },
     ],
   },
   {
     type: 'data',
     subType: 'math_op',
-    label: '数学运算',
-    description: '加减乘除取模',
+    label: t('Math operation'),
+    description: t('Add, subtract, multiply, divide, modulo'),
     icon: '🧮',
     color: NODE_COLORS.data,
     defaultParams: {
@@ -305,14 +306,14 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       { name: 'B', type: 'float' },
     ],
     outputs: [
-      { name: '结果', type: 'float' },
+      { name: 'Result', type: 'float' },
     ],
   },
   {
     type: 'data',
     subType: 'string_op',
-    label: '字符串操作',
-    description: '拼接、格式化',
+    label: t('String operation'),
+    description: t('Concatenate, format'),
     icon: '🔤',
     color: NODE_COLORS.data,
     defaultParams: {
@@ -323,14 +324,14 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
       { name: 'B', type: 'string' },
     ],
     outputs: [
-      { name: '结果', type: 'string' },
+      { name: 'Result', type: 'string' },
     ],
   },
   {
     type: 'data',
     subType: 'get_property',
-    label: '获取属性',
-    description: '读取组件当前属性值',
+    label: t('Get property'),
+    description: t('Read the component\'s current property value'),
     icon: '🔍',
     color: NODE_COLORS.data,
     defaultParams: {
@@ -339,7 +340,7 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     },
     inputs: [],
     outputs: [
-      { name: '值', type: 'any' },
+      { name: 'Value', type: 'any' },
     ],
   },
 
@@ -347,20 +348,20 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
   {
     type: 'custom',
     subType: 'c_code_block',
-    label: 'C 代码块',
-    description: '嵌入自定义 C 代码',
+    label: t('Lisp code block'),
+    description: t('Embed custom Lisp code'),
     icon: '💻',
     color: NODE_COLORS.custom,
     defaultParams: {
-      code: '// 自定义代码\n',
+      code: ';; Custom code\n',
     },
     inputs: [
-      { name: '执行', type: 'execution' },
-      { name: '输入1', type: 'any' },
+      { name: 'Exec', type: 'execution' },
+      { name: 'Input1', type: 'any' },
     ],
     outputs: [
-      { name: '完成', type: 'execution' },
-      { name: '输出1', type: 'any' },
+      { name: 'Done', type: 'execution' },
+      { name: 'Output1', type: 'any' },
     ],
   },
 ];
@@ -377,9 +378,9 @@ export function getNodesByCategory(category: string): LogicNodeDefinition[] {
 
 // Node categories for palette
 export const NODE_CATEGORIES = [
-  { id: 'trigger', name: '触发', icon: '⚡', color: NODE_COLORS.trigger },
-  { id: 'condition', name: '条件', icon: '🔀', color: NODE_COLORS.condition },
-  { id: 'action', name: '动作', icon: '🎬', color: NODE_COLORS.action },
-  { id: 'data', name: '数据', icon: '📊', color: NODE_COLORS.data },
-  { id: 'custom', name: '自定义', icon: '💻', color: NODE_COLORS.custom },
+  { id: 'trigger', name: 'Trigger', icon: '⚡', color: NODE_COLORS.trigger },
+  { id: 'condition', name: 'Condition', icon: '🔀', color: NODE_COLORS.condition },
+  { id: 'action', name: 'Action', icon: '🎬', color: NODE_COLORS.action },
+  { id: 'data', name: 'Data', icon: '📊', color: NODE_COLORS.data },
+  { id: 'custom', name: 'Custom', icon: '💻', color: NODE_COLORS.custom },
 ];

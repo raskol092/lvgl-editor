@@ -1,0 +1,357 @@
+// ui/ui_logic.lisp generator: logic graphs -> Lisp functions, triggers and a tick function
+
+import type { LogicGraph, LogicNode, LogicPort, LogicVariable } from '../../components/LogicEditor/types';
+import type { LispGenOptions } from './types';
+import type { NameResolver } from './names';
+import { lstr, sym, indent, comment, banner, userCode, shift } from './sexp';
+
+interface Ctx {
+  graph: LogicGraph;
+  names: NameResolver;
+  options: LispGenOptions;
+  pageHint?: string;
+}
+
+const num = (x: unknown, d = 0) => (Number.isFinite(Number(x)) ? Number(x) : d);
+
+/** Wrap forms in a progn that always has a value. */
+function progn(lines: string[]): string[] {
+  return ['(progn', ...shift(lines, 2), '  nil)'];
+}
+
+function closeLast(lines: string[]): string[] {
+  const out = [...lines];
+  out[out.length - 1] += ')';
+  return out;
+}
+
+function lispLiteral(type: string | undefined, value: unknown): string {
+  switch (type) {
+    case 'string': {
+      const s = value === undefined || value === null ? '' : String(value);
+      return /^".*"$/s.test(s) ? s : lstr(s);
+    }
+    case 'bool':
+      return value === true || value === 'true' ? 't' : 'nil';
+    case 'float': {
+      const n = Number(value) || 0;
+      return Number.isInteger(n) ? n.toFixed(1) : String(n);
+    }
+    default:
+      return String(num(value));
+  }
+}
+
+function portDefault(port: LogicPort): string {
+  if (port.defaultValue === undefined) return port.type === 'string' ? '""' : port.type === 'bool' ? 'nil' : '0';
+  return lispLiteral(port.type === 'any' ? (typeof port.defaultValue === 'string' ? 'string' : typeof port.defaultValue === 'boolean' ? 'bool' : 'int') : port.type, port.defaultValue);
+}
+
+// ---------------------------------------------------------------- graph walking
+
+function nextExecNode(node: LogicNode, g: LogicGraph): string | null {
+  const out = node.outputs.find(o => o.type === 'execution');
+  if (!out) return null;
+  return g.connections.find(c => c.sourceNode === node.id && c.sourceOutput === out.id)?.targetNode ?? null;
+}
+
+function outputTarget(node: LogicNode, name: string, g: LogicGraph): string | null {
+  const out = node.outputs.find(o => o.name === name);
+  if (!out) return null;
+  return g.connections.find(c => c.sourceNode === node.id && c.sourceOutput === out.id)?.targetNode ?? null;
+}
+
+function inputValue(node: LogicNode, name: string, c: Ctx): string {
+  const port = node.inputs.find(i => i.name === name);
+  if (!port) return '0';
+  const conn = c.graph.connections.find(k => k.targetNode === node.id && k.targetInput === port.id);
+  if (!conn) return portDefault(port);
+  const src = c.graph.nodes.find(n => n.id === conn.sourceNode);
+  return src ? expression(src, c) : portDefault(port);
+}
+
+function varSym(name: string, c: Ctx): string {
+  return sym(c.options, 'var', name);
+}
+
+function expression(node: LogicNode, c: Ctx): string {
+  const p = node.params;
+  switch (node.subType) {
+    case 'var_read':
+      return varSym(p.variableName || p.variableId || 'unknown', c);
+    case 'math_op': {
+      const a = inputValue(node, 'A', c);
+      const b = inputValue(node, 'B', c);
+      const op = p.operator || '+';
+      if (op === '%') return `(mod ${a} ${b})`;
+      return `(${['+', '-', '*', '/'].includes(op) ? op : '+'} ${a} ${b})`;
+    }
+    case 'compare': {
+      const a = inputValue(node, 'A', c);
+      const b = inputValue(node, 'B', c);
+      const op = p.operator || '==';
+      if (op === '==') return `(= ${a} ${b})`;
+      if (op === '!=') return `(not (= ${a} ${b}))`;
+      return `(${['>', '<', '>=', '<='].includes(op) ? op : '='} ${a} ${b})`;
+    }
+    case 'logic_op': {
+      const a = inputValue(node, 'A', c);
+      const op = p.operator || 'AND';
+      if (op === 'NOT') return `(not ${a})`;
+      return `(${op === 'OR' ? 'or' : 'and'} ${a} ${inputValue(node, 'B', c)})`;
+    }
+    case 'string_op': {
+      const a = inputValue(node, 'A', c);
+      const b = inputValue(node, 'B', c);
+      const op = p.operation || 'concat';
+      if (op === 'length') return `(str-len ${a})`;
+      if (op === 'concat') return `(str-merge ${a} ${b})`;
+      return a;
+    }
+    case 'get_property': {
+      const t = c.names.varByName(p.targetComponent || 'obj', c.pageHint);
+      switch (p.property || 'x') {
+        case 'x': return `(lv-obj-get-x ${t})`;
+        case 'y': return `(lv-obj-get-y ${t})`;
+        case 'width': return `(lv-obj-get-width ${t})`;
+        case 'height': return `(lv-obj-get-height ${t})`;
+        case 'opacity': return `(lv-obj-get-style-opa ${t} LV_PART_MAIN)`;
+        default: return '0';
+      }
+    }
+    default:
+      return '0';
+  }
+}
+
+function chain(nodeId: string, c: Ctx, visited: Set<string>): string[] {
+  if (visited.has(nodeId)) return [];
+  visited.add(nodeId);
+  const node = c.graph.nodes.find(n => n.id === nodeId);
+  if (!node) return [];
+  const out = [...nodeForms(node, c)];
+  if (node.subType !== 'if_else' && node.subType !== 'switch') {
+    const next = nextExecNode(node, c.graph);
+    if (next) out.push(...chain(next, c, visited));
+  }
+  return out;
+}
+
+function nodeForms(node: LogicNode, c: Ctx): string[] {
+  const p = node.params;
+  const g = c.graph;
+  const gen = c.options.generateComments;
+  const t = () => c.names.varByName(p.targetComponent || 'obj', c.pageHint);
+
+  switch (node.subType) {
+    case 'event_trigger':
+      return gen ? [comment(`Event: ${p.eventType || 'LV_EVENT_CLICKED'} on ${p.targetComponent || '?'}`)] : [];
+    case 'timer_trigger':
+      return gen ? [comment(`Timer: ${p.mode || 'repeat'}, ${p.duration || 1000}ms`)] : [];
+    case 'if_else': {
+      const cond = inputValue(node, 'Condition', c);
+      const tId = outputTarget(node, 'True', g);
+      const fId = outputTarget(node, 'False', g);
+      const tLines = tId ? chain(tId, c, new Set()) : [];
+      const fLines = fId ? chain(fId, c, new Set()) : [];
+      if (!fId) return closeLast([`(if ${cond}`, ...shift(progn(tLines.length ? tLines : [comment('True branch')]), 4), '    nil']);
+      return closeLast([`(if ${cond}`, ...shift(progn(tLines.length ? tLines : [comment('True branch')]), 4), ...shift(progn(fLines), 4)]);
+    }
+    case 'switch': {
+      const value = inputValue(node, 'Value', c);
+      const cases: unknown[] = p.cases || [0, 1, 2];
+      const lines: string[] = ['(cond'];
+      for (const cv of cases) {
+        const id = outputTarget(node, `Case ${cv}`, g) || outputTarget(node, String(cv), g);
+        const body = id ? chain(id, c, new Set()) : [];
+        lines.push(`  ((= ${value} ${num(cv)})`, ...closeLast(shift(progn(body), 3)));
+      }
+      const dId = outputTarget(node, 'Default', g);
+      lines.push('  (t', ...closeLast(shift(progn(dId ? chain(dId, c, new Set()) : []), 3)));
+      return closeLast(lines);
+    }
+    case 'compare':
+    case 'logic_op':
+    case 'var_read':
+    case 'math_op':
+    case 'string_op':
+    case 'get_property':
+      return []; // pure expressions, inlined where they are used
+    case 'set_property': {
+      const prop = p.property || 'x';
+      const value = p.value !== undefined ? p.value : 0;
+      const target = t();
+      const setters: Record<string, string> = {
+        x: `(lv-obj-set-x ${target} ${num(value)})`,
+        y: `(lv-obj-set-y ${target} ${num(value)})`,
+        width: `(lv-obj-set-width ${target} ${num(value)})`,
+        height: `(lv-obj-set-height ${target} ${num(value)})`,
+        opacity: `(lv-obj-set-style-opa ${target} ${num(value, 255)} LV_PART_MAIN)`,
+      };
+      return [setters[prop] || comment(`Set property: ${prop} on ${target}`)];
+    }
+    case 'navigate_page': {
+      const page = p.targetPage || '';
+      if (!c.names.hasScreen(page)) return [comment(`Unknown page: ${page}`)];
+      const screen = c.names.screenVar(page);
+      const anim = p.animation || 'none';
+      if (anim === 'none') return [`(lv-screen-load ${screen})`];
+      const m: Record<string, string> = {
+        fade: 'LV_SCREEN_LOAD_ANIM_FADE_IN', slide_left: 'LV_SCREEN_LOAD_ANIM_MOVE_LEFT',
+        slide_right: 'LV_SCREEN_LOAD_ANIM_MOVE_RIGHT', slide_up: 'LV_SCREEN_LOAD_ANIM_MOVE_TOP',
+        slide_down: 'LV_SCREEN_LOAD_ANIM_MOVE_BOTTOM',
+      };
+      return [`(lv-screen-load-anim ${screen} ${m[anim] || 'LV_SCREEN_LOAD_ANIM_FADE_IN'} 300 0 nil)`];
+    }
+    case 'show_hide': {
+      const target = t();
+      switch (p.action || 'toggle') {
+        case 'show': return [`(lv-obj-remove-flag ${target} LV_OBJ_FLAG_HIDDEN)`];
+        case 'hide': return [`(lv-obj-add-flag ${target} LV_OBJ_FLAG_HIDDEN)`];
+        case 'toggle':
+          return [
+            `(if (lv-obj-has-flag ${target} LV_OBJ_FLAG_HIDDEN)`,
+            `    (lv-obj-remove-flag ${target} LV_OBJ_FLAG_HIDDEN)`,
+            `    (lv-obj-add-flag ${target} LV_OBJ_FLAG_HIDDEN))`,
+          ];
+        default: return [comment(`Unknown show/hide action: ${p.action}`)];
+      }
+    }
+    case 'set_text': {
+      const target = c.names.varByName(p.targetComponent || 'label', c.pageHint);
+      return [`(lv-label-set-text ${target} ${inputValue(node, 'Text', c)})`];
+    }
+    case 'set_value': {
+      const target = c.names.varByName(p.targetComponent || 'slider', c.pageHint);
+      const value = inputValue(node, 'Number', c);
+      switch (p.componentType || 'slider') {
+        case 'bar': return [`(lv-bar-set-value ${target} ${value} LV_ANIM_ON)`];
+        case 'arc': return [`(lv-arc-set-value ${target} ${value})`];
+        case 'spinner': return [comment('A spinner value cannot be set directly')];
+        default: return [`(lv-slider-set-value ${target} ${value} LV_ANIM_ON)`];
+      }
+    }
+    case 'call_function': {
+      const fn = p.functionName || 'custom-function';
+      const args: unknown[] = Array.isArray(p.arguments) ? p.arguments : [];
+      return [`(${[fn, ...args.map(String)].join(' ')})`];
+    }
+    case 'delay':
+    {
+      const secs = num(p.duration, 1000) / 1000;
+      return [`(sleep ${Number.isInteger(secs) ? secs.toFixed(1) : String(secs)})`];
+    }
+    case 'var_write':
+      return [`(setq ${varSym(p.variableName || p.variableId || 'unknown', c)} ${inputValue(node, 'Value', c)})`];
+    case 'c_code_block': {
+      // the node type keeps its historic name; its body is now Lisp
+      const code = String(p.code || ';; Custom code').trim();
+      return code.split('\n');
+    }
+    default:
+      return gen ? [comment(`Unknown node type: ${node.subType}`)] : [];
+  }
+}
+
+// ---------------------------------------------------------------- file
+
+function graphFn(g: LogicGraph, o: LispGenOptions): string {
+  return sym(o, 'logic', g.name);
+}
+
+function collectVariables(graphs: LogicGraph[]): LogicVariable[] {
+  const map = new Map<string, LogicVariable>();
+  for (const g of graphs) for (const v of g.variables) if (!map.has(v.name)) map.set(v.name, v);
+  return [...map.values()];
+}
+
+function functionBody(g: LogicGraph, c: Ctx): string[] {
+  const triggers = g.nodes.filter(n => n.type === 'trigger');
+  if (triggers.length === 0) {
+    const lines: string[] = [];
+    for (const n of g.nodes) {
+      if (n.type === 'action' || n.type === 'custom') lines.push(...nodeForms(n, c));
+    }
+    return lines;
+  }
+  const visited = new Set<string>();
+  const lines: string[] = [];
+  for (const t of triggers) lines.push(...chain(t.id, c, visited));
+  return lines;
+}
+
+export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, options: LispGenOptions): string {
+  const o = options;
+  const i = indent(o);
+  const L: string[] = [];
+  L.push(...banner('ui_logic.lisp - logic graphs (generated by LVGL UI Editor)'));
+  L.push(comment('ui-logic-init registers the triggers, ui-logic-tick runs the timers (called from the main loop).'));
+  L.push('');
+
+  const vars = collectVariables(graphs);
+  if (o.generateComments) L.push(...banner('Logic variables'));
+  if (vars.length === 0) L.push(comment('No variables defined'));
+  for (const v of vars) L.push(`(def ${sym(o, 'var', v.name)} ${lispLiteral(v.type, v.defaultValue)})`);
+  L.push('');
+
+  if (o.generateComments) L.push(...banner('Logic functions'));
+  if (graphs.length === 0) L.push(comment('No logic graphs defined'), '');
+  for (const g of graphs) {
+    const c: Ctx = { graph: g, names, options: o };
+    if (o.generateComments) {
+      L.push(comment(`Logic: ${g.name}`));
+      if (g.description) L.push(comment(g.description));
+    }
+    L.push(`(defun ${graphFn(g, o)} ()`, `${i}(progn`);
+    const body = functionBody(g, c);
+    L.push(...shift(body.length ? body : [comment('Empty logic graph')], o.indentSize * 2));
+    L.push(`${i}${i}nil))`, '');
+  }
+
+  // event wrappers, init and tick
+  const eventGraphs = graphs.filter(g => g.nodes.some(n => n.subType === 'event_trigger'));
+  const timerGraphs = graphs.filter(g => g.nodes.some(n => n.subType === 'timer_trigger'));
+
+  for (const g of eventGraphs) {
+    L.push(`(defun ${graphFn(g, o)}-on-event (e) (${graphFn(g, o)}))`);
+  }
+  if (eventGraphs.length) L.push('');
+
+  const init: string[] = [];
+  for (const g of eventGraphs) {
+    for (const t of g.nodes.filter(n => n.subType === 'event_trigger')) {
+      if (!t.params.targetComponent) continue;
+      const target = names.varByName(t.params.targetComponent);
+      init.push(`(lv-obj-add-event-cb ${target} '${graphFn(g, o)}-on-event ${t.params.eventType || 'LV_EVENT_CLICKED'})`);
+    }
+  }
+  const timers: Array<{ fn: string; clock: string; done: string; seconds: string; once: boolean }> = [];
+  for (const g of timerGraphs) {
+    g.nodes.filter(n => n.subType === 'timer_trigger').forEach((t, idx) => {
+      const base = `${graphFn(g, o)}-timer${idx}`;
+      const ms = num(t.params.duration, 1000);
+      const secs = ms % 1000 === 0 ? (ms / 1000).toFixed(1) : String(ms / 1000);
+      timers.push({ fn: graphFn(g, o), clock: base, done: `${base}-done`, seconds: secs, once: t.params.mode === 'delay' });
+      init.push(`(def ${base} (systime))`, `(def ${base}-done nil)`);
+    });
+  }
+  if (o.generateComments) L.push(...banner('Init and timers'));
+  L.push(`(defun ui-logic-init ()`, `${i}(progn`);
+  L.push(...shift(init.length ? init : [comment('No triggers to register')], o.indentSize * 2));
+  L.push(`${i}${i}nil))`, '');
+
+  L.push(`(defun ui-logic-tick ()`, `${i}(progn`);
+  const tick: string[] = [];
+  for (const t of timers) {
+    if (t.once) {
+      tick.push(`(if (and (not ${t.done}) (>= (secs-since ${t.clock}) ${t.seconds}))`, `    (progn (setq ${t.done} t) (${t.fn})))`);
+    } else {
+      tick.push(`(if (>= (secs-since ${t.clock}) ${t.seconds})`, `    (progn (setq ${t.clock} (systime)) (${t.fn})))`);
+    }
+  }
+  L.push(...shift(tick.length ? tick : [comment('No timers')], o.indentSize * 2));
+  L.push(`${i}${i}nil))`, '');
+
+  L.push(...userCode('logic_custom', o));
+  return L.join('\n') + '\n';
+}

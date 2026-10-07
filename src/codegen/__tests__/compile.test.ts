@@ -8,7 +8,7 @@ import { execSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { generateCode } from '../generator';
+import { generateCCode as generateCode } from '../generator';
 import {
   defaultOptions,
   createComponent,

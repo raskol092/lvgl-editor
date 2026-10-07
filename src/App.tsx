@@ -26,6 +26,7 @@ import WasmPreview from './components/WasmPreview';
 import CompilePreview from 'virtual:compile-preview';
 import { HierarchyPanel } from './components/HierarchyPanel';
 import { ThemeSelector } from './components/ThemeSelector';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ResourcePanel, useResourceStore } from './resources';
 import { useLogicEditorStore } from './components/LogicEditor';
 import { ProjectListPage } from './components/ProjectManager';
@@ -40,6 +41,8 @@ import { useProjectStore } from './store/projectStore';
 import type { LvglComponent, Page } from './types';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { getComponentDefinition } from './utils/componentDefinitions';
+import { t } from './i18n';
+import ToolIcon from './components/icons/ToolIcon';
 import './App.css';
 
 type TabType = 'design' | 'logic' | 'code' | 'preview';
@@ -212,9 +215,9 @@ const EditorView: React.FC<EditorViewProps> = ({
       const logicGraphs = useLogicEditorStore.getState().graphs;
       await saveProjectData(currentProjectId, pages, logicGraphs, images, fonts);
       setLastSaveTime(Date.now());
-      success('项目已保存');
+      success(t('Project saved'));
     } catch (err) {
-      error('保存失败: ' + String(err));
+      error(t('Save failed') + ': ' + String(err));
     }
   }, [currentProjectId, pages, images, fonts, saveProjectData, setLastSaveTime, success, error]);
 
@@ -226,9 +229,9 @@ const EditorView: React.FC<EditorViewProps> = ({
       await saveProjectData(currentProjectId, pages, logicGraphs, images, fonts);
       const project = await exportProject(currentProjectId);
       downloadProject(project);
-      success(`项目已导出`);
+      success(t('Project exported'));
     } catch (err) {
-      error('导出失败: ' + String(err));
+      error(t('Export failed') + ': ' + String(err));
     }
   }, [currentProjectId, pages, images, fonts, saveProjectData, exportProject, success, error]);
 
@@ -256,15 +259,15 @@ const EditorView: React.FC<EditorViewProps> = ({
         openProject(id);
         setProjectName(cfg.name);
       }
-      success(`项目「${project.name}」导入成功`);
+      success(t('Project "{0}" imported successfully', project.name));
     } catch (err) {
-      error('导入失败: ' + String(err));
+      error(t('Import failed') + ': ' + String(err));
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleNewProjectClick = useCallback(async () => {
-    if (await modal.confirm('创建新项目将返回项目列表，当前项目会自动保存。继续吗？')) {
+    if (await modal.confirm(t('Creating a new project returns to the project list; the current project is saved automatically. Continue?'))) {
       // Save current project first
       if (currentProjectId) {
         const logicGraphs = useLogicEditorStore.getState().graphs;
@@ -417,7 +420,7 @@ const EditorView: React.FC<EditorViewProps> = ({
 
     return (
       <div className="drag-overlay-item">
-        <span className="drag-overlay-icon">{definition.icon}</span>
+        <span className="drag-overlay-icon"><ToolIcon name={definition.type} size={18} fallback={definition.icon} /></span>
         <span className="drag-overlay-name">{definition.name}</span>
       </div>
     );
@@ -483,20 +486,20 @@ const EditorView: React.FC<EditorViewProps> = ({
                 className={`preview-sub-tab ${resolvedPreviewMode === 'simple' ? 'active' : ''}`}
                 onClick={() => setPreviewMode('simple')}
               >
-                📱 简易预览
+                {t('📱 Simple preview')}
               </button>
               <button
                 className={`preview-sub-tab ${resolvedPreviewMode === 'wasm' ? 'active' : ''}`}
                 onClick={() => setPreviewMode('wasm')}
               >
-                🖥️ LVGL 预览
+                {t('🖥️ LVGL preview')}
               </button>
               {isCompilePreviewEnabled && (
                 <button
                   className={`preview-sub-tab ${resolvedPreviewMode === 'compile' ? 'active' : ''}`}
                   onClick={() => setPreviewMode('compile')}
                 >
-                  🔨 编译运行
+                  {t('🔨 Compile & run')}
                 </button>
               )}
             </div>
@@ -519,7 +522,7 @@ const EditorView: React.FC<EditorViewProps> = ({
     <div className="app">
       <div className="app-header">
         <div className="app-logo">
-          <button className="back-to-list-btn" onClick={handleBackToList} title="返回项目列表">
+          <button className="back-to-list-btn" onClick={handleBackToList} title={t('Back to project list')}>
             ◀
           </button>
           <span className="logo-icon">📐</span>
@@ -532,53 +535,54 @@ const EditorView: React.FC<EditorViewProps> = ({
             className={`tab-btn ${activeTab === 'design' ? 'active' : ''}`}
             onClick={() => setActiveTab('design')}
           >
-            🎨 设计
+            {t('🎨 Design')}
           </button>
           <button
             className={`tab-btn ${activeTab === 'logic' ? 'active' : ''}`}
             onClick={() => setActiveTab('logic')}
           >
-            🔗 逻辑
+            {t('🔗 Logic')}
           </button>
           <button
             className={`tab-btn ${activeTab === 'code' ? 'active' : ''}`}
             onClick={() => setActiveTab('code')}
           >
-            💻 代码
+            {t('💻 Code')}
           </button>
           <button
             className={`tab-btn ${activeTab === 'preview' ? 'active' : ''}`}
             onClick={() => setActiveTab('preview')}
           >
-            📱 预览
+            {t('📱 Preview')}
           </button>
         </div>
 
         <div className="app-toolbar">
-          <ToolbarButton icon="💾" label="保存" onClick={handleSaveProject} shortcut="Ctrl+S" />
-          <ToolbarButton icon="📤" label="导出" onClick={handleExportProject} />
-          <ToolbarButton icon="📥" label="导入" onClick={handleImportProject} />
+          <ToolbarButton icon="💾" label={t('Save')} onClick={handleSaveProject} shortcut="Ctrl+S" />
+          <ToolbarButton icon="📤" label={t('Export')} onClick={handleExportProject} />
+          <ToolbarButton icon="📥" label={t('Import')} onClick={handleImportProject} />
           <div className="toolbar-divider" />
-          <ToolbarButton icon="↩️" label="撤销" onClick={() => useEditorStore.getState().undo()} shortcut="Ctrl+Z" />
-          <ToolbarButton icon="↪️" label="重做" onClick={() => useEditorStore.getState().redo()} shortcut="Ctrl+Y" />
+          <ToolbarButton icon="↩️" label={t('Undo')} onClick={() => useEditorStore.getState().undo()} shortcut="Ctrl+Z" />
+          <ToolbarButton icon="↪️" label={t('Redo')} onClick={() => useEditorStore.getState().redo()} shortcut="Ctrl+Y" />
           <div className="toolbar-divider" />
           <ToolbarButton
             icon="📦"
-            label="资源"
+            label={t('Resources')}
             onClick={() => setShowResourcePanel(!showResourcePanel)}
             active={showResourcePanel}
           />
           <ToolbarButton
             icon="⚙️"
-            label="设置"
+            label={t('Settings')}
             onClick={() => setShowProjectSettings(true)}
           />
           <div className="toolbar-divider" />
+          <LanguageSwitcher />
           <ThemeSelector />
           <div className="toolbar-divider" />
           <ToolbarButton
             icon="❓"
-            label="帮助"
+            label={t('Help')}
             onClick={() => setShowHelpPanel(true)}
             shortcut="F1"
           />

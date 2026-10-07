@@ -294,7 +294,7 @@ describe('generateLogicSource', () => {
       const node = createLogicNode('set_text', {
         id: 'n1',
         params: { targetComponent: 'myLabel' },
-        inputs: [createLogicPort({ id: 'in1', name: '文本', type: 'string', defaultValue: '"Hello"' })],
+        inputs: [createLogicPort({ id: 'in1', name: 'Text', type: 'string', defaultValue: '"Hello"' })],
         outputs: [],
       });
       const graph = createLogicGraph({ name: 'st', nodes: [node] });
@@ -309,7 +309,7 @@ describe('generateLogicSource', () => {
       const node = createLogicNode('set_value', {
         id: 'n1',
         params: { targetComponent: 'mySlider', componentType: 'slider' },
-        inputs: [createLogicPort({ id: 'in1', name: '数值', type: 'int', defaultValue: 50 })],
+        inputs: [createLogicPort({ id: 'in1', name: 'Number', type: 'int', defaultValue: 50 })],
         outputs: [],
       });
       const graph = createLogicGraph({ name: 'sv', nodes: [node] });
@@ -321,7 +321,7 @@ describe('generateLogicSource', () => {
       const node = createLogicNode('set_value', {
         id: 'n1',
         params: { targetComponent: 'myBar', componentType: 'bar' },
-        inputs: [createLogicPort({ id: 'in1', name: '数值', type: 'int', defaultValue: 75 })],
+        inputs: [createLogicPort({ id: 'in1', name: 'Number', type: 'int', defaultValue: 75 })],
         outputs: [],
       });
       const graph = createLogicGraph({ name: 'sv', nodes: [node] });
@@ -333,7 +333,7 @@ describe('generateLogicSource', () => {
       const node = createLogicNode('set_value', {
         id: 'n1',
         params: { targetComponent: 'myArc', componentType: 'arc' },
-        inputs: [createLogicPort({ id: 'in1', name: '数值', type: 'int', defaultValue: 30 })],
+        inputs: [createLogicPort({ id: 'in1', name: 'Number', type: 'int', defaultValue: 30 })],
         outputs: [],
       });
       const graph = createLogicGraph({ name: 'sv', nodes: [node] });
@@ -396,7 +396,7 @@ describe('generateLogicSource', () => {
       const node = createLogicNode('var_write', {
         id: 'n1',
         params: { variableName: 'counter' },
-        inputs: [createLogicPort({ id: 'in1', name: '值', type: 'int', defaultValue: 42 })],
+        inputs: [createLogicPort({ id: 'in1', name: 'Value', type: 'int', defaultValue: 42 })],
         outputs: [],
       });
       const conn = createLogicConnection({
@@ -473,7 +473,7 @@ describe('generateLogicSource', () => {
       const varWrite = createLogicNode('var_write', {
         id: 'vw1',
         params: { variableName: 'result' },
-        inputs: [createLogicPort({ id: 'vw1_in', name: '值', type: 'int' })],
+        inputs: [createLogicPort({ id: 'vw1_in', name: 'Value', type: 'int' })],
         outputs: [],
       });
       const dataConn = createLogicConnection({
@@ -498,7 +498,7 @@ describe('generateLogicSource', () => {
       const varWrite = createLogicNode('var_write', {
         id: 'vw1',
         params: { variableName: 'sum' },
-        inputs: [createLogicPort({ id: 'vw1_in', name: '值', type: 'int' })],
+        inputs: [createLogicPort({ id: 'vw1_in', name: 'Value', type: 'int' })],
         outputs: [],
       });
       const dataConn = createLogicConnection({
@@ -523,7 +523,7 @@ describe('generateLogicSource', () => {
       const ifNode = createLogicNode('if_else', {
         id: 'if1', type: 'condition',
         params: {},
-        inputs: [createLogicPort({ id: 'if1_cond', name: '条件', type: 'bool' })],
+        inputs: [createLogicPort({ id: 'if1_cond', name: 'Condition', type: 'bool' })],
         outputs: [
           createLogicPort({ id: 'if1_true', name: 'True', type: 'execution' }),
           createLogicPort({ id: 'if1_false', name: 'False', type: 'execution' }),
@@ -551,7 +551,7 @@ describe('generateLogicSource', () => {
       const ifNode = createLogicNode('if_else', {
         id: 'if1', type: 'condition',
         params: {},
-        inputs: [createLogicPort({ id: 'if1_cond', name: '条件', type: 'bool' })],
+        inputs: [createLogicPort({ id: 'if1_cond', name: 'Condition', type: 'bool' })],
         outputs: [
           createLogicPort({ id: 'if1_true', name: 'True', type: 'execution' }),
           createLogicPort({ id: 'if1_false', name: 'False', type: 'execution' }),
@@ -579,7 +579,7 @@ describe('generateLogicSource', () => {
       const ifNode = createLogicNode('if_else', {
         id: 'if1', type: 'condition',
         params: {},
-        inputs: [createLogicPort({ id: 'if1_cond', name: '条件', type: 'bool' })],
+        inputs: [createLogicPort({ id: 'if1_cond', name: 'Condition', type: 'bool' })],
         outputs: [
           createLogicPort({ id: 'if1_true', name: 'True', type: 'execution' }),
           createLogicPort({ id: 'if1_false', name: 'False', type: 'execution' }),
@@ -607,7 +607,7 @@ describe('generateLogicSource', () => {
       const varWrite = createLogicNode('var_write', {
         id: 'vw1',
         params: { variableName: 'len' },
-        inputs: [createLogicPort({ id: 'vw1_in', name: '值', type: 'int' })],
+        inputs: [createLogicPort({ id: 'vw1_in', name: 'Value', type: 'int' })],
         outputs: [],
       });
       const dataConn = createLogicConnection({
@@ -632,7 +632,7 @@ describe('generateLogicSource', () => {
       const varWrite = createLogicNode('var_write', {
         id: 'vw1',
         params: { variableName: 'msg' },
-        inputs: [createLogicPort({ id: 'vw1_in', name: '值', type: 'string' })],
+        inputs: [createLogicPort({ id: 'vw1_in', name: 'Value', type: 'string' })],
         outputs: [],
       });
       const dataConn = createLogicConnection({
@@ -654,7 +654,7 @@ describe('generateLogicSource', () => {
       const varWrite = createLogicNode('var_write', {
         id: 'vw1',
         params: { variableName: 'pos_x' },
-        inputs: [createLogicPort({ id: 'vw1_in', name: '值', type: 'int' })],
+        inputs: [createLogicPort({ id: 'vw1_in', name: 'Value', type: 'int' })],
         outputs: [],
       });
       const dataConn = createLogicConnection({
@@ -679,7 +679,7 @@ describe('generateLogicSource', () => {
       const ifNode = createLogicNode('if_else', {
         id: 'if1', type: 'condition',
         params: {},
-        inputs: [createLogicPort({ id: 'if1_cond', name: '条件', type: 'bool', defaultValue: 'true' })],
+        inputs: [createLogicPort({ id: 'if1_cond', name: 'Condition', type: 'bool', defaultValue: 'true' })],
         outputs: [
           createLogicPort({ id: 'if1_true', name: 'True', type: 'execution' }),
           createLogicPort({ id: 'if1_false', name: 'False', type: 'execution' }),
@@ -729,7 +729,7 @@ describe('generateLogicSource', () => {
       const ifNode = createLogicNode('if_else', {
         id: 'if1', type: 'condition',
         params: {},
-        inputs: [createLogicPort({ id: 'if1_cond', name: '条件', type: 'bool', defaultValue: 'true' })],
+        inputs: [createLogicPort({ id: 'if1_cond', name: 'Condition', type: 'bool', defaultValue: 'true' })],
         outputs: [
           createLogicPort({ id: 'if1_true', name: 'True', type: 'execution' }),
           createLogicPort({ id: 'if1_false', name: 'False', type: 'execution' }),
@@ -772,7 +772,7 @@ describe('generateLogicSource', () => {
       const switchNode = createLogicNode('switch', {
         id: 'sw1', type: 'condition',
         params: { cases: [0, 1, 2] },
-        inputs: [createLogicPort({ id: 'sw1_val', name: '值', type: 'int', defaultValue: 0 })],
+        inputs: [createLogicPort({ id: 'sw1_val', name: 'Value', type: 'int', defaultValue: 0 })],
         outputs: [
           createLogicPort({ id: 'sw1_c0', name: 'Case 0', type: 'execution' }),
           createLogicPort({ id: 'sw1_c1', name: 'Case 1', type: 'execution' }),

@@ -5,6 +5,7 @@ import { useResourceStore } from './resourceStore';
 import ImageManager from './ImageManager';
 import FontManager from './FontManager';
 import IconLibrary from './IconLibrary';
+import { t } from '../i18n';
 import './ResourcePanel.css';
 
 const ResourcePanel: React.FC = () => {
@@ -20,28 +21,28 @@ const ResourcePanel: React.FC = () => {
   } = useResourceStore();
   
   const tabs = [
-    { id: 'images' as const, label: '图片', icon: '🖼️', count: images.length },
-    { id: 'fonts' as const, label: '字体', icon: '🔤', count: fonts.length },
-    { id: 'icons' as const, label: '图标', icon: '⭐', count: 0 },
+    { id: 'images' as const, label: t('Image'), icon: '🖼️', count: images.length },
+    { id: 'fonts' as const, label: t('Font'), icon: '🔤', count: fonts.length },
+    { id: 'icons' as const, label: t('Icons'), icon: '⭐', count: 0 },
   ];
   
   return (
     <div className="resource-panel">
       {/* Header */}
       <div className="resource-header">
-        <h3>📦 资源管理</h3>
+        <h3>{t('📦 Resource manager')}</h3>
         <div className="view-toggle">
           <button
             className={viewMode === 'grid' ? 'active' : ''}
             onClick={() => setViewMode('grid')}
-            title="网格视图"
+            title={t('Grid view')}
           >
             ▦
           </button>
           <button
             className={viewMode === 'list' ? 'active' : ''}
             onClick={() => setViewMode('list')}
-            title="列表视图"
+            title={t('List view')}
           >
             ☰
           </button>
@@ -69,7 +70,7 @@ const ResourcePanel: React.FC = () => {
       <div className="resource-search">
         <input
           type="text"
-          placeholder="搜索资源..."
+          placeholder={t('Search resources...')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />

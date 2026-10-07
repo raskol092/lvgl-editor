@@ -5,6 +5,7 @@ import { useResourceStore } from './resourceStore';
 import type { ImageResource, ImageFormat } from './types';
 import { toast } from '../components/Toast';
 import { modal } from '../components/Modal';
+import { t } from '../i18n';
 import './ImageManager.css';
 
 interface ImageManagerProps {
@@ -49,7 +50,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
       }
     } catch (error) {
       console.error('Failed to upload image:', error);
-      toast.error('上传图片失败');
+      toast.error(t('Failed to upload image'));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -60,7 +61,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
   
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (await modal.confirm('确定要删除这个图片吗？')) {
+    if (await modal.confirm(t('Delete this image?'))) {
       deleteImage(id);
     }
   };
@@ -72,13 +73,13 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
       setShowCodeModal(true);
     } catch (error) {
       console.error('Failed to generate code:', error);
-      toast.error('生成代码失败');
+      toast.error(t('Failed to generate code'));
     }
   };
   
   const handleCopyCode = () => {
     navigator.clipboard.writeText(generatedCode);
-    toast.success('代码已复制到剪贴板');
+    toast.success(t('Code copied to clipboard'));
   };
   
   const handleDownloadCode = () => {
@@ -111,7 +112,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
           onClick={handleUploadClick}
           disabled={isUploading}
         >
-          {isUploading ? '上传中...' : '📤 上传图片'}
+          {isUploading ? t('Uploading...') : t('📤 Upload image')}
         </button>
         <input
           ref={fileInputRef}
@@ -128,8 +129,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
         {images.length === 0 ? (
           <div className="empty-state">
             <span className="empty-icon">🖼️</span>
-            <p>暂无图片资源</p>
-            <p className="empty-hint">点击上方按钮上传图片</p>
+            <p>{t('No image resources')}</p>
+            <p className="empty-hint">{t('Click the button above to upload an image')}</p>
           </div>
         ) : (
           images.map(image => (
@@ -148,7 +149,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
               <button
                 className="delete-btn"
                 onClick={(e) => handleDelete(image.id, e)}
-                title="删除"
+                title={t('Delete')}
               >
                 🗑️
               </button>
@@ -160,9 +161,9 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
       {/* Selected Image Details */}
       {selectedImage && (
         <div className="image-details">
-          <h4>图片属性</h4>
+          <h4>{t('Image properties')}</h4>
           <div className="detail-row">
-            <label>名称:</label>
+            <label>{t('Name:')}</label>
             <input
               type="text"
               value={selectedImage.name}
@@ -170,7 +171,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
             />
           </div>
           <div className="detail-row">
-            <label>C 变量名:</label>
+            <label>{t('C variable name:')}</label>
             <input
               type="text"
               value={selectedImage.cArrayName}
@@ -178,15 +179,15 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
             />
           </div>
           <div className="detail-row">
-            <label>尺寸:</label>
+            <label>{t('Size:')}</label>
             <span>{selectedImage.width} × {selectedImage.height}</span>
           </div>
           <div className="detail-row">
-            <label>文件大小:</label>
+            <label>{t('File size:')}</label>
             <span>{formatFileSize(selectedImage.size)}</span>
           </div>
           <div className="detail-row">
-            <label>颜色格式:</label>
+            <label>{t('Color format:')}</label>
             <select
               value={selectedImage.format}
               onChange={(e) => updateImage(selectedImage.id, { format: e.target.value as ImageFormat })}
@@ -199,7 +200,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
           
           <div className="detail-actions">
             <button onClick={() => handleGenerateCode(selectedImage)}>
-              📝 生成 C 代码
+              {t('📝 Generate C code')}
             </button>
           </div>
         </div>
@@ -210,12 +211,12 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
         <div className="modal-overlay" onClick={() => setShowCodeModal(false)}>
           <div className="modal-content code-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>生成的 C 代码</h3>
+              <h3>{t('Generated C code')}</h3>
               <button className="close-btn" onClick={() => setShowCodeModal(false)}>×</button>
             </div>
             <div className="modal-body">
               <div className="code-options">
-                <label>颜色格式:</label>
+                <label>{t('Color format:')}</label>
                 <select
                   value={codeFormat}
                   onChange={(e) => setCodeFormat(e.target.value as ImageFormat)}
@@ -225,14 +226,14 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
                   <option value="ARGB8888">ARGB8888</option>
                 </select>
                 <button onClick={() => selectedImage && handleGenerateCode(selectedImage)}>
-                  重新生成
+                  {t('Regenerate')}
                 </button>
               </div>
               <pre className="code-preview">{generatedCode}</pre>
             </div>
             <div className="modal-footer">
-              <button onClick={handleCopyCode}>📋 复制代码</button>
-              <button onClick={handleDownloadCode}>💾 下载文件</button>
+              <button onClick={handleCopyCode}>{t('📋 Copy code')}</button>
+              <button onClick={handleDownloadCode}>{t('💾 Download file')}</button>
             </div>
           </div>
         </div>

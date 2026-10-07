@@ -24,13 +24,13 @@
   flex-direction: column;
   gap: 4px;
   font-size: 13px;
-  color: #aaa;
+  color: #64748b;
 }
 
 .npd-input {
   padding: 7px 10px;
-  background: #1a1a2e;
-  border: 1px solid #3a3a5c;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 6px;
   color: #e0e0e0;
   font-size: 13px;
@@ -44,8 +44,8 @@
 
 .npd-select {
   padding: 7px 10px;
-  background: #1a1a2e;
-  border: 1px solid #3a3a5c;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 6px;
   color: #e0e0e0;
   font-size: 13px;
@@ -69,10 +69,10 @@
 .npd-section-title {
   font-size: 13px;
   font-weight: 600;
-  color: #bbb;
+  color: #64748b;
   margin-top: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid #3a3a5c;
+  border-bottom: 1px solid #334155;
 }
 
 .npd-checkbox-label {

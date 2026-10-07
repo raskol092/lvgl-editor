@@ -2,13 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { componentCategories, getComponentsByCategory } from '../../utils/componentDefinitions';
 import type { ComponentDefinition, ComponentCategory } from '../../types';
+import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './ComponentPanel.css';
 
 interface DraggableComponentProps {
   definition: ComponentDefinition;
+  onHover: (name: string | null) => void;
 }
 
-const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition }) => {
+const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition, onHover }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette-${definition.type}`,
     data: {
@@ -21,11 +24,13 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition }) =
     <div
       ref={setNodeRef}
       className={`component-item ${isDragging ? 'dragging' : ''}`}
+      onMouseEnter={() => onHover(definition.name)}
+      onMouseLeave={() => onHover(null)}
       {...listeners}
       {...attributes}
     >
-      <span className="component-icon">{definition.icon}</span>
-      <span className="component-name">{definition.name}</span>
+      <span className="component-icon"><ToolIcon name={definition.type} size={22} fallback={definition.icon} /></span>
+      <span className="component-name">{t(definition.name)}</span>
     </div>
   );
 };
@@ -35,6 +40,7 @@ interface CategorySectionProps {
   components: ComponentDefinition[];
   isCollapsed: boolean;
   onToggle: () => void;
+  onHover: (name: string | null) => void;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -42,18 +48,19 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   components,
   isCollapsed,
   onToggle,
+  onHover,
 }) => {
   return (
     <div className="category-section">
       <div className="category-header" onClick={onToggle}>
-        <span className="category-icon">{category.icon}</span>
-        <span className="category-name">{category.name}</span>
+        <span className="category-icon"><ToolIcon name={`cat:${category.id}`} size={14} fallback={category.icon} /></span>
+        <span className="category-name">{t(category.name)}</span>
         <span className={`collapse-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
       </div>
       {!isCollapsed && (
         <div className="category-components">
           {components.map(def => (
-            <DraggableComponent key={def.type} definition={def} />
+            <DraggableComponent key={def.type} definition={def} onHover={onHover} />
           ))}
         </div>
       )}
@@ -63,6 +70,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
 const ComponentPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [hovered, setHovered] = useState<string | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   const toggleCategory = (categoryId: string) => {
@@ -100,13 +108,13 @@ const ComponentPanel: React.FC = () => {
   return (
     <div className="component-panel">
       <div className="panel-header">
-        <h3>组件</h3>
+        <h3>{t('Components')}</h3>
       </div>
       
       <div className="search-box">
         <input
           type="text"
-          placeholder="搜索组件..."
+          placeholder={t('Search components...')}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
@@ -125,8 +133,13 @@ const ComponentPanel: React.FC = () => {
             components={components}
             isCollapsed={collapsedCategories.has(category.id)}
             onToggle={() => toggleCategory(category.id)}
+            onHover={setHovered}
           />
         ))}
+      </div>
+
+      <div className="panel-hint">
+        {hovered ? <strong>{t(hovered)}</strong> : <>{t('Drag & drop to add')}</>}
       </div>
     </div>
   );

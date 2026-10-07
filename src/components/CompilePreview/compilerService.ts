@@ -4,6 +4,8 @@
  * then loads the Emscripten module in the browser.
  */
 
+import { t } from '../../i18n';
+
 export type CompileStatus =
   | 'idle'
   | 'compiling'
@@ -73,7 +75,7 @@ export async function compileCode(
 
   try {
     // Step 1: Send code to server for compilation
-    onStatus?.('compiling', '正在服务端编译...');
+    onStatus?.('compiling', t('Compiling on the server...'));
 
     // Strip "include/" prefix — server expects flat file names
     const files: Record<string, string> = {};
@@ -91,19 +93,19 @@ export async function compileCode(
     });
 
     if (!resp.ok) {
-      throw new Error(`服务端错误: ${resp.status} ${resp.statusText}`);
+      throw new Error(`${t('Server error')}: ${resp.status} ${resp.statusText}`);
     }
 
     const data: CompileResponse = await resp.json();
 
     if (!data.success) {
-      result.output = data.error ?? '编译失败（未知错误）';
-      onStatus?.('error', '编译失败');
+      result.output = data.error ?? t('Compilation failed (unknown error)');
+      onStatus?.('error', t('Compilation failed'));
       return result;
     }
 
     // Step 2: Load the Emscripten JS glue
-    onStatus?.('loading', '正在加载编译结果...');
+    onStatus?.('loading', t('Loading compiled output...'));
 
     const buildId = data.buildId;
     const runtime = await loadEmscriptenModule(buildId, width, height);
@@ -113,17 +115,17 @@ export async function compileCode(
       result.width = runtime.getWidth();
       result.height = runtime.getHeight();
       result.success = true;
-      result.output = '编译成功';
-      onStatus?.('done', '运行中');
+      result.output = t('Compiled successfully');
+      onStatus?.('done', t('Running'));
     } else {
-      result.output = 'Emscripten 模块加载失败';
-      onStatus?.('error', '模块加载失败');
+      result.output = t('Failed to load the Emscripten module');
+      onStatus?.('error', t('Module failed to load'));
     }
 
     return result;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    result.output = '错误: ' + msg;
+    result.output = t('Error') + ': ' + msg;
     onStatus?.('error', msg);
     return result;
   }

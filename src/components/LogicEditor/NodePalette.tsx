@@ -3,6 +3,8 @@
 import React, { useState, useCallback } from 'react';
 import { NODE_CATEGORIES, getNodesByCategory, NODE_DEFINITIONS } from './nodeDefinitions';
 import type { LogicNodeDefinition } from './types';
+import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './NodePalette.css';
 
 interface NodePaletteProps {
@@ -18,6 +20,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
     custom: true,
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [hovered, setHovered] = useState<LogicNodeDefinition | null>(null);
 
   const toggleCategory = useCallback((categoryId: string) => {
     setExpandedCategories(prev => ({
@@ -47,14 +50,14 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
   return (
     <div className="node-palette">
       <div className="palette-header">
-        <h3>节点</h3>
+        <h3>{t('Nodes')}</h3>
       </div>
 
       {/* Search */}
       <div className="palette-search">
         <input
           type="text"
-          placeholder="搜索节点..."
+          placeholder={t('Search nodes...')}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
@@ -71,13 +74,14 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
           // Search results
           <div className="search-results">
             {filteredDefinitions.length === 0 ? (
-              <div className="no-results">未找到匹配的节点</div>
+              <div className="no-results">{t('No matching nodes found')}</div>
             ) : (
               filteredDefinitions.map(def => (
                 <NodeItem
                   key={def.subType}
                   definition={def}
                   onDragStart={handleDragStart}
+                  onHover={setHovered}
                 />
               ))
             )}
@@ -89,10 +93,9 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
               <div
                 className="category-header"
                 onClick={() => toggleCategory(category.id)}
-                style={{ borderLeftColor: category.color }}
               >
-                <span className="category-icon">{category.icon}</span>
-                <span className="category-name">{category.name}</span>
+                <span className="category-icon"><ToolIcon name={`cat:${category.id}`} size={14} fallback={category.icon} /></span>
+                <span className="category-name">{t(category.name)}</span>
                 <span className="category-toggle">
                   {expandedCategories[category.id] ? '▼' : '▶'}
                 </span>
@@ -104,12 +107,24 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
                       key={def.subType}
                       definition={def}
                       onDragStart={handleDragStart}
+                      onHover={setHovered}
                     />
                   ))}
                 </div>
               )}
             </div>
           ))
+        )}
+      </div>
+
+      <div className="panel-hint">
+        {hovered ? (
+          <>
+            <strong>{hovered.label}</strong>
+            <span>{hovered.description}</span>
+          </>
+        ) : (
+          t('Drag & drop to add')
         )}
       </div>
     </div>
@@ -120,21 +135,22 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
 interface NodeItemProps {
   definition: LogicNodeDefinition;
   onDragStart: (event: React.DragEvent, definition: LogicNodeDefinition) => void;
+  onHover: (definition: LogicNodeDefinition | null) => void;
 }
 
-const NodeItem: React.FC<NodeItemProps> = ({ definition, onDragStart }) => {
+const NodeItem: React.FC<NodeItemProps> = ({ definition, onDragStart, onHover }) => {
   return (
     <div
       className="node-item"
       draggable
       onDragStart={e => onDragStart(e, definition)}
-      style={{ borderLeftColor: definition.color }}
-      title={definition.description}
+      style={{ '--node-color': definition.color } as React.CSSProperties}
+      onMouseEnter={() => onHover(definition)}
+      onMouseLeave={() => onHover(null)}
     >
-      <span className="node-icon">{definition.icon}</span>
+      <span className="node-icon"><ToolIcon name={definition.subType === 'switch' ? 'switch_node' : definition.subType} size={22} fallback={definition.icon} /></span>
       <div className="node-info">
         <span className="node-label">{definition.label}</span>
-        <span className="node-description">{definition.description}</span>
       </div>
     </div>
   );

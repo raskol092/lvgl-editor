@@ -15,6 +15,7 @@ import {
   duplicateSelectedComponents,
   selectAllComponents,
 } from '../../hooks/useKeyboardShortcuts';
+import { t } from '../../i18n';
 import './Canvas.css';
 
 interface BoxSelection {
@@ -703,7 +704,7 @@ const Canvas: React.FC = () => {
     const items: ContextMenuItem[] = [
       {
         id: 'copy',
-        label: '复制',
+        label: t('Copy'),
         icon: '📋',
         shortcut: 'Ctrl+C',
         disabled: !hasSelection,
@@ -713,7 +714,7 @@ const Canvas: React.FC = () => {
       },
       {
         id: 'cut',
-        label: '剪切',
+        label: t('Cut'),
         icon: '✂️',
         shortcut: 'Ctrl+X',
         disabled: !hasSelection,
@@ -723,7 +724,7 @@ const Canvas: React.FC = () => {
       },
       {
         id: 'paste',
-        label: '粘贴',
+        label: t('Paste'),
         icon: '📄',
         shortcut: 'Ctrl+V',
         disabled: !hasClipboard(),
@@ -733,7 +734,7 @@ const Canvas: React.FC = () => {
       },
       {
         id: 'duplicate',
-        label: '复制并粘贴',
+        label: t('Duplicate'),
         icon: '⧉',
         shortcut: 'Ctrl+D',
         disabled: !hasSelection,
@@ -744,7 +745,7 @@ const Canvas: React.FC = () => {
       { id: 'divider1', label: '', divider: true },
       {
         id: 'delete',
-        label: '删除',
+        label: t('Delete'),
         icon: '🗑️',
         shortcut: 'Delete',
         disabled: !hasSelection,
@@ -757,7 +758,7 @@ const Canvas: React.FC = () => {
       { id: 'divider2', label: '', divider: true },
       {
         id: 'bring-front',
-        label: '置于顶层',
+        label: t('Bring to front'),
         icon: '⬆️',
         disabled: !hasSelection || hasMultiple,
         onClick: () => {
@@ -769,7 +770,7 @@ const Canvas: React.FC = () => {
       },
       {
         id: 'bring-forward',
-        label: '上移一层',
+        label: t('Move up one layer'),
         icon: '↑',
         disabled: !hasSelection || hasMultiple,
         onClick: () => {
@@ -781,7 +782,7 @@ const Canvas: React.FC = () => {
       },
       {
         id: 'send-backward',
-        label: '下移一层',
+        label: t('Move down one layer'),
         icon: '↓',
         disabled: !hasSelection || hasMultiple,
         onClick: () => {
@@ -793,7 +794,7 @@ const Canvas: React.FC = () => {
       },
       {
         id: 'send-back',
-        label: '置于底层',
+        label: t('Send to back'),
         icon: '⬇️',
         disabled: !hasSelection || hasMultiple,
         onClick: () => {
@@ -806,7 +807,7 @@ const Canvas: React.FC = () => {
       { id: 'divider3', label: '', divider: true },
       {
         id: 'select-all',
-        label: '全选',
+        label: t('Select all'),
         icon: '☑️',
         shortcut: 'Ctrl+A',
         onClick: () => {
@@ -971,11 +972,11 @@ const Canvas: React.FC = () => {
       
       {/* Zoom controls */}
       <div className="zoom-controls">
-        <button onClick={handleZoomOut} title="缩小">−</button>
-        <button className="zoom-level" onClick={handleZoomReset} title="重置缩放">
+        <button onClick={handleZoomOut} title={t('Zoom out')}>−</button>
+        <button className="zoom-level" onClick={handleZoomReset} title={t('Reset zoom')}>
           {Math.round(canvas.zoom * 100)}%
         </button>
-        <button onClick={handleZoomIn} title="放大">+</button>
+        <button onClick={handleZoomIn} title={t('Zoom in')}>+</button>
       </div>
       
       {/* Context Menu */}
