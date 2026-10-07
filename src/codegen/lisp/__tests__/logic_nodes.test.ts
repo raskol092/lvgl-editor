@@ -43,10 +43,15 @@ it('every logic node type generates the expected Lisp', () => {
   expect(src).toContain('(lv-bar-set-value ui-prog (+ 1 2) LV_ANIM_ON)')
   // navigate, delay, call_function, set_text with string_op, custom code
   expect(src).toContain('(lv-screen-load-anim ui-screen-second LV_SCREEN_LOAD_ANIM_FADE_IN 300 0 nil)')
-  expect(src).toContain('(sleep 0.25)')
+  // delay never blocks: everything after it is deferred
+  expect(src).not.toContain('(sleep')
+  expect(src).toContain('(ui-defer 0.25 (lambda ()')
+  expect(src.indexOf('(ui-defer 0.25')).toBeLessThan(src.indexOf('(my-fn 1 2)'))
   expect(src).toContain('(my-fn 1 2)')
   expect(src).toContain('(lv-label-set-text ui-txt (str-merge "a" "b"))')
   expect(src).toContain('(print "hi")')
+  expect(src).toContain('(defun ui-defer-tick ()')
+  expect(src).toContain('(ui-defer-tick)')
   // parentheses balance
   let d = 0, str = false
   for (let i = 0; i < src.length; i++) {

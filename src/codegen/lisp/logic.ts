@@ -146,6 +146,14 @@ function chain(nodeId: string, c: Ctx, visited: Set<string>): string[] {
   visited.add(nodeId);
   const node = c.graph.nodes.find(n => n.id === nodeId);
   if (!node) return [];
+  if (node.subType === 'delay') {
+    // never block the main loop: the rest of the chain is scheduled and runs from ui-logic-tick
+    const next = nextExecNode(node, c.graph);
+    const rest = next ? chain(next, c, visited) : [];
+    if (rest.length === 0) return [];
+    const secs = num(node.params.duration, 1000) / 1000;
+    return closeLast([`(ui-defer ${Number.isInteger(secs) ? secs.toFixed(1) : String(secs)} (lambda ()`, ...shift(progn(rest), 2)]).map((l, idx, arr) => (idx === arr.length - 1 ? l + ')' : l));
+  }
   const out = [...nodeForms(node, c)];
   if (node.subType !== 'if_else' && node.subType !== 'switch') {
     const next = nextExecNode(node, c.graph);
@@ -272,10 +280,7 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
       return [`(${[fn, ...args.map(String)].join(' ')})`];
     }
     case 'delay':
-    {
-      const secs = num(p.duration, 1000) / 1000;
-      return [`(sleep ${Number.isInteger(secs) ? secs.toFixed(1) : String(secs)})`];
-    }
+      return []; // handled by chain(): the rest of the chain is deferred
     case 'var_write':
       return [`(setq ${varSym(p.variableName || p.variableId || 'unknown', c)} ${inputValue(node, 'Value', c)})`];
     case 'c_code_block': {
@@ -375,8 +380,31 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
   L.push(...shift(init.length ? init : [comment('No triggers to register')], o.indentSize * 2));
   L.push(`${i}${i}nil))`, '');
 
+  // non-blocking delays: ui-defer queues (start-time seconds fn), ui-defer-tick runs what is due
+  if (o.generateComments) L.push(...banner('Deferred calls (Delay nodes)'));
+  L.push(
+    '(def ui-defer-queue nil)',
+    '',
+    '(defun ui-defer (secs f)',
+    `${i}(setq ui-defer-queue (cons (list (systime) secs f) ui-defer-queue)))`,
+    '',
+    '(defun ui-defer-tick ()',
+    `${i}(if (eq ui-defer-queue nil)`,
+    `${i}${i}nil`,
+    `${i}${i}(let ((q ui-defer-queue))`,
+    `${i}${i}${i}(progn`,
+    `${i}${i}${i}${i}(setq ui-defer-queue nil)`,
+    `${i}${i}${i}${i}(map (lambda (d)`,
+    `${i}${i}${i}${i}${i}${i}(if (>= (secs-since (ix d 0)) (ix d 1))`,
+    `${i}${i}${i}${i}${i}${i}${i}(trap ((ix d 2)))`,
+    `${i}${i}${i}${i}${i}${i}${i}(setq ui-defer-queue (cons d ui-defer-queue))))`,
+    `${i}${i}${i}${i}${i}q)`,
+    `${i}${i}${i}${i}nil))))`,
+    '',
+  );
+
   L.push(`(defun ui-logic-tick ()`, `${i}(progn`);
-  const tick: string[] = [];
+  const tick: string[] = ['(ui-defer-tick)'];
   for (const t of timers) {
     if (t.once) {
       tick.push(`(if (and (not ${t.done}) (>= (secs-since ${t.clock}) ${t.seconds}))`, `    (progn (setq ${t.done} t) (${t.fn})))`);
