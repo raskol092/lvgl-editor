@@ -1,3 +1,4 @@
+import { getArcStyle, isArcLike } from '../../utils/arcStyle';
 import { Link2, Unlock } from 'lucide-react';
 import Emoji from '../icons/Emoji';
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
@@ -297,7 +298,16 @@ const PropertyEditor: React.FC = () => {
         <h3>{t('Properties')}</h3>
       </div>
       
-      <div className="property-sections">
+      <div
+        className="property-sections"
+        onClick={(e) => {
+          // click on a section title folds / unfolds the section
+          const header = (e.target as HTMLElement).closest('.section-header');
+          if (header && header.parentElement?.classList.contains('property-section')) {
+            header.parentElement.classList.toggle('collapsed');
+          }
+        }}
+      >
         {/* Component Info */}
         <div className="property-section">
           <div className="section-header">{t('Component info')}</div>
@@ -318,11 +328,11 @@ const PropertyEditor: React.FC = () => {
           </div>
         </div>
 
-        {/* Position */}
+        {/* Position and size */}
         <div className="property-section">
-          <div className="section-header">{t('Position')}</div>
-          <div className="property-row two-col">
-            <div className="property-field">
+          <div className="section-header">{t('Position and size')}</div>
+          <div className="geometry-grid">
+            <div className="geometry-field">
               <label>X</label>
               <input
                 type="number"
@@ -330,7 +340,7 @@ const PropertyEditor: React.FC = () => {
                 onChange={(e) => handlePropertyChange('x', parseInt(e.target.value) || 0)}
               />
             </div>
-            <div className="property-field">
+            <div className="geometry-field">
               <label>Y</label>
               <input
                 type="number"
@@ -338,89 +348,42 @@ const PropertyEditor: React.FC = () => {
                 onChange={(e) => handlePropertyChange('y', parseInt(e.target.value) || 0)}
               />
             </div>
-          </div>
-        </div>
-
-        {/* Size */}
-        <div className="property-section">
-          <div className="section-header">{t('Size')}</div>
-          {/* Width */}
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <label style={{ fontSize: 12, color: '#666', width: 32, flexShrink: 0 }}>{t('Width')}</label>
-              <div className="size-mode-switcher">
-                {(['px', 'percent', 'content'] as const).map((m) => (
-                  <button
-                    key={m}
-                    className={`size-mode-btn ${(component.widthMode || 'px') === m ? 'active' : ''}`}
-                    onClick={() => handlePropertyChange('widthMode', m)}
-                  >
-                    {m === 'px' ? 'px' : m === 'percent' ? '%' : 'auto'}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {(component.widthMode || 'px') === 'content' ? (
-              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#1e293b', borderRadius: 4 }}>{t('Fit content')}</div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <input
-                  type="number"
-                  value={component.width}
-                  min={(component.widthMode || 'px') === 'percent' ? 1 : 10}
-                  max={(component.widthMode || 'px') === 'percent' ? 100 : undefined}
-                  onChange={(e) => {
-                    const v = parseInt(e.target.value) || ((component.widthMode || 'px') === 'percent' ? 1 : 10);
-                    const min = (component.widthMode || 'px') === 'percent' ? 1 : 10;
-                    const max = (component.widthMode || 'px') === 'percent' ? 100 : Infinity;
-                    handlePropertyChange('width', Math.min(max, Math.max(min, v)));
-                  }}
-                  style={{ flex: 1, padding: '6px 8px', border: '1px solid #ddd', borderRadius: 4, fontSize: 12 }}
-                />
-                {(component.widthMode || 'px') === 'percent' && (
-                  <span style={{ fontSize: 12, color: '#888' }}>%</span>
-                )}
-              </div>
-            )}
-          </div>
-          {/* Height */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <label style={{ fontSize: 12, color: '#666', width: 32, flexShrink: 0 }}>{t('Height')}</label>
-              <div className="size-mode-switcher">
-                {(['px', 'percent', 'content'] as const).map((m) => (
-                  <button
-                    key={m}
-                    className={`size-mode-btn ${(component.heightMode || 'px') === m ? 'active' : ''}`}
-                    onClick={() => handlePropertyChange('heightMode', m)}
-                  >
-                    {m === 'px' ? 'px' : m === 'percent' ? '%' : 'auto'}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {(component.heightMode || 'px') === 'content' ? (
-              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#1e293b', borderRadius: 4 }}>{t('Fit content')}</div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <input
-                  type="number"
-                  value={component.height}
-                  min={(component.heightMode || 'px') === 'percent' ? 1 : 10}
-                  max={(component.heightMode || 'px') === 'percent' ? 100 : undefined}
-                  onChange={(e) => {
-                    const v = parseInt(e.target.value) || ((component.heightMode || 'px') === 'percent' ? 1 : 10);
-                    const min = (component.heightMode || 'px') === 'percent' ? 1 : 10;
-                    const max = (component.heightMode || 'px') === 'percent' ? 100 : Infinity;
-                    handlePropertyChange('height', Math.min(max, Math.max(min, v)));
-                  }}
-                  style={{ flex: 1, padding: '6px 8px', border: '1px solid #ddd', borderRadius: 4, fontSize: 12 }}
-                />
-                {(component.heightMode || 'px') === 'percent' && (
-                  <span style={{ fontSize: 12, color: '#888' }}>%</span>
-                )}
-              </div>
-            )}
+            {(['width', 'height'] as const).map((dim) => {
+              const modeKey = dim === 'width' ? 'widthMode' : 'heightMode';
+              const mode = component[modeKey] || 'px';
+              const min = mode === 'percent' ? 1 : 10;
+              const max = mode === 'percent' ? 100 : Infinity;
+              return (
+                <div className="geometry-field" key={dim}>
+                  <label>{dim === 'width' ? t('Width') : t('Height')}</label>
+                  <div className="geometry-size">
+                    {mode === 'content' ? (
+                      <div className="geometry-auto">{t('Fit content')}</div>
+                    ) : (
+                      <input
+                        type="number"
+                        value={component[dim]}
+                        min={min}
+                        max={max === Infinity ? undefined : max}
+                        onChange={(e) => {
+                          const v = parseInt(e.target.value) || min;
+                          handlePropertyChange(dim, Math.min(max, Math.max(min, v)));
+                        }}
+                      />
+                    )}
+                    <select
+                      value={mode}
+                      title={t('Size unit')}
+                      onChange={(e) => handlePropertyChange(modeKey, e.target.value)}
+                    >
+                      <option value="px">px</option>
+                      <option value="percent">%</option>
+                      <option value="content">auto</option>
+                    </select>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -481,7 +444,7 @@ const PropertyEditor: React.FC = () => {
 
         {/* Flags */}
         <div className="property-section">
-          <div className="section-header">Flags</div>
+          <div className="section-header">{t('Flags')}</div>
           {renderFlagsSection(component, handlePropertyChange)}
         </div>
 
@@ -531,6 +494,8 @@ const PropertyEditor: React.FC = () => {
             </div>
           </div>
           
+          {!isArcLike(component.type) && (
+            <>
           <div className="property-row">
             <label>{t('Border color')}</label>
             <div className="color-input-wrapper">
@@ -611,6 +576,8 @@ const PropertyEditor: React.FC = () => {
                   onChange={(e) => handleStyleChange('borderRadiusBottomRight', parseInt(e.target.value) || 0)} />
               </div>
             </div>
+          )}
+            </>
           )}
 
           {/* Border side selector */}
@@ -1036,7 +1003,7 @@ const PropertyEditor: React.FC = () => {
           <div className="property-section">
             <div className="section-header">{t('Flex item')}</div>
             <div className="property-row">
-              <label>flexGrow</label>
+              <label>{t('Flex grow')}</label>
               <input
                 type="number"
                 value={component.props.flexGrow ?? 0}
@@ -1046,7 +1013,7 @@ const PropertyEditor: React.FC = () => {
               />
             </div>
             <div className="property-row">
-              <label>flexShrink</label>
+              <label>{t('Flex shrink')}</label>
               <input
                 type="number"
                 value={component.props.flexShrink ?? 1}
@@ -1056,7 +1023,7 @@ const PropertyEditor: React.FC = () => {
               />
             </div>
             <div className="property-row">
-              <label>alignSelf</label>
+              <label>{t('Align self')}</label>
               <select
                 value={component.props.alignSelf || 'auto'}
                 onChange={(e) => handlePropsChange('alignSelf', e.target.value)}
@@ -1576,6 +1543,7 @@ function renderComponentProps(
   onBatchChange?: (updates: Record<string, any>) => void
 ): React.ReactNode {
   const { type, props } = component;
+  const arcStyle = getArcStyle(component);
 
   switch (type) {
     case 'btn':
@@ -1962,6 +1930,32 @@ function renderComponentProps(
       return (
         <div className="property-section">
           <div className="section-header">{t('Arc')}</div>
+          <div className="property-row two-col">
+            <div className="property-field">
+              <label>{t('Arc width')}</label>
+              <input
+                type="number"
+                min={1}
+                max={200}
+                value={arcStyle.width}
+                onChange={(e) => onChange('arcWidth', Math.max(1, parseInt(e.target.value) || 1))}
+              />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('Arc color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={arcStyle.color} onChange={(e) => onChange('arcColor', e.target.value)} />
+              <input type="text" value={arcStyle.color} onChange={(e) => onChange('arcColor', e.target.value)} className="color-text" />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('Track color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} />
+              <input type="text" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} className="color-text" />
+            </div>
+          </div>
           <div className="property-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
             <label>{t('Start angle:')} {props.startAngle || 135}°</label>
             <input
@@ -2038,6 +2032,32 @@ function renderComponentProps(
       return (
         <div className="property-section">
           <div className="section-header">{t('Spinner')}</div>
+          <div className="property-row two-col">
+            <div className="property-field">
+              <label>{t('Arc width')}</label>
+              <input
+                type="number"
+                min={1}
+                max={200}
+                value={arcStyle.width}
+                onChange={(e) => onChange('arcWidth', Math.max(1, parseInt(e.target.value) || 1))}
+              />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('Arc color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={arcStyle.color} onChange={(e) => onChange('arcColor', e.target.value)} />
+              <input type="text" value={arcStyle.color} onChange={(e) => onChange('arcColor', e.target.value)} className="color-text" />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('Track color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} />
+              <input type="text" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} className="color-text" />
+            </div>
+          </div>
           <div className="property-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
             <label>{t('Spin speed:')} {props.speed || 1000}ms</label>
             <input

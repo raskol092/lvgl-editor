@@ -204,6 +204,23 @@ describe('ui/ui.lisp', () => {
   });
 });
 
+describe('arcs and spinners', () => {
+  it('use arc styles instead of a box border', () => {
+    const arc = createComponent('arc', {
+      name: 'dial',
+      props: { arcWidth: 14, arcColor: '#ff0000', arcTrackColor: '#222222' },
+      // legacy projects stored the arc in the border style: it must not become a box border
+      styles: { default: { borderWidth: 15, borderColor: '#2196F3' } },
+    });
+    const ui = generateCode([createPage({ components: [arc] })])['ui/ui.lisp'];
+    expect(ui).toContain('(lv-obj-set-style-border-width ui-dial 0 LV_PART_MAIN)');
+    expect(ui).not.toContain('border-width ui-dial 15');
+    expect(ui).toContain('(lv-obj-set-style-arc-width ui-dial 14 LV_PART_INDICATOR)');
+    expect(ui).toContain('(lv-obj-set-style-arc-color ui-dial 0xFF0000 LV_PART_INDICATOR)');
+    expect(ui).toContain('(lv-obj-set-style-arc-color ui-dial 0x222222 LV_PART_MAIN)');
+  });
+});
+
 describe('ui/ui_events.lisp', () => {
   const ev = sampleProject()['ui/ui_events.lisp'];
   it('builds navigation, visibility and value actions', () => {

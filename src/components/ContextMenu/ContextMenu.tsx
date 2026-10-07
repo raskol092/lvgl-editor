@@ -77,6 +77,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }) => {
       ref={menuRef}
       className="context-menu"
       style={{ left: x, top: y }}
+      // The menu is rendered inside the canvas: without this a click on an item first reaches the canvas,
+      // which clears the selection, and the item (e.g. Delete) is then disabled before its click fires.
+      onMouseDown={(e) => e.stopPropagation()}
+      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); }}
     >
       {items.map((item, index) => {
         if (item.divider) {

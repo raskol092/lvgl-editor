@@ -4,6 +4,7 @@ import type { Page, LvglComponent, StyleProps, Animation, Theme } from '../../ty
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LispGenOptions } from './types';
 import type { NameResolver } from './names';
+import { getArcStyle, isArcLike } from '../../utils/arcStyle';
 import { sym, lstr, lcolor, lopa, indent, comment, banner, userCode, shift, symbolText } from './sexp';
 
 export interface UiContext {
@@ -539,7 +540,17 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
     if (m[sb]) out.push(`(lv-obj-set-scrollbar-mode ${v} ${m[sb]})`);
   }
 
-  out.push(...styleForms(v, comp.styles.default, 'LV_PART_MAIN', ctx));
+  const arcLike = isArcLike(comp.type);
+  // arcs and spinners have no box border: their border style only ever described the arc
+  const defaultStyle = arcLike ? { ...comp.styles.default, borderWidth: 0, borderColor: undefined, borderRadius: undefined } : comp.styles.default;
+  out.push(...styleForms(v, defaultStyle, 'LV_PART_MAIN', ctx));
+  if (arcLike) {
+    const arc = getArcStyle(comp);
+    out.push(`(lv-obj-set-style-arc-width ${v} ${arc.width} LV_PART_MAIN)`);
+    out.push(`(lv-obj-set-style-arc-color ${v} ${lcolor(arc.track)} LV_PART_MAIN)`);
+    out.push(`(lv-obj-set-style-arc-width ${v} ${arc.width} LV_PART_INDICATOR)`);
+    out.push(`(lv-obj-set-style-arc-color ${v} ${lcolor(arc.color)} LV_PART_INDICATOR)`);
+  }
   if (comp.styles.pressed) out.push(...styleForms(v, comp.styles.pressed, 'LV_STATE_PRESSED', ctx));
   if (comp.styles.focused) out.push(...styleForms(v, comp.styles.focused, 'LV_STATE_FOCUSED', ctx));
   if (comp.styles.disabled) out.push(...styleForms(v, comp.styles.disabled, 'LV_STATE_DISABLED', ctx));

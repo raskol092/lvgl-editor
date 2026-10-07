@@ -360,13 +360,13 @@ export const componentDefinitions: ComponentDefinition[] = [
     category: 'display',
     defaultWidth: 100,
     defaultHeight: 100,
-    defaultProps: { startAngle: 135, endAngle: 45, value: 60 },
+    defaultProps: { startAngle: 135, endAngle: 45, value: 60, arcWidth: 12, arcColor: '#2196F3', arcTrackColor: '#e0e0e0' },
     defaultStyles: {
       default: {
         // arc: arc_indic bg=#E0E0E0, indicator=#2196F3, no bg fill
         bgColor: 'transparent',
-        borderColor: '#2196F3',
-        borderWidth: 15,
+        borderColor: 'transparent',
+        borderWidth: 0,
         borderRadius: 0,
         textColor: '#212121',
         opacity: 1,
@@ -382,13 +382,13 @@ export const componentDefinitions: ComponentDefinition[] = [
     category: 'display',
     defaultWidth: 50,
     defaultHeight: 50,
-    defaultProps: { speed: 1000 },
+    defaultProps: { speed: 1000, arcWidth: 12, arcColor: '#2196F3', arcTrackColor: '#e0e0e0' },
     defaultStyles: {
       default: {
         // spinner: same as arc — arc_indic bg=#E0E0E0, indicator=#2196F3
         bgColor: 'transparent',
-        borderColor: '#2196F3',
-        borderWidth: 15,
+        borderColor: 'transparent',
+        borderWidth: 0,
         borderRadius: 0,
         textColor: '#212121',
         opacity: 1,
