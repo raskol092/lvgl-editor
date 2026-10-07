@@ -222,7 +222,15 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
         opacity: `(lv-obj-set-style-opa ${target} ${expr ?? String(num(literal, 255))} LV_PART_MAIN)`,
         visible: flag(`(lv-obj-remove-flag ${target} ${hidden})`, `(lv-obj-add-flag ${target} ${hidden})`),
         checked: flag(`(lv-obj-add-state ${target} LV_STATE_CHECKED)`, `(lv-obj-remove-state ${target} LV_STATE_CHECKED)`),
-        text: `(lv-label-set-text ${target} ${expr ?? lstr(String(literal))})`,
+        text: (() => {
+          const tv = expr ?? lstr(String(literal));
+          switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
+            case 'textarea': return `(lv-textarea-set-text ${target} ${tv})`;
+            case 'btn': return `(lv-label-set-text (lv-obj-get-child ${target} 0) ${tv})`;
+            case 'checkbox': return `(lv-checkbox-set-text ${target} ${tv})`;
+            default: return `(lv-label-set-text ${target} ${tv})`;
+          }
+        })(),
         value: (() => {
           switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
             case 'bar': return `(lv-bar-set-value ${target} ${val} LV_ANIM_ON)`;
@@ -262,14 +270,27 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
     }
     case 'set_text': {
       const target = c.names.varByName(p.targetComponent || 'label', c.pageHint);
-      return [`(lv-label-set-text ${target} ${inputValue(node, 'Text', c)})`];
+      const text = inputValue(node, 'Text', c);
+      // like the event action: the setter depends on the widget (a button keeps its text in a child label)
+      switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
+        case 'textarea': return [`(lv-textarea-set-text ${target} ${text})`];
+        case 'btn': return [`(lv-label-set-text (lv-obj-get-child ${target} 0) ${text})`];
+        case 'checkbox': return [`(lv-checkbox-set-text ${target} ${text})`];
+        case 'dropdown': return [comment('dropdown caption cannot be changed through the LVGL bridge')];
+        default: return [`(lv-label-set-text ${target} ${text})`];
+      }
     }
     case 'set_value': {
       const target = c.names.varByName(p.targetComponent || 'slider', c.pageHint);
       const value = inputValue(node, 'Number', c);
-      switch (p.componentType || 'slider') {
+      // the setter follows the real type of the target (the node itself has no type setting)
+      const type = c.names.compByName(p.targetComponent || '', c.pageHint)?.type ?? p.componentType ?? 'slider';
+      switch (type) {
         case 'bar': return [`(lv-bar-set-value ${target} ${value} LV_ANIM_ON)`];
         case 'arc': return [`(lv-arc-set-value ${target} ${value})`];
+        case 'dropdown': return [`(lv-dropdown-set-selected ${target} ${value})`];
+        case 'switch':
+        case 'checkbox': return [`(if (and ${value} (not (eq ${value} 0))) (lv-obj-add-state ${target} LV_STATE_CHECKED) (lv-obj-remove-state ${target} LV_STATE_CHECKED))`];
         case 'spinner': return [comment('A spinner value cannot be set directly')];
         default: return [`(lv-slider-set-value ${target} ${value} LV_ANIM_ON)`];
       }

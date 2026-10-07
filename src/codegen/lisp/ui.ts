@@ -630,6 +630,12 @@ const ANIM_RUNTIME = `(def ui-anims nil)
     ((eq kind 'bounce) (ui-bounce k))
     (t k)))
 
+;; zoom / rotation work on any widget (not only images) and turn around the centre
+(defun ui-pivot (obj)
+  (progn
+    (lv-obj-set-style-transform-pivot-x obj (/ (lv-obj-get-width obj) 2) LV_PART_MAIN)
+    (lv-obj-set-style-transform-pivot-y obj (/ (lv-obj-get-height obj) 2) LV_PART_MAIN)))
+
 (defun ui-anim-set (obj prop v)
   (cond
     ((eq prop 'x) (lv-obj-set-x obj v))
@@ -637,8 +643,8 @@ const ANIM_RUNTIME = `(def ui-anims nil)
     ((eq prop 'width) (lv-obj-set-width obj v))
     ((eq prop 'height) (lv-obj-set-height obj v))
     ((eq prop 'opa) (lv-obj-set-style-opa obj v LV_PART_MAIN))
-    ((eq prop 'transform-zoom) (lv-image-set-scale obj v))
-    ((eq prop 'transform-angle) (lv-image-set-rotation obj v))
+    ((eq prop 'transform-zoom) (progn (ui-pivot obj) (lv-obj-set-style-transform-scale-x obj v LV_PART_MAIN) (lv-obj-set-style-transform-scale-y obj v LV_PART_MAIN)))
+    ((eq prop 'transform-angle) (progn (ui-pivot obj) (lv-obj-set-style-transform-rotation obj v LV_PART_MAIN)))
     (t nil)))
 
 ;; one animation step: returns the updated record, or nil when finished
@@ -659,7 +665,9 @@ const ANIM_RUNTIME = `(def ui-anims nil)
 ;; call this regularly from the main loop
 (defun ui-anim-step ()
   (if ui-anims
-      (setq ui-anims (filter (lambda (a) a) (map ui-anim-tick ui-anims)))))`;
+      ;; a failing animation (e.g. its widget was deleted) is dropped instead of stopping all the others
+      (setq ui-anims (filter (lambda (a) a)
+                             (map (lambda (a) (let ((r (trap (ui-anim-tick a)))) (if (eq (car r) 'exit-error) nil r))) ui-anims)))))`;
 
 export function hasAnimations(pages: Page[]): boolean {
   const walk = (cs: LvglComponent[]): boolean => cs.some(c => (c.animations && c.animations.length > 0) || walk(c.children));

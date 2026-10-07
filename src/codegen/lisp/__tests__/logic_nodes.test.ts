@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest'
 import { generateCode } from '../index'
-import { createComponent, createPage, createLogicNode, createLogicPort, createLogicGraph, createLogicConnection, createLogicVariable } from '../../__tests__/helpers'
+import { createComponent, createPage, createAnimation, createLogicNode, createLogicPort, createLogicGraph, createLogicConnection, createLogicVariable } from '../../__tests__/helpers'
 
 const ex = (id: string, name = 'Exec') => createLogicPort({ id, name, type: 'execution' })
 const val = (id: string, name: string, type = 'any', d?: unknown) => createLogicPort({ id, name, type, defaultValue: d } as never)
@@ -63,4 +63,34 @@ it('every logic node type generates the expected Lisp', () => {
     else if (c === ')') d--
   }
   expect(d).toBe(0)
+})
+
+it('Set text picks the setter by widget type; animations zoom any widget', () => {
+  const btn = createComponent('btn', { id: 'b1', name: 'go', animations: [createAnimation({ id: 'z1', type: 'zoom_in', property: 'transform_zoom', startValue: 128, endValue: 256 })] })
+  const area = createComponent('textarea', { id: 'a1', name: 'note' })
+  const pages = [createPage({ id: 'p1', name: 'main', components: [btn, area] })]
+  const mk = (id: string, target: string) => createLogicNode('set_text', { id, params: { targetComponent: target }, inputs: [ex(`${id}i`), val(`${id}t`, 'Text', 'string', 'x')], outputs: [ex(`${id}o`, 'Done')] })
+  const trig = createLogicNode('event_trigger', { id: 't', params: { eventType: 'LV_EVENT_CLICKED', targetComponent: 'b1' }, outputs: [ex('to')] })
+  const g = createLogicGraph({ id: 'g1', name: 'texts', nodes: [trig, mk('n1', 'b1'), mk('n2', 'a1')], connections: [conn('t', 'to', 'n1', 'n1i'), conn('n1', 'n1o', 'n2', 'n2i')] })
+  const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+  expect(src).toContain('(lv-label-set-text (lv-obj-get-child ui-go 0) "x")')
+  expect(src).toContain('(lv-textarea-set-text ui-note "x")')
+  const ui = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+  expect(ui).toContain('lv-obj-set-style-transform-scale-x')
+  expect(ui).not.toContain('lv-image-set-scale')
+})
+
+it('Set value uses the real type of the target (arc value -> bar)', () => {
+  const arc = createComponent('arc', { id: 'a1', name: 'knob' })
+  const bar = createComponent('bar', { id: 'b1', name: 'level' })
+  const pages = [createPage({ id: 'p1', name: 'main', components: [arc, bar] })]
+  const trig = createLogicNode('event_trigger', { id: 't', params: { eventType: 'LV_EVENT_VALUE_CHANGED', targetComponent: 'a1' }, outputs: [ex('to')] })
+  const get = createLogicNode('get_property', { id: 'g', params: { targetComponent: 'a1', property: 'value' }, outputs: [val('go', 'Value')] })
+  const set = createLogicNode('set_value', { id: 's', params: { targetComponent: 'b1' }, inputs: [ex('si'), val('sn', 'Number', 'int', 0)], outputs: [ex('so', 'Done')] })
+  const g = createLogicGraph({ id: 'g1', name: 'link', nodes: [trig, get, set], connections: [
+    conn('t', 'to', 's', 'si'),
+    conn('g', 'go', 's', 'sn', 'data'),
+  ] })
+  const out = generateCode(pages, undefined, [g], undefined, [], [], '', 14)
+  expect(out['ui/ui_logic.lisp']).toContain('(lv-bar-set-value ui-level (lv-arc-get-value ui-knob) LV_ANIM_ON)')
 })
