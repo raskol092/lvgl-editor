@@ -409,17 +409,22 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       case 'img':
         return <CanvasImageContent src={props.src} recolor={defaultStyle.imageRecolor} iconColor={th.text} />;
       
-      case 'line':
+      case 'line': {
+        // lv_line draws a polyline through its points (object coordinates); default color = theme text
+        const pts: number[][] = Array.isArray(props.points) && props.points.length >= 2 ? props.points : [[0, 0], [component.width, 0]];
         return (
-          <div className="lvgl-line" style={{
-            width: '100%',
-            height: '2px',
-            backgroundColor: defaultStyle.borderColor || defaultStyle.textColor || th.text,
-            position: 'absolute',
-            top: '50%',
-            transform: 'translateY(-50%)',
-          }} />
+          <svg className="lvgl-line" style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}>
+            <polyline
+              fill="none"
+              points={pts.map(pt => `${Number(pt?.[0]) || 0},${Number(pt?.[1]) || 0}`).join(' ')}
+              stroke={props.lineColor || th.text}
+              strokeWidth={props.lineWidth ?? 2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         );
+      }
       
       case 'textarea':
         return (
@@ -847,12 +852,13 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           if (dn < 1) return { n: prevDays + dn, other: true };
           if (dn > daysIn) return { n: dn - daysIn, other: true };
           return { n: dn, other: false };
-        }).slice(0, first + daysIn > 35 ? 42 : 35);
+        });
+        // LVGL always shows 6 weeks (42 days), so the grid runs on into the next month
         return (
           <div className="lvgl-calendar" style={{
             width: '100%',
             height: '100%',
-            fontSize: '10px',
+            fontSize: '11px',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
@@ -864,15 +870,21 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '1fr', gap: '1px', flex: 1, padding: '2px' }}>
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', alignSelf: 'center' }}>{d}</div>
+                <div key={d} style={{ textAlign: 'center', alignSelf: 'center' }}>{d}</div>
               ))}
-              {cells.map((c, i) => (
-                <div key={i} style={{
-                  textAlign: 'center', alignSelf: 'center', padding: '1px 0',
-                  opacity: c.other ? 0.45 : 1,
-                  outline: !c.other && props.showToday && c.n === 1 ? `1px solid ${th.primary}` : undefined,
-                }}>{c.n}</div>
-              ))}
+              {cells.map((c, i) => {
+                const today = !c.other && props.showToday && c.n === 1;
+                return (
+                  <div key={i} style={{
+                    justifySelf: 'center', alignSelf: 'center',
+                    width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: 3,
+                    border: today ? `2px solid ${th.primary}` : c.other ? '1px solid transparent' : `1px solid ${th.border}`,
+                    boxSizing: 'border-box',
+                    opacity: c.other ? 0.7 : 1,
+                  }}>{c.n}</div>
+                );
+              })}
             </div>
           </div>
         );
