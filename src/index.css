@@ -18,8 +18,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
   line-height: 1.5;
-  color: #e2e8f0;
-  background: #1e293b;
+  color: var(--c-200);
+  background: var(--c-800);
 }
 
 /* Prevent text selection during drag */
@@ -28,15 +28,27 @@ body {
 }
 
 /* Dark slate theme (LVGL Studio AI look) */
-:root { color-scheme: dark; }
+/* Editor chrome palette: --c-950 is the deepest surface, --c-200 the main text */
+:root, :root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-950: #020617; --c-900: #0f172a; --c-800: #1e293b; --c-700: #334155; --c-600: #475569;
+  --c-500: #64748b; --c-400: #94a3b8; --c-300: #cbd5e1; --c-200: #e2e8f0;
+  --c-a1: #60a5fa; --c-a2: #93c5fd; --hover-bg: rgba(255,255,255,.1);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --c-950: #e2e8f0; --c-900: #f1f5f9; --c-800: #ffffff; --c-700: #cbd5e1; --c-600: #94a3b8;
+  --c-500: #64748b; --c-400: #475569; --c-300: #334155; --c-200: #0f172a;
+  --c-a1: #2563eb; --c-a2: #1d4ed8; --hover-bg: rgba(15,23,42,.08);
+}
 code, pre, kbd, samp, textarea.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #1e293b; }
-::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #64748b; }
+::-webkit-scrollbar-track { background: var(--c-800); }
+::-webkit-scrollbar-thumb { background: var(--c-600); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-500); }
 input, select, textarea, button { font-family: inherit; }
-input, select, textarea { background: #1e293b; color: #e2e8f0; border-color: #334155; }
-input::placeholder, textarea::placeholder { color: #64748b; }
+input, select, textarea { background: var(--c-800); color: var(--c-200); border-color: var(--c-700); }
+input::placeholder, textarea::placeholder { color: var(--c-500); }
 
 /* Vector icons that replace emoji inside texts */
 .emoji-icon {
@@ -44,4 +56,11 @@ input::placeholder, textarea::placeholder { color: #64748b; }
   vertical-align: -0.2em;
   flex-shrink: 0;
   margin-right: 0.15em;
+}
+
+/* Semantic aliases used by older components */
+:root {
+  --bg-primary: var(--c-900); --bg-secondary: var(--c-800); --bg-hover: var(--c-700);
+  --text-primary: var(--c-200); --text-secondary: var(--c-400);
+  --border-color: var(--c-700); --accent-color: var(--c-a1);
 }

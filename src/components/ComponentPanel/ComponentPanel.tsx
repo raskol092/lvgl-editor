@@ -4,6 +4,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { componentCategories, getComponentsByCategory } from '../../utils/componentDefinitions';
 import type { ComponentDefinition, ComponentCategory } from '../../types';
 import { t } from '../../i18n';
+import { quickAddComponent } from '../../utils/quickAdd';
 import ToolIcon from '../icons/ToolIcon';
 import './ComponentPanel.css';
 
@@ -27,6 +28,8 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition, onH
       className={`component-item ${isDragging ? 'dragging' : ''}`}
       onMouseEnter={() => onHover(definition.name)}
       onMouseLeave={() => onHover(null)}
+      title={t('Click to add, or drag onto the canvas')}
+      onClick={() => quickAddComponent(definition.type)}
       {...listeners}
       {...attributes}
     >
@@ -140,7 +143,7 @@ const ComponentPanel: React.FC = () => {
       </div>
 
       <div className="panel-hint">
-        {hovered ? <strong>{t(hovered)}</strong> : <>{t('Drag & drop to add')}</>}
+        {hovered ? <strong>{t(hovered)}</strong> : <>{t('Click or drag to add')}</>}
       </div>
     </div>
   );

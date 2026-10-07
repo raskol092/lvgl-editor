@@ -3,14 +3,14 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #0f172a;
+  background: var(--c-900);
   overflow: hidden;
   user-select: none;
 }
 
 .node-palette .palette-header {
   padding: 12px 16px;
-  background: #1e293b;
+  background: var(--c-800);
   border-bottom: 2px solid #3b82f6;
   text-align: center;
 }
@@ -21,21 +21,21 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #60a5fa;
+  color: var(--c-a1);
 }
 
 .node-palette .palette-search {
   padding: 12px;
   position: relative;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid var(--c-700);
   background: rgba(30, 41, 59, 0.3);
 }
 
 .node-palette .palette-search input {
   width: 100%;
   padding: 6px 28px 6px 10px;
-  background: #020617;
-  border: 1px solid #334155;
+  background: var(--c-950);
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   font-size: 12px;
   color: #fff;
@@ -53,7 +53,7 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--c-400);
   cursor: pointer;
   font-size: 12px;
 }
@@ -78,11 +78,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #64748b;
+  color: var(--c-500);
 }
 
 .node-palette .category-header:hover {
-  color: #cbd5e1;
+  color: var(--c-300);
 }
 
 .node-palette .category-icon {
@@ -112,17 +112,17 @@
   justify-content: center;
   padding: 12px 6px;
   border-radius: 8px;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-top: 3px solid #334155;
-  border-top-color: var(--node-color, #334155);
-  color: #cbd5e1;
+  background: var(--c-800);
+  border: 1px solid var(--c-700);
+  border-top: 3px solid var(--c-700);
+  border-top-color: var(--node-color, var(--c-700));
+  color: var(--c-300);
   cursor: grab;
   transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
 
 .node-palette .node-item:hover {
-  background: #334155;
+  background: var(--c-700);
   box-shadow: 0 0 0 2px #3b82f6;
 }
 
@@ -155,31 +155,31 @@
   padding: 24px 8px;
   text-align: center;
   font-size: 12px;
-  color: #64748b;
+  color: var(--c-500);
 }
 
 .node-palette .panel-hint {
   min-height: 60px;
   padding: 12px;
-  border-top: 1px solid #334155;
-  background: #020617;
+  border-top: 1px solid var(--c-700);
+  background: var(--c-950);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   font-size: 12px;
-  color: #64748b;
+  color: var(--c-500);
 }
 
 .node-palette .panel-hint strong {
-  color: #60a5fa;
+  color: var(--c-a1);
   margin-bottom: 2px;
 }
 
 .node-palette .panel-hint span {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .node-palette .node-icon,
@@ -187,9 +187,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #60a5fa;
+  color: var(--c-a1);
 }
 
 .node-palette .node-item:hover .node-icon {
-  color: #93c5fd;
+  color: var(--c-a2);
 }

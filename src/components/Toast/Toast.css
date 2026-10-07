@@ -14,7 +14,7 @@
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: #0f172a;
+  background: var(--c-900);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   min-width: 280px;
@@ -78,13 +78,13 @@
 
 .toast-info .toast-icon {
   background: rgba(37,99,235,0.22);
-  color: #60a5fa;
+  color: var(--c-a1);
 }
 
 .toast-message {
   flex: 1;
   font-size: 14px;
-  color: #e2e8f0;
+  color: var(--c-200);
   line-height: 1.4;
 }
 
@@ -95,7 +95,7 @@
   background: transparent;
   cursor: pointer;
   font-size: 18px;
-  color: #94a3b8;
+  color: var(--c-400);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,8 +105,8 @@
 }
 
 .toast-close:hover {
-  background: #1e293b;
-  color: #94a3b8;
+  background: var(--c-800);
+  color: var(--c-400);
 }
 
 /* Border accent colors */

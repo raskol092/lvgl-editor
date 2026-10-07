@@ -1,6 +1,6 @@
 .page-manager {
-  background: #1e293b;
-  border-top: 1px solid #334155;
+  background: var(--c-800);
+  border-top: 1px solid var(--c-700);
   display: flex;
   align-items: center;
   padding: 0 8px;
@@ -22,7 +22,7 @@
 }
 
 .page-tabs::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: var(--c-600);
   border-radius: 2px;
 }
 
@@ -31,25 +31,25 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   white-space: nowrap;
   transition: all 0.2s;
   user-select: none;
 }
 
 .page-tab:hover {
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .page-tab.active {
-  background: #0f172a;
+  background: var(--c-900);
   border-bottom-color: #fff;
-  color: #e2e8f0;
+  color: var(--c-200);
   font-weight: 500;
   position: relative;
 }
@@ -86,12 +86,12 @@
 .add-page-btn {
   width: 28px;
   height: 28px;
-  border: 1px dashed #475569;
+  border: 1px dashed var(--c-600);
   background: transparent;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  color: #94a3b8;
+  color: var(--c-400);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,7 +101,7 @@
 
 .add-page-btn:hover {
   border-color: #3b82f6;
-  color: #60a5fa;
+  color: var(--c-a1);
   background: rgba(37,99,235,0.22);
 }
 
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 8px;
   padding-left: 12px;
-  border-left: 1px solid #334155;
+  border-left: 1px solid var(--c-700);
 }
 
 .page-prop-row {
@@ -121,14 +121,14 @@
 
 .page-prop-row label {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .page-prop-row input[type="color"] {
   width: 24px;
   height: 24px;
   padding: 0;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   cursor: pointer;
   background: none;
@@ -146,8 +146,8 @@
 /* Context Menu */
 .page-context-menu {
   position: fixed;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 4px 0;
@@ -168,11 +168,11 @@
 }
 
 .page-context-menu button:hover {
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .page-context-menu button.disabled {
-  color: #cbd5e1;
+  color: var(--c-300);
   cursor: not-allowed;
 }
 

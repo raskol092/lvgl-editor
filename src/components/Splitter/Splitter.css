@@ -1,7 +1,7 @@
 .splitter {
   flex-shrink: 0;
   position: relative;
-  background: #334155;
+  background: var(--c-700);
   transition: background 0.15s;
   z-index: 5;
   touch-action: none;

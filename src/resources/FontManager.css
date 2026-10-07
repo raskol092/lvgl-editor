@@ -31,8 +31,8 @@
 .font-list.grid .font-item {
   display: flex;
   flex-direction: column;
-  background: #0f172a;
-  border: 2px solid #334155;
+  background: var(--c-900);
+  border: 2px solid var(--c-700);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -56,12 +56,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  background: linear-gradient(135deg, var(--c-800) 0%, var(--c-700) 100%);
 }
 
 .font-list.grid .preview-text {
   font-size: 32px;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 .font-list.grid .font-info {
@@ -81,12 +81,12 @@
 
 .font-list.grid .font-family {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .font-list.grid .font-sizes {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 /* Font Item - List View */
@@ -95,8 +95,8 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -104,7 +104,7 @@
 
 .font-list.list .font-item:hover {
   border-color: #3b82f6;
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .font-list.list .font-item.selected {
@@ -119,13 +119,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  background: linear-gradient(135deg, var(--c-800) 0%, var(--c-700) 100%);
   border-radius: 6px;
 }
 
 .font-list.list .preview-text {
   font-size: 24px;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 .font-list.list .font-info {
@@ -144,13 +144,13 @@
 
 .font-list.list .font-family {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   display: block;
 }
 
 .font-list.list .font-sizes {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--c-400);
   display: block;
 }
 
@@ -163,9 +163,9 @@
 /* Font Details Panel */
 .font-details {
   padding: 12px;
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 8px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   max-height: 500px;
   overflow-y: auto;
 }
@@ -173,7 +173,7 @@
 .font-details h4 {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 /* Font Metadata Grid */
@@ -183,8 +183,8 @@
   gap: 8px;
   margin-bottom: 12px;
   padding: 10px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
 }
 
@@ -196,14 +196,14 @@
 
 .meta-label {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .meta-value {
   font-size: 12px;
-  color: #e2e8f0;
+  color: var(--c-200);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -219,14 +219,14 @@
 
 .bpp-hint {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 /* Preview size tag */
 .preview-size-tag {
   display: inline-block;
   font-size: 10px !important;
-  color: #94a3b8;
+  color: var(--c-400);
   min-width: 36px;
   font-family: system-ui, sans-serif !important;
 }
@@ -240,15 +240,15 @@
 
 .template-copy-row button {
   padding: 6px 14px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--c-800);
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
 }
 
 .template-copy-row button:hover {
-  background: #334155;
+  background: var(--c-700);
 }
 
 .detail-section {
@@ -258,14 +258,14 @@
 .detail-section > label {
   display: block;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   margin-bottom: 6px;
 }
 
 .detail-section select {
   width: 100%;
   padding: 8px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   font-size: 13px;
 }
@@ -273,7 +273,7 @@
 .detail-section textarea {
   width: 100%;
   padding: 8px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   font-size: 12px;
   font-family: monospace;
@@ -296,8 +296,8 @@
 .size-btn {
   min-width: 36px;
   padding: 6px 8px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
@@ -319,15 +319,15 @@
 .extract-btn {
   margin-top: 6px;
   padding: 6px 12px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--c-800);
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
 }
 
 .extract-btn:hover {
-  background: #334155;
+  background: var(--c-700);
 }
 
 /* Font Preview Section */
@@ -338,13 +338,13 @@
 .font-preview-section > label {
   display: block;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   margin-bottom: 6px;
 }
 
 .preview-box {
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   padding: 12px;
   min-height: 60px;
@@ -367,7 +367,7 @@
 
 .command-hint {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--c-400);
   margin: 0 0 12px 0;
   line-height: 1.6;
 }
@@ -376,15 +376,15 @@
   display: block;
   margin-top: 8px;
   padding: 8px 12px;
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 12px;
 }
 
 .command-preview {
-  background: #020617;
-  color: #cbd5e1;
+  background: var(--c-950);
+  color: var(--c-300);
   padding: 16px;
   border-radius: 8px;
   font-family: 'Consolas', 'Monaco', monospace;

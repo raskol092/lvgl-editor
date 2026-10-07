@@ -34,7 +34,7 @@
   position: absolute;
   width: 8px;
   height: 8px;
-  background: #0f172a;
+  background: var(--c-900);
   border: 2px solid #3b82f6;
   border-radius: 1px;
   pointer-events: auto;
@@ -165,4 +165,16 @@
   z-index: 30;
   line-height: 1;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.lvgl-inline-edit {
+  width: 100%;
+  min-width: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #2563eb;
+  border-radius: 2px;
+  padding: 0 2px;
+  font: inherit;
+  text-align: inherit;
+  outline: none;
 }

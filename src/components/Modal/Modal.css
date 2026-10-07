@@ -29,8 +29,8 @@
 }
 
 .modal-dialog {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--c-800);
+  border: 1px solid var(--c-700);
   border-radius: 10px;
   min-width: 340px;
   max-width: 480px;
@@ -54,8 +54,8 @@
   width: 100%;
   margin-top: 14px;
   padding: 8px 12px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   color: #e0e0e0;
   font-size: 14px;
@@ -85,8 +85,8 @@
 }
 
 .modal-btn-cancel {
-  background: #334155;
-  color: #cbd5e1;
+  background: var(--c-700);
+  color: var(--c-300);
 }
 
 .modal-btn-cancel:hover {

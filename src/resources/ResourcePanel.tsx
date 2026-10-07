@@ -4,6 +4,7 @@ import { ti } from '../i18n/ti';
 
 import React from 'react';
 import { useResourceStore } from './resourceStore';
+import { useEditorStore } from '../store/editorStore';
 import ImageManager from './ImageManager';
 import FontManager from './FontManager';
 import IconLibrary from './IconLibrary';
@@ -22,6 +23,12 @@ const ResourcePanel: React.FC = () => {
     fonts,
   } = useResourceStore();
   
+  const pickTarget = useResourceStore(s => s.pickTarget);
+  const setPickTarget = useResourceStore(s => s.setPickTarget);
+  const selected = useEditorStore(s => s.selection.selectedIds);
+  const targetComp = useEditorStore(s => (pickTarget ? s.getComponentById(pickTarget) : undefined));
+  const picking = !!targetComp && selected.length === 1 && selected[0] === pickTarget;
+
   const tabs = [
     { id: 'images' as const, label: t('Image'), icon: '🖼️', count: images.length },
     { id: 'fonts' as const, label: t('Font'), icon: '🔤', count: fonts.length },
@@ -51,6 +58,13 @@ const ResourcePanel: React.FC = () => {
         </div>
       </div>
       
+      {picking && (
+        <div className="resource-pick-banner">
+          <span>{t('Choose an image for "{0}"', targetComp!.name)}</span>
+          <button onClick={() => setPickTarget(null)}>{t('Cancel')}</button>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="resource-tabs">
         {tabs.map(tab => (

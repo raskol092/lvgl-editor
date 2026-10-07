@@ -3,8 +3,8 @@
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background: #0f172a;
-  border-bottom: 1px solid #334155;
+  background: var(--c-900);
+  border-bottom: 1px solid var(--c-700);
 }
 
 .align-toolbar-group {
@@ -15,7 +15,7 @@
 .align-toolbar-divider {
   width: 1px;
   height: 20px;
-  background: #334155;
+  background: var(--c-700);
   margin: 0 4px;
 }
 
@@ -29,17 +29,17 @@
   background: transparent;
   border-radius: 4px;
   cursor: pointer;
-  color: #94a3b8;
+  color: var(--c-400);
   transition: all 0.15s;
 }
 
 .align-btn:hover:not(:disabled) {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: var(--c-800);
+  color: var(--c-200);
 }
 
 .align-btn:active:not(:disabled) {
-  background: #334155;
+  background: var(--c-700);
 }
 
 .align-btn:disabled {

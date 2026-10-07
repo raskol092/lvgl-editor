@@ -5,6 +5,7 @@ import { ti } from '../i18n/ti';
 import React, { useState, useMemo } from 'react';
 import { toast } from '../components/Toast';
 import DraggableResource from './DraggableResource';
+import { chooseIcon } from './chooseImage';
 import { t } from '../i18n';
 import './IconLibrary.css';
 
@@ -143,8 +144,8 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
               dragId={`icon-${icon.name}`}
               dragData={{ type: 'new-icon', iconName: icon.name, path: icon.path }}
               className={`icon-item ${selectedIcon === icon.name ? 'selected' : ''}`}
-              onClick={() => setSelectedIcon(icon.name)}
-              title={`${icon.name} — ${t('Drag onto the canvas')}`}
+              onClick={() => { setSelectedIcon(icon.name); chooseIcon(icon.name, icon.path, () => toast.error(t('Failed to add icon'))); }}
+              title={`${icon.name} — ${t('Click to use, or drag onto the canvas')}`}
             >
               <svg viewBox="0 0 24 24" width="24" height="24">
                 <path d={icon.path} fill="currentColor" />

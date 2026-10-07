@@ -37,6 +37,8 @@ interface ResourceState {
   viewMode: 'grid' | 'list';
   searchQuery: string;
   selectedResourceId: string | null;
+  /** Image component waiting for a resource choice (set by clicking it on the canvas) */
+  pickTarget: string | null;
   
   // Actions - Images
   addImage: (file: File) => Promise<ImageResource>;
@@ -59,6 +61,7 @@ interface ResourceState {
   setViewMode: (mode: 'grid' | 'list') => void;
   setSearchQuery: (query: string) => void;
   setSelectedResource: (id: string | null) => void;
+  setPickTarget: (id: string | null) => void;
   
   // Actions - Project
   exportResources: () => { images: ImageResource[]; fonts: FontResource[] };
@@ -80,6 +83,8 @@ export const useResourceStore = create<ResourceState>((set, get) => ({
   viewMode: 'grid',
   searchQuery: '',
   selectedResourceId: null,
+  pickTarget: null,
+  setPickTarget: (id) => set({ pickTarget: id }),
   
   // Image actions
   addImage: async (file: File) => {

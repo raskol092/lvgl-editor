@@ -11,7 +11,7 @@
   display: flex;
   gap: 8px;
   padding: 8px;
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 6px;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .upload-btn:disabled {
-  background: #475569;
+  background: var(--c-600);
   cursor: not-allowed;
 }
 
@@ -65,7 +65,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #94a3b8;
+  color: var(--c-400);
   text-align: center;
 }
 
@@ -77,15 +77,15 @@
 
 .empty-hint {
   font-size: 12px;
-  color: #64748b;
+  color: var(--c-500);
 }
 
 /* Image Item - Grid View */
 .image-list.grid .image-item {
   display: flex;
   flex-direction: column;
-  background: #0f172a;
-  border: 2px solid #334155;
+  background: var(--c-900);
+  border: 2px solid var(--c-700);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -109,7 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #cbd5e1;
+  background: var(--c-300);
   overflow: hidden;
 }
 
@@ -136,7 +136,7 @@
 
 .image-list.grid .image-size {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 /* Image Item - List View */
@@ -145,8 +145,8 @@
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -154,7 +154,7 @@
 
 .image-list.list .image-item:hover {
   border-color: #3b82f6;
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .image-list.list .image-item.selected {
@@ -169,7 +169,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -196,7 +196,7 @@
 
 .image-list.list .image-size {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 /* Delete Button */
@@ -234,15 +234,15 @@
 /* Image Details Panel */
 .image-details {
   padding: 12px;
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 8px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
 }
 
 .image-details h4 {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 .detail-row {
@@ -255,7 +255,7 @@
 .detail-row label {
   width: 80px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   flex-shrink: 0;
 }
 
@@ -263,7 +263,7 @@
 .detail-row select {
   flex: 1;
   padding: 6px 8px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   font-size: 12px;
 }
@@ -276,7 +276,7 @@
 
 .detail-row span {
   font-size: 12px;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 .detail-actions {
@@ -315,7 +315,7 @@
 }
 
 .modal-content {
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   max-width: 90vw;
@@ -333,7 +333,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid var(--c-700);
 }
 
 .modal-header h3 {
@@ -349,12 +349,12 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #94a3b8;
+  color: var(--c-400);
   border-radius: 4px;
 }
 
 .close-btn:hover {
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .modal-body {
@@ -372,30 +372,30 @@
 
 .code-options label {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .code-options select {
   padding: 6px 10px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 4px;
 }
 
 .code-options button {
   padding: 6px 12px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--c-800);
+  border: 1px solid var(--c-700);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .code-options button:hover {
-  background: #334155;
+  background: var(--c-700);
 }
 
 .code-preview {
-  background: #020617;
-  color: #cbd5e1;
+  background: var(--c-950);
+  color: var(--c-300);
   padding: 16px;
   border-radius: 8px;
   font-family: 'Consolas', 'Monaco', monospace;
@@ -411,7 +411,7 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 20px;
-  border-top: 1px solid #334155;
+  border-top: 1px solid var(--c-700);
 }
 
 .modal-footer button {

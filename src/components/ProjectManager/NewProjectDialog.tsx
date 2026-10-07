@@ -29,7 +29,7 @@ const FONT_OPTIONS = [
 
 const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ onClose, onCreate }) => {
   const [name, setName] = useState('');
-  const [preset, setPreset] = useState('480×320 (TFT)');
+  const [preset, setPreset] = useState('800×480 (WVGA)');
   const [customW, setCustomW] = useState(DEFAULT_DISPLAY.width);
   const [customH, setCustomH] = useState(DEFAULT_DISPLAY.height);
   const [colorDepth, setColorDepth] = useState<16 | 24 | 32>(DEFAULT_DISPLAY.colorDepth);
@@ -42,7 +42,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ onClose, onCreate }
   const getResolution = (): { w: number; h: number } => {
     if (isCustom) return { w: customW, h: customH };
     const found = RESOLUTION_PRESETS.find(p => p.label === preset);
-    return found ? { w: found.w, h: found.h } : { w: 480, h: 320 };
+    return found ? { w: found.w, h: found.h } : { w: 800, h: 480 };
   };
 
   const handlePresetChange = (value: string) => {

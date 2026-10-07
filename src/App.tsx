@@ -302,6 +302,20 @@ const EditorView: React.FC<EditorViewProps> = ({
     goToProjectList();
   }, [currentProjectId, pages, images, fonts, saveProjectData, goToProjectList]);
 
+  // Clicking an image on the canvas opens the resource manager to choose its picture
+  useEffect(() => {
+    const onPick = (e: Event) => {
+      const id = (e as CustomEvent<{ id: string }>).detail?.id;
+      if (!id) return;
+      const rs = useResourceStore.getState();
+      rs.setActiveTab('images');
+      rs.setPickTarget(id);
+      setShowResourcePanel(true);
+    };
+    window.addEventListener('pick-image', onPick);
+    return () => window.removeEventListener('pick-image', onPick);
+  }, []);
+
   // Listen for keyboard shortcut events
   useEffect(() => {
     const handleToggleHelp = () => setShowHelpPanel(prev => !prev);
