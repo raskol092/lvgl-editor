@@ -64,3 +64,18 @@ it('every logic node type generates the expected Lisp', () => {
   }
   expect(d).toBe(0)
 })
+
+it('Set text picks the setter by widget type; animations zoom any widget', () => {
+  const btn = createComponent('btn', { id: 'b1', name: 'go' })
+  const area = createComponent('textarea', { id: 'a1', name: 'note' })
+  const pages = [createPage({ id: 'p1', name: 'main', components: [btn, area] })]
+  const mk = (id: string, target: string) => createLogicNode('set_text', { id, params: { targetComponent: target }, inputs: [ex(`${id}i`), val(`${id}t`, 'Text', 'string', 'x')], outputs: [ex(`${id}o`, 'Done')] })
+  const trig = createLogicNode('event_trigger', { id: 't', params: { eventType: 'LV_EVENT_CLICKED', targetComponent: 'b1' }, outputs: [ex('to')] })
+  const g = createLogicGraph({ id: 'g1', name: 'texts', nodes: [trig, mk('n1', 'b1'), mk('n2', 'a1')], connections: [conn('t', 'to', 'n1', 'n1i'), conn('n1', 'n1o', 'n2', 'n2i')] })
+  const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+  expect(src).toContain('(lv-label-set-text (lv-obj-get-child ui-go 0) "x")')
+  expect(src).toContain('(lv-textarea-set-text ui-note "x")')
+  const ui = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+  expect(ui).toContain('lv-obj-set-style-transform-scale-x')
+  expect(ui).not.toContain('lv-image-set-scale')
+})
