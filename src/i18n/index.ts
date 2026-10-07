@@ -17,7 +17,7 @@ function detectLang(): Lang {
   return nav.toLowerCase().startsWith('ru') ? 'ru' : 'en';
 }
 
-let current: Lang = detectLang();
+const current: Lang = detectLang();
 if (typeof document !== 'undefined') document.documentElement.lang = current;
 
 export function getLang(): Lang {

@@ -1,11 +1,14 @@
+import Emoji from '../components/icons/Emoji';
+import { ti } from '../i18n/ti';
 // Image Manager Component
 
 import React, { useState, useRef } from 'react';
 import { useResourceStore } from './resourceStore';
-import type { ImageResource, ImageFormat } from './types';
+import type { ImageFormat } from './types';
 import { toast } from '../components/Toast';
 import { modal } from '../components/Modal';
 import { t } from '../i18n';
+import DraggableResource from './DraggableResource';
 import './ImageManager.css';
 
 interface ImageManagerProps {
@@ -18,7 +21,6 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
     addImage,
     deleteImage,
     updateImage,
-    generateImageCode,
     selectedResourceId,
     setSelectedResource,
   } = useResourceStore();
@@ -26,9 +28,6 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
   const images = getFilteredImages();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showCodeModal, setShowCodeModal] = useState(false);
-  const [generatedCode, setGeneratedCode] = useState('');
-  const [codeFormat, setCodeFormat] = useState<ImageFormat>('ARGB8888');
   
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -66,34 +65,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
     }
   };
   
-  const handleGenerateCode = async (image: ImageResource) => {
-    try {
-      const code = await generateImageCode(image.id, codeFormat);
-      setGeneratedCode(code);
-      setShowCodeModal(true);
-    } catch (error) {
-      console.error('Failed to generate code:', error);
-      toast.error(t('Failed to generate code'));
-    }
-  };
   
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(generatedCode);
-    toast.success(t('Code copied to clipboard'));
-  };
   
-  const handleDownloadCode = () => {
-    const selectedImage = images.find(img => img.id === selectedResourceId);
-    const filename = selectedImage ? `${selectedImage.cArrayName}.c` : 'image.c';
-    
-    const blob = new Blob([generatedCode], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
   
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -112,7 +85,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
           onClick={handleUploadClick}
           disabled={isUploading}
         >
-          {isUploading ? t('Uploading...') : t('📤 Upload image')}
+          {isUploading ? t('Uploading...') : ti('📤 Upload image')}
         </button>
         <input
           ref={fileInputRef}
@@ -128,16 +101,19 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
       <div className={`image-list ${viewMode}`}>
         {images.length === 0 ? (
           <div className="empty-state">
-            <span className="empty-icon">🖼️</span>
+            <span className="empty-icon"><Emoji c="🖼" /></span>
             <p>{t('No image resources')}</p>
             <p className="empty-hint">{t('Click the button above to upload an image')}</p>
           </div>
         ) : (
           images.map(image => (
-            <div
+            <DraggableResource
               key={image.id}
+              dragId={`image-${image.id}`}
+              dragData={{ type: 'new-image', imageId: image.id, width: image.width, height: image.height }}
               className={`image-item ${selectedResourceId === image.id ? 'selected' : ''}`}
               onClick={() => setSelectedResource(image.id)}
+              title={t('Drag onto the canvas')}
             >
               <div className="image-preview">
                 <img src={image.data} alt={image.name} />
@@ -151,9 +127,9 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
                 onClick={(e) => handleDelete(image.id, e)}
                 title={t('Delete')}
               >
-                🗑️
+                <Emoji c="🗑" />
               </button>
-            </div>
+            </DraggableResource>
           ))
         )}
       </div>
@@ -196,45 +172,6 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
               <option value="RGB888">RGB888 (24-bit)</option>
               <option value="ARGB8888">ARGB8888 (32-bit)</option>
             </select>
-          </div>
-          
-          <div className="detail-actions">
-            <button onClick={() => handleGenerateCode(selectedImage)}>
-              {t('📝 Generate C code')}
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Code Modal */}
-      {showCodeModal && (
-        <div className="modal-overlay" onClick={() => setShowCodeModal(false)}>
-          <div className="modal-content code-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{t('Generated C code')}</h3>
-              <button className="close-btn" onClick={() => setShowCodeModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="code-options">
-                <label>{t('Color format:')}</label>
-                <select
-                  value={codeFormat}
-                  onChange={(e) => setCodeFormat(e.target.value as ImageFormat)}
-                >
-                  <option value="RGB565">RGB565</option>
-                  <option value="RGB888">RGB888</option>
-                  <option value="ARGB8888">ARGB8888</option>
-                </select>
-                <button onClick={() => selectedImage && handleGenerateCode(selectedImage)}>
-                  {t('Regenerate')}
-                </button>
-              </div>
-              <pre className="code-preview">{generatedCode}</pre>
-            </div>
-            <div className="modal-footer">
-              <button onClick={handleCopyCode}>{t('📋 Copy code')}</button>
-              <button onClick={handleDownloadCode}>{t('💾 Download file')}</button>
-            </div>
           </div>
         </div>
       )}

@@ -1,3 +1,5 @@
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import Emoji from '../icons/Emoji';
 // Node Palette - Drag nodes from here to the canvas
 
 import React, { useState, useCallback } from 'react';
@@ -63,7 +65,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
         />
         {searchQuery && (
           <button className="clear-search" onClick={() => setSearchQuery('')}>
-            ✕
+            <Emoji c="✕" />
           </button>
         )}
       </div>
@@ -97,7 +99,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
                 <span className="category-icon"><ToolIcon name={`cat:${category.id}`} size={14} fallback={category.icon} /></span>
                 <span className="category-name">{t(category.name)}</span>
                 <span className="category-toggle">
-                  {expandedCategories[category.id] ? '▼' : '▶'}
+                  {expandedCategories[category.id] ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                 </span>
               </div>
               {expandedCategories[category.id] && (

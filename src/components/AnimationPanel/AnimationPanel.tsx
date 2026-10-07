@@ -1,3 +1,7 @@
+import { Sunrise, Sunset, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, ZoomIn, ZoomOut, Settings } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import Emoji from '../icons/Emoji';
+import { ti } from '../../i18n/ti';
 import React, { useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { Animation, AnimationType } from '../../types';
@@ -17,16 +21,16 @@ const ANIM_TYPE_LABELS: Record<AnimationType, string> = {
   custom: t('Custom'),
 };
 
-const ANIM_TYPE_ICONS: Record<AnimationType, string> = {
-  fade_in: '🌅',
-  fade_out: '🌇',
-  slide_left: '⬅️',
-  slide_right: '➡️',
-  slide_up: '⬆️',
-  slide_down: '⬇️',
-  zoom_in: '🔍',
-  zoom_out: '🔎',
-  custom: '⚙️',
+const ANIM_TYPE_ICONS: Record<AnimationType, LucideIcon> = {
+  fade_in: Sunrise,
+  fade_out: Sunset,
+  slide_left: ArrowLeft,
+  slide_right: ArrowRight,
+  slide_up: ArrowUp,
+  slide_down: ArrowDown,
+  zoom_in: ZoomIn,
+  zoom_out: ZoomOut,
+  custom: Settings,
 };
 
 const AnimationPanel: React.FC = () => {
@@ -73,7 +77,7 @@ const AnimationPanel: React.FC = () => {
     return (
       <div className="animation-panel">
         <div className="panel-header">
-          <h3>{t('🎬 Animations')}</h3>
+          <h3>{ti('🎬 Animations')}</h3>
         </div>
         <div className="anim-no-selection">
           <p>{t('Select a component')}</p>
@@ -86,7 +90,7 @@ const AnimationPanel: React.FC = () => {
   return (
     <div className="animation-panel">
       <div className="panel-header">
-        <h3>{t('🎬 Animations')}</h3>
+        <h3>{ti('🎬 Animations')}</h3>
         <button className="add-anim-btn" onClick={handleAddAnim} title={t('Add animation')}>+</button>
       </div>
       <div className="anim-list">
@@ -102,16 +106,16 @@ const AnimationPanel: React.FC = () => {
             <div key={anim.id} className="anim-item">
               <div className="anim-info" onClick={() => handleEditAnim(anim)}>
                 <div className="anim-type">
-                  <span className="anim-icon">{ANIM_TYPE_ICONS[anim.type] || '⚙️'}</span>
+                  <span className="anim-icon">{React.createElement(ANIM_TYPE_ICONS[anim.type] || Settings, { size: 16 })}</span>
                   {anim.name || ANIM_TYPE_LABELS[anim.type] || anim.type}
                 </div>
                 <div className="anim-detail">
-                  {anim.duration}ms · {anim.easing} · {anim.property}: {anim.startValue}→{anim.endValue}
+                  {anim.duration}ms · {anim.easing} · {anim.property}: {anim.startValue}<Emoji c="→" />{anim.endValue}
                 </div>
               </div>
               <div className="anim-actions">
-                <button className="anim-edit-btn" onClick={() => handleEditAnim(anim)} title={t('Edit')}>✏️</button>
-                <button className="anim-delete-btn" onClick={() => handleDeleteAnim(anim.id)} title={t('Delete')}>🗑️</button>
+                <button className="anim-edit-btn" onClick={() => handleEditAnim(anim)} title={t('Edit')}><Emoji c="✏" /></button>
+                <button className="anim-delete-btn" onClick={() => handleDeleteAnim(anim.id)} title={t('Delete')}><Emoji c="🗑" /></button>
               </div>
             </div>
           ))

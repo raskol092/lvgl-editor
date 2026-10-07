@@ -5,14 +5,10 @@ import type {
   ImageResource,
   FontResource,
   IconResource,
-  ImageFormat,
 } from './types';
 import {
   fileToBase64,
   getImageDimensions,
-  loadImageFromBase64,
-  generateImageCCode,
-  DEFAULT_IMAGE_OPTIONS,
 } from './converters/imageConverter';
 import {
   fontFileToBase64,
@@ -47,7 +43,6 @@ interface ResourceState {
   updateImage: (id: string, updates: Partial<ImageResource>) => void;
   deleteImage: (id: string) => void;
   getImageById: (id: string) => ImageResource | undefined;
-  generateImageCode: (id: string, format?: ImageFormat) => Promise<string>;
   
   // Actions - Fonts
   addFont: (file: File) => Promise<FontResource>;
@@ -133,21 +128,6 @@ export const useResourceStore = create<ResourceState>((set, get) => ({
     return get().images.find(img => img.id === id);
   },
   
-  generateImageCode: async (id, format) => {
-    const image = get().getImageById(id);
-    if (!image) {
-      throw new Error('Image not found');
-    }
-    
-    const { imageData } = await loadImageFromBase64(image.data);
-    const options = {
-      ...DEFAULT_IMAGE_OPTIONS,
-      format: format || image.format,
-    };
-    
-    const result = generateImageCCode(image.cArrayName, imageData, options);
-    return result.cCode;
-  },
   
   // Font actions
   addFont: async (file: File) => {

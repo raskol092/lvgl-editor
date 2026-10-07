@@ -1,3 +1,5 @@
+import Emoji from '../icons/Emoji';
+import { tp } from '../../i18n/ti';
 import React from 'react';
 import { useThemeStore } from '../../store/themeStore';
 import type { ThemePreset } from '../../types';
@@ -13,15 +15,15 @@ const ThemeSelector: React.FC = () => {
 
   return (
     <div className="theme-selector">
-      <span className="theme-selector-icon">🎨</span>
+      <span className="theme-selector-icon"><Emoji c="🎨" /></span>
       <select
         className="theme-selector-select"
         value={preset}
         onChange={handleChange}
         title={t('Current theme: {0}', t(currentTheme.name))}
       >
-        <option value="light">{t('☀️ Light')}</option>
-        <option value="dark">{t('🌙 Dark')}</option>
+        <option value="light">{tp('☀️ Light')}</option>
+        <option value="dark">{tp('🌙 Dark')}</option>
       </select>
     </div>
   );

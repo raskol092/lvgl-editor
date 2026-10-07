@@ -1,3 +1,4 @@
+import { Check, X, AlertTriangle, Info } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import './Toast.css';
 
@@ -42,10 +43,10 @@ const ToastItem: React.FC<ToastItemProps> = ({ message, onRemove }) => {
   }, [message, onRemove]);
 
   const icons = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ',
+    success: <Check size={16} />,
+    error: <X size={16} />,
+    warning: <AlertTriangle size={16} />,
+    info: <Info size={16} />,
   };
 
   return (

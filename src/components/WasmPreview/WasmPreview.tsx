@@ -1,3 +1,5 @@
+import { richText } from '../../i18n/ti';
+import { ti } from '../../i18n/ti';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { editorStateToJson } from './editorStateToJson';
@@ -6,7 +8,7 @@ import './WasmPreview.css';
 
 type Status = 'loading' | 'ready' | 'error';
 
-const WasmPreview: React.FC = () => {
+const WasmPreviewInner: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [status, setStatus] = useState<Status>('loading');
@@ -55,11 +57,14 @@ const WasmPreview: React.FC = () => {
     return () => clearTimeout(t);
   }, [status]);
 
+  // The runtime creates its display at start-up, so a new canvas size needs a fresh iframe
+  const iframeSrc = `/wasm/lvgl_wasm.html?w=${canvas.width}&h=${canvas.height}`;
+
   const handleRefresh = () => {
     setStatus('loading');
     const iframe = iframeRef.current;
     if (iframe) {
-      iframe.src = '/wasm/lvgl_wasm.html';
+      iframe.src = iframeSrc;
     }
   };
 
@@ -74,10 +79,10 @@ const WasmPreview: React.FC = () => {
     <div className="wasm-preview">
       <div className="wasm-preview-toolbar">
         <span className={`wasm-preview-status wasm-preview-status--${status}`}>
-          {statusLabel}
+          {richText(statusLabel)}
         </span>
         <button className="wasm-preview-refresh" onClick={handleRefresh}>
-          {t('🔄 Refresh')}
+          {ti('🔄 Refresh')}
         </button>
       </div>
 
@@ -97,7 +102,7 @@ const WasmPreview: React.FC = () => {
           <iframe
             ref={iframeRef}
             className="wasm-preview-iframe"
-            src="/wasm/lvgl_wasm.html"
+            src={iframeSrc}
             title={t('LVGL WASM preview')}
             width={canvas.width}
             height={canvas.height}
@@ -110,6 +115,13 @@ const WasmPreview: React.FC = () => {
       </div>
     </div>
   );
+};
+
+// A new canvas size remounts the preview: the runtime creates its display only at start-up
+const WasmPreview: React.FC = () => {
+  const width = useEditorStore((s) => s.canvas.width);
+  const height = useEditorStore((s) => s.canvas.height);
+  return <WasmPreviewInner key={`${width}x${height}`} />;
 };
 
 export default WasmPreview;

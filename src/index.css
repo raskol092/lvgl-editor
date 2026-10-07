@@ -37,3 +37,11 @@ code, pre, kbd, samp, textarea.mono { font-family: 'JetBrains Mono', ui-monospac
 input, select, textarea, button { font-family: inherit; }
 input, select, textarea { background: #1e293b; color: #e2e8f0; border-color: #334155; }
 input::placeholder, textarea::placeholder { color: #64748b; }
+
+/* Vector icons that replace emoji inside texts */
+.emoji-icon {
+  display: inline-block;
+  vertical-align: -0.2em;
+  flex-shrink: 0;
+  margin-right: 0.15em;
+}

@@ -1,7 +1,10 @@
+import Emoji from '../components/icons/Emoji';
+import { ti } from '../i18n/ti';
 // Icon Library Component - Built-in icons for LVGL
 
 import React, { useState, useMemo } from 'react';
 import { toast } from '../components/Toast';
+import DraggableResource from './DraggableResource';
 import { t } from '../i18n';
 import './IconLibrary.css';
 
@@ -130,16 +133,18 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
       <div className={`icon-grid ${viewMode}`}>
         {filteredIcons.length === 0 ? (
           <div className="empty-state">
-            <span className="empty-icon">⭐</span>
+            <span className="empty-icon"><Emoji c="⭐" /></span>
             <p>{t('No icons found')}</p>
           </div>
         ) : (
           filteredIcons.map(icon => (
-            <div
+            <DraggableResource
               key={icon.name}
+              dragId={`icon-${icon.name}`}
+              dragData={{ type: 'new-icon', iconName: icon.name, path: icon.path }}
               className={`icon-item ${selectedIcon === icon.name ? 'selected' : ''}`}
               onClick={() => setSelectedIcon(icon.name)}
-              title={icon.name}
+              title={`${icon.name} — ${t('Drag onto the canvas')}`}
             >
               <svg viewBox="0 0 24 24" width="24" height="24">
                 <path d={icon.path} fill="currentColor" />
@@ -147,7 +152,7 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
               {viewMode === 'list' && (
                 <span className="icon-name">{icon.name}</span>
               )}
-            </div>
+            </DraggableResource>
           ))
         )}
       </div>
@@ -165,8 +170,8 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
             <span className="icon-category">{selectedIconData.category}</span>
           </div>
           <div className="icon-actions">
-            <button onClick={handleCopySvg}>{t('📋 Copy SVG')}</button>
-            <button onClick={handleCopyPath}>{t('📝 Copy path')}</button>
+            <button onClick={handleCopySvg}>{ti('📋 Copy SVG')}</button>
+            <button onClick={handleCopyPath}>{ti('📝 Copy path')}</button>
           </div>
         </div>
       )}

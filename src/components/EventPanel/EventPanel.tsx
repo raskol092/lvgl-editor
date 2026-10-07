@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 import React, { useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { EventBinding, LvglEventType } from '../../types';
@@ -141,7 +142,7 @@ const EventPanel: React.FC = () => {
             <div key={event.id} className="event-item">
               <div className="event-info" onClick={() => handleEditEvent(event)}>
                 <div className="event-type">
-                  <span className="event-icon">⚡</span>
+                  <span className="event-icon"><Emoji c="⚡" /></span>
                   {getEventLabel(event.eventType)}
                 </div>
                 <div className="event-handler">
@@ -154,14 +155,14 @@ const EventPanel: React.FC = () => {
                   onClick={() => handleEditEvent(event)}
                   title={t('Edit')}
                 >
-                  ✏️
+                  <Emoji c="✏" />
                 </button>
                 <button 
                   className="event-delete-btn" 
                   onClick={() => handleDeleteEvent(event.id)}
                   title={t('Delete')}
                 >
-                  🗑️
+                  <Emoji c="🗑" />
                 </button>
               </div>
             </div>

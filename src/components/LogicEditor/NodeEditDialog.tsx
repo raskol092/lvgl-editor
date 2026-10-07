@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 // Node Edit Dialog - Edit node parameters
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -403,7 +404,7 @@ const NodeEditDialog: React.FC<NodeEditDialogProps> = ({ nodeId, onClose }) => {
       <div className="node-edit-dialog" onClick={e => e.stopPropagation()}>
         <div className="dialog-header">
           <h3>{t('Edit node')}</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+          <button className="close-btn" onClick={onClose}><Emoji c="✕" /></button>
         </div>
 
         <div className="dialog-body">

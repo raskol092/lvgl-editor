@@ -1,3 +1,5 @@
+import { Link2, Unlock } from 'lucide-react';
+import Emoji from '../icons/Emoji';
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useResourceStore } from '../../resources/resourceStore';
@@ -19,7 +21,7 @@ const CollapsibleSection: React.FC<{
   return (
     <div className="collapsible-section">
       <div className="collapsible-header" onClick={() => setOpen(!open)}>
-        <span className={`collapsible-arrow ${open ? 'open' : ''}`}>▶</span>
+        <span className={`collapsible-arrow ${open ? 'open' : ''}`}><Emoji c="▶" /></span>
         <span>{title}</span>
       </div>
       {open && <div className="collapsible-body">{children}</div>}
@@ -145,19 +147,19 @@ const DropdownOptionsEditor: React.FC<{
             onClick={() => handleMoveUp(i)}
             disabled={i === 0}
             title={t('Move up')}
-          >↑</button>
+          ><Emoji c="↑" /></button>
           <button
             className="dropdown-option-btn"
             onClick={() => handleMoveDown(i)}
             disabled={i === options.length - 1}
             title={t('Move down')}
-          >↓</button>
+          ><Emoji c="↓" /></button>
           <button
             className="dropdown-option-btn delete"
             onClick={() => handleDelete(i)}
             disabled={options.length <= 1}
             title={t('Delete')}
-          >✕</button>
+          ><Emoji c="✕" /></button>
         </div>
       ))}
       <button className="dropdown-option-add" onClick={handleAdd}>{t('+ Add option')}</button>
@@ -359,7 +361,7 @@ const PropertyEditor: React.FC = () => {
               </div>
             </div>
             {(component.widthMode || 'px') === 'content' ? (
-              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#f5f5f5', borderRadius: 4 }}>{t('Fit content')}</div>
+              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#1e293b', borderRadius: 4 }}>{t('Fit content')}</div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <input
@@ -398,7 +400,7 @@ const PropertyEditor: React.FC = () => {
               </div>
             </div>
             {(component.heightMode || 'px') === 'content' ? (
-              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#f5f5f5', borderRadius: 4 }}>{t('Fit content')}</div>
+              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#1e293b', borderRadius: 4 }}>{t('Fit content')}</div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <input
@@ -434,7 +436,7 @@ const PropertyEditor: React.FC = () => {
                 onClick={() => handlePropertyChange('align', opt.value)}
                 title={opt.value}
               >
-                {opt.label}
+                <Emoji c={opt.label} />
               </button>
             ))}
           </div>
@@ -574,7 +576,7 @@ const PropertyEditor: React.FC = () => {
                     setRadiusLinked(!radiusLinked);
                   }}
                   title={radiusLinked ? t('Set separately') : t('Set uniformly')}
-                >{radiusLinked ? '🔗' : '🔓'}</button>
+                >{radiusLinked ? <Link2 size={14} /> : <Unlock size={14} />}</button>
               </div>
               {radiusLinked && (
                 <input
@@ -684,7 +686,7 @@ const PropertyEditor: React.FC = () => {
                 setPaddingLinked(!paddingLinked);
               }}
               title={paddingLinked ? t('Set separately') : t('Set uniformly')}
-            >{paddingLinked ? '🔗' : '🔓'}</button>
+            >{paddingLinked ? <Link2 size={14} /> : <Unlock size={14} />}</button>
           </div>
           {!paddingLinked && (
             <div className="four-dir-grid">
@@ -2132,7 +2134,7 @@ function ImagePropsEditor({
             ) : (
               <span className="image-src-placeholder">{t('Select an image resource...')}</span>
             )}
-            <span className="image-src-arrow">▼</span>
+            <span className="image-src-arrow"><Emoji c="▼" /></span>
           </div>
           {showDropdown && (
             <div className="image-src-dropdown">
@@ -2434,7 +2436,7 @@ function WindowEditor({
                 placeholder={t('Button ID')}
                 className="win-btn-id-input"
               />
-              <button className="win-btn-delete" onClick={() => removeHeaderButton(i)} title={t('Delete')}>✕</button>
+              <button className="win-btn-delete" onClick={() => removeHeaderButton(i)} title={t('Delete')}><Emoji c="✕" /></button>
             </div>
           ))}
           <button className="win-btn-add" onClick={addHeaderButton}>{t('+ Add button')}</button>
@@ -2516,7 +2518,7 @@ function ChartSeriesEditor({
                   className="chart-series-delete"
                   onClick={(e) => { e.stopPropagation(); removeSeries(i); }}
                   title={t('Delete series')}
-                >✕</button>
+                ><Emoji c="✕" /></button>
               )}
             </div>
             {expandedSeries === i && (
@@ -2724,7 +2726,7 @@ function CalendarEditor({
           {highlightedDates.map(date => (
             <span key={date} className="calendar-date-tag">
               {date}
-              <button className="calendar-date-tag-remove" onClick={() => removeDate(date)}>✕</button>
+              <button className="calendar-date-tag-remove" onClick={() => removeDate(date)}><Emoji c="✕" /></button>
             </span>
           ))}
         </div>
@@ -2866,19 +2868,19 @@ function TabManager({
                 onClick={(e) => { e.stopPropagation(); moveTab(i, 'up'); }}
                 disabled={i === 0}
                 title={t('Move up')}
-              >↑</button>
+              ><Emoji c="↑" /></button>
               <button
                 className="tab-manager-move-btn"
                 onClick={(e) => { e.stopPropagation(); moveTab(i, 'down'); }}
                 disabled={i === tabs.length - 1}
                 title={t('Move down')}
-              >↓</button>
+              ><Emoji c="↓" /></button>
               {tabs.length > 1 && (
                 <button
                   className="tab-manager-delete-btn"
                   onClick={(e) => { e.stopPropagation(); removeTab(i); }}
                   title={t('Delete')}
-                >✕</button>
+                ><Emoji c="✕" /></button>
               )}
             </div>
           </div>
@@ -3111,7 +3113,7 @@ function LineEditor({
                 />
               </div>
               {points.length > 2 && (
-                <button className="line-point-delete" onClick={() => removePoint(i)} title={t('Delete')}>✕</button>
+                <button className="line-point-delete" onClick={() => removePoint(i)} title={t('Delete')}><Emoji c="✕" /></button>
               )}
             </div>
           ))}

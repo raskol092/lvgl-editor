@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 import React, { useState, useMemo } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { componentCategories, getComponentsByCategory } from '../../utils/componentDefinitions';
@@ -55,7 +56,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       <div className="category-header" onClick={onToggle}>
         <span className="category-icon"><ToolIcon name={`cat:${category.id}`} size={14} fallback={category.icon} /></span>
         <span className="category-name">{t(category.name)}</span>
-        <span className={`collapse-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
+        <span className={`collapse-icon ${isCollapsed ? 'collapsed' : ''}`}><Emoji c="▼" /></span>
       </div>
       {!isCollapsed && (
         <div className="category-components">

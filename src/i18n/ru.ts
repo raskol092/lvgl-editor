@@ -754,4 +754,11 @@ export const ru: Record<string, string> = {
   'Lisp code block': 'Блок Lisp-кода',
   'Call a custom Lisp function': 'Вызывает пользовательскую Lisp-функцию',
   'Embed custom Lisp code': 'Встраивает пользовательский Lisp-код',
+  'Download ZIP': 'Скачать ZIP',
+  '🗜️ Download ZIP': '🗜️ Скачать ZIP',
+  'Download project as ZIP': 'Скачать проект ZIP-архивом',
+  'ZIP downloaded': 'ZIP-архив скачан',
+  'Drag onto the canvas': 'Перетащите на холст',
+  'Failed to add icon': 'Не удалось добавить значок',
+  'imported': 'импорт',
 };

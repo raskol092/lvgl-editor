@@ -1,48 +1,15 @@
 /// <reference types="vitest/config" />
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
-import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
-import compilePlugin from './vite-plugin-compile'
-
-const compilePreviewModuleId = 'virtual:compile-preview'
-const compilePreviewModulePath = fileURLToPath(new URL('./src/components/CompilePreview/index.ts', import.meta.url))
-
-function compilePreviewModulePlugin(enableCompilePreview: boolean): Plugin {
-  const resolvedCompilePreviewModuleId = `\0${compilePreviewModuleId}`
-
-  return {
-    name: 'compile-preview-module',
-    resolveId(id) {
-      if (id === compilePreviewModuleId) {
-        return resolvedCompilePreviewModuleId
-      }
-    },
-    load(id) {
-      if (id !== resolvedCompilePreviewModuleId) {
-        return null
-      }
-
-      if (enableCompilePreview) {
-        return `export { default } from ${JSON.stringify(compilePreviewModulePath)}`
-      }
-
-      return 'const CompilePreview = () => null\nexport default CompilePreview'
-    },
-  }
-}
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const enableCompilePreview = env.VITE_ENABLE_COMPILE_PREVIEW !== 'false'
 
   return {
     base: env.VITE_BASE_PATH || '/',
     plugins: [
       react(),
-      compilePreviewModulePlugin(enableCompilePreview),
-      ...(enableCompilePreview ? [compilePlugin()] : []),
     ],
     test: {
       environment: 'jsdom',

@@ -1,3 +1,4 @@
+import { ti } from '../../i18n/ti';
 import React, { useState, useMemo, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { useEditorStore } from '../../store/editorStore';
@@ -6,8 +7,9 @@ import { useLogicEditorStore } from '../LogicEditor';
 import { useResourceStore } from '../../resources/resourceStore';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
-import { generateCode, getGeneratedFileNames, downloadAsZip, convertAssets } from '../../codegen/lisp';
+import { generateCode, getGeneratedFileNames, convertAssets } from '../../codegen/lisp';
 import type { LispGenOptions, LispFileName } from '../../codegen/lisp';
+import { useZipExport } from '../../hooks/useZipExport';
 import { toast } from '../Toast';
 import { t } from '../../i18n';
 import './CodePreview.css';
@@ -52,6 +54,8 @@ const CodePreview: React.FC = () => {
     namingStyle,
   }), [namingStyle]);
 
+  const { download } = useZipExport(codeGenOptions);
+
   const generatedCode = useMemo(() => {
     try {
       return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, imagePalettes);
@@ -85,14 +89,7 @@ const CodePreview: React.FC = () => {
     toast.success(t('{0} downloaded', selectedFile));
   };
 
-  const handleDownloadAll = async () => {
-    try {
-      await downloadAsZip(pages, codeGenOptions, logicGraphs, 'lvgl_ui.zip', currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize);
-      toast.success(t('All files downloaded'));
-    } catch {
-      toast.error(t('Download failed'));
-    }
-  };
+  const handleDownloadAll = download;
 
   return (
     <div className="code-preview">
@@ -119,13 +116,13 @@ const CodePreview: React.FC = () => {
             <option value="snake_case">snake_case</option>
           </select>
           <button className="code-action-btn" onClick={handleCopy} title={t('Copy code')}>
-            {t('📋 Copy')}
+            {ti('📋 Copy')}
           </button>
           <button className="code-action-btn" onClick={handleDownload} title={t('Download current file')}>
-            {t('💾 Download')}
+            {ti('💾 Download')}
           </button>
-          <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download all files')}>
-            {t('📦 Download all')}
+          <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download project as ZIP')}>
+            {ti('🗜️ Download ZIP')}
           </button>
         </div>
       </div>
