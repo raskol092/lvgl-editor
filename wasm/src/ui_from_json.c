@@ -320,15 +320,36 @@ static lv_obj_t *create_table(lv_obj_t *parent, const cJSON *comp) {
     lv_obj_t *tbl = lv_table_create(parent);
     const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
     if (props) {
-        int rows = cjson_get_int(props, "rows", 3);
-        int cols = cjson_get_int(props, "cols", 3);
-        lv_table_set_row_count(tbl, (uint32_t)rows);
-        lv_table_set_column_count(tbl, (uint32_t)cols);
-        /* Fill header row */
-        for (int c = 0; c < cols; c++) {
-            char hdr[32];
-            snprintf(hdr, sizeof(hdr), "Col %d", c + 1);
-            lv_table_set_cell_value(tbl, 0, (uint32_t)c, hdr);
+        /* same as the generated Lisp: rows, columns, column widths and the non-empty cells */
+        cJSON *r = cJSON_GetObjectItemCaseSensitive(props, "rows");
+        cJSON *c = cJSON_GetObjectItemCaseSensitive(props, "cols");
+        if (cJSON_IsNumber(r)) lv_table_set_row_count(tbl, (uint32_t)r->valueint);
+        if (cJSON_IsNumber(c)) lv_table_set_column_count(tbl, (uint32_t)c->valueint);
+        cJSON *widths = cJSON_GetObjectItemCaseSensitive(props, "columnWidths");
+        if (cJSON_IsArray(widths)) {
+            int i = 0;
+            cJSON *w;
+            cJSON_ArrayForEach(w, widths) {
+                if (cJSON_IsNumber(w)) lv_table_set_column_width(tbl, (uint32_t)i, (int32_t)w->valueint);
+                i++;
+            }
+        }
+        cJSON *cells = cJSON_GetObjectItemCaseSensitive(props, "cellData");
+        if (cJSON_IsArray(cells)) {
+            int ri = 0;
+            cJSON *row;
+            cJSON_ArrayForEach(row, cells) {
+                if (cJSON_IsArray(row)) {
+                    int ci = 0;
+                    cJSON *cell;
+                    cJSON_ArrayForEach(cell, row) {
+                        if (cJSON_IsString(cell) && cell->valuestring[0])
+                            lv_table_set_cell_value(tbl, (uint32_t)ri, (uint32_t)ci, cell->valuestring);
+                        ci++;
+                    }
+                }
+                ri++;
+            }
         }
     }
     return tbl;
@@ -443,6 +464,16 @@ static lv_obj_t *create_win(lv_obj_t *parent, const cJSON *comp) {
     if (props) {
         const char *title = cjson_get_string(props, "title");
         if (title) lv_win_add_title(win, title);
+        int hh = cjson_get_int(props, "headerHeight", 0);
+        if (hh > 0 && hh != 40) lv_obj_set_height(lv_win_get_header(win), hh);
+        /* header buttons, same as the generated Lisp: close button first, then the custom ones */
+        cJSON *close = cJSON_GetObjectItemCaseSensitive(props, "showCloseBtn");
+        if (!close || !cJSON_IsFalse(close)) lv_win_add_button(win, LV_SYMBOL_CLOSE, 40);
+        cJSON *hb = cJSON_GetObjectItemCaseSensitive(props, "headerButtons");
+        if (cJSON_IsArray(hb)) {
+            cJSON *b;
+            cJSON_ArrayForEach(b, hb) lv_win_add_button(win, LV_SYMBOL_SETTINGS, cjson_get_int(b, "width", 40));
+        }
     }
     /* Register win content area with virtual ID */
     if (comp_id) {

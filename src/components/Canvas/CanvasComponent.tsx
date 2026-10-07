@@ -409,17 +409,22 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       case 'img':
         return <CanvasImageContent src={props.src} recolor={defaultStyle.imageRecolor} iconColor={th.text} />;
       
-      case 'line':
+      case 'line': {
+        // lv_line draws a polyline through its points (object coordinates); default color = theme text
+        const pts: number[][] = Array.isArray(props.points) && props.points.length >= 2 ? props.points : [[0, 0], [component.width, 0]];
         return (
-          <div className="lvgl-line" style={{
-            width: '100%',
-            height: '2px',
-            backgroundColor: defaultStyle.borderColor || defaultStyle.textColor || th.text,
-            position: 'absolute',
-            top: '50%',
-            transform: 'translateY(-50%)',
-          }} />
+          <svg className="lvgl-line" style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}>
+            <polyline
+              fill="none"
+              points={pts.map(pt => `${Number(pt?.[0]) || 0},${Number(pt?.[1]) || 0}`).join(' ')}
+              stroke={props.lineColor || th.text}
+              strokeWidth={props.lineWidth ?? 2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         );
+      }
       
       case 'textarea':
         return (
@@ -608,26 +613,45 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           </div>
         );
       
-      case 'win':
+      case 'win': {
+        // like lv_win: a header bar (default 40 px) with the title and square primary-colored buttons on the right
+        const headerH = Number(props.headerHeight) || 40;
+        const onPrimary = '#ffffff';
+        const hdrBtns: string[] = [];
+        if (props.showCloseBtn !== false) hdrBtns.push('✕');
+        if (Array.isArray(props.headerButtons)) props.headerButtons.forEach(() => hdrBtns.push('⚙'));
         return (
           <div className="lvgl-win" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{
-              padding: '8px 12px',
+              height: headerH,
+              padding: '4px 8px 4px 12px',
+              boxSizing: 'border-box',
               backgroundColor: tint,
-              borderBottom: `1px solid ${th.border}`,
-              fontSize: '13px',
-              fontWeight: 600,
+              fontSize: props.fontSize || defaultFontSize,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              gap: 6,
               flexShrink: 0,
             }}>
-              <span>{props.title || 'Window'}</span>
-              {props.showCloseBtn !== false && <span style={{ color: muted, cursor: 'pointer' }}>✕</span>}
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{props.title || 'Window'}</span>
+              {hdrBtns.map((ic, i) => (
+                <span key={i} style={{
+                  width: 40,
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 6,
+                  backgroundColor: th.primary,
+                  color: onPrimary,
+                  flexShrink: 0,
+                }}>{ic}</span>
+              ))}
             </div>
             <div className="lvgl-win-content" style={{ flex: 1, padding: '8px' }}>{children}</div>
           </div>
         );
+      }
       
       case 'bar': {
         const barMin = props.min ?? 0;
@@ -788,33 +812,37 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         );
       }
       
-      case 'table':
+      case 'table': {
+        // lv_table: rows separated by horizontal lines, columns have their own widths, a scrollbar when it overflows
+        const rows = Number(props.rows || 3);
+        const cols = Number(props.cols || 3);
+        const widths: number[] = Array.from({ length: cols }, (_, c) => Number(props.columnWidths?.[c]) || 60);
+        const fs = Number(props.fontSize) || defaultFontSize;
+        const rowH = Math.round(fs + 42);
+        const overflowY = rows * rowH > component.height;
         return (
           <div className="lvgl-table" style={{
             width: '100%',
             height: '100%',
-            display: 'grid',
-            gridTemplateColumns: `repeat(${props.cols || 3}, 1fr)`,
-            gridTemplateRows: `repeat(${props.rows || 3}, 1fr)`,
-            gap: '1px',
-            backgroundColor: th.border,
-            border: `1px solid ${th.border}`,
-            borderRadius: defaultStyle.borderRadius || 4,
+            position: 'relative',
             overflow: 'hidden',
+            color: th.text,
+            fontSize: fs,
+            borderRadius: defaultStyle.borderRadius || 0,
           }}>
-            {Array.from({ length: (props.rows || 3) * (props.cols || 3) }).map((_, i) => (
-              <div key={i} style={{
-                backgroundColor: i < (props.cols || 3) && props.headerRow !== false ? th.surface : th.surface,
-                padding: '4px',
-                fontSize: '10px',
-                fontWeight: i < (props.cols || 3) && props.headerRow !== false ? 600 : 400,
-                color: th.text,
-              }}>
-                {props.cellData?.[Math.floor(i / (props.cols || 3))]?.[i % (props.cols || 3)] || ''}
+            {Array.from({ length: rows }).map((_, r) => (
+              <div key={r} style={{ display: 'flex', height: rowH, boxSizing: 'border-box', borderBottom: `1px solid ${th.border}`, width: widths.reduce((a, w) => a + w, 0) }}>
+                {widths.map((w, c) => (
+                  <div key={c} style={{ width: w, flexShrink: 0, padding: '0 12px', display: 'flex', alignItems: 'center', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                    {props.cellData?.[r]?.[c] || ''}
+                  </div>
+                ))}
               </div>
             ))}
+            {overflowY && <div style={{ position: 'absolute', right: 4, top: 4, width: 4, height: '45%', borderRadius: 2, backgroundColor: th.border }} />}
           </div>
         );
+      }
       
       case 'calendar': {
         // like LVGL: weekday row + full month grid, neighbouring months dimmed, "today" boxed
@@ -828,12 +856,13 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           if (dn < 1) return { n: prevDays + dn, other: true };
           if (dn > daysIn) return { n: dn - daysIn, other: true };
           return { n: dn, other: false };
-        }).slice(0, first + daysIn > 35 ? 42 : 35);
+        });
+        // LVGL always shows 6 weeks (42 days), so the grid runs on into the next month
         return (
           <div className="lvgl-calendar" style={{
             width: '100%',
             height: '100%',
-            fontSize: '10px',
+            fontSize: '11px',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
@@ -845,15 +874,21 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '1fr', gap: '1px', flex: 1, padding: '2px' }}>
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', alignSelf: 'center' }}>{d}</div>
+                <div key={d} style={{ textAlign: 'center', alignSelf: 'center' }}>{d}</div>
               ))}
-              {cells.map((c, i) => (
-                <div key={i} style={{
-                  textAlign: 'center', alignSelf: 'center', padding: '1px 0',
-                  opacity: c.other ? 0.45 : 1,
-                  outline: !c.other && props.showToday && c.n === 1 ? `1px solid ${th.primary}` : undefined,
-                }}>{c.n}</div>
-              ))}
+              {cells.map((c, i) => {
+                const today = !c.other && props.showToday && c.n === 1;
+                return (
+                  <div key={i} style={{
+                    justifySelf: 'center', alignSelf: 'center',
+                    width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: 3,
+                    border: today ? `2px solid ${th.primary}` : c.other ? '1px solid transparent' : `1px solid ${th.border}`,
+                    boxSizing: 'border-box',
+                    opacity: c.other ? 0.7 : 1,
+                  }}>{c.n}</div>
+                );
+              })}
             </div>
           </div>
         );

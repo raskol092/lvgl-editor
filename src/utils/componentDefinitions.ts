@@ -99,10 +99,10 @@ export const componentDefinitions: ComponentDefinition[] = [
     defaultProps: { points: [[0, 0], [100, 0]] },
     defaultStyles: {
       default: {
-        // line: line_color = color_text, line_width = 1
+        // line: drawn through its points with line_color = color_text; no box border
         bgColor: 'transparent',
         borderColor: '#212121',
-        borderWidth: 1,
+        borderWidth: 0,
         borderRadius: 0,
         textColor: '#212121',
         opacity: 1,
