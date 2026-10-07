@@ -443,6 +443,16 @@ static lv_obj_t *create_win(lv_obj_t *parent, const cJSON *comp) {
     if (props) {
         const char *title = cjson_get_string(props, "title");
         if (title) lv_win_add_title(win, title);
+        int hh = cjson_get_int(props, "headerHeight", 0);
+        if (hh > 0 && hh != 40) lv_obj_set_height(lv_win_get_header(win), hh);
+        /* header buttons, same as the generated Lisp: close button first, then the custom ones */
+        cJSON *close = cJSON_GetObjectItemCaseSensitive(props, "showCloseBtn");
+        if (!close || !cJSON_IsFalse(close)) lv_win_add_button(win, LV_SYMBOL_CLOSE, 40);
+        cJSON *hb = cJSON_GetObjectItemCaseSensitive(props, "headerButtons");
+        if (cJSON_IsArray(hb)) {
+            cJSON *b;
+            cJSON_ArrayForEach(b, hb) lv_win_add_button(win, LV_SYMBOL_SETTINGS, cjson_get_int(b, "width", 40));
+        }
     }
     /* Register win content area with virtual ID */
     if (comp_id) {

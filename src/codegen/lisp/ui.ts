@@ -429,7 +429,7 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       if (props.title) out.push(`(lv-win-add-title ${v} ${lstr(props.title)})`);
       const header = `${v}${o.namingStyle === 'snake_case' ? '_' : '-'}header`;
       const btns: Array<{ icon: string; width: number }> = [];
-      if (props.showCloseBtn) btns.push({ icon: 'LV_SYMBOL_CLOSE', width: 40 });
+      if (props.showCloseBtn !== false) btns.push({ icon: 'LV_SYMBOL_CLOSE', width: 40 });
       if (Array.isArray(props.headerButtons)) {
         for (const b of props.headerButtons) btns.push({ icon: b.icon || 'LV_SYMBOL_SETTINGS', width: b.width || 40 });
       }
