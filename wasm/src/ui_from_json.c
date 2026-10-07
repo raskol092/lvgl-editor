@@ -83,6 +83,13 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
     s = cjson_get_string(style, "textColor");
     if (s) lv_obj_set_style_text_color(obj, hex_to_color(s), sel);
 
+    /* image recolor (library icons follow the theme text color) */
+    s = cjson_get_string(style, "imageRecolor");
+    if (s) {
+        lv_obj_set_style_image_recolor(obj, hex_to_color(s), sel);
+        lv_obj_set_style_image_recolor_opa(obj, LV_OPA_COVER, sel);
+    }
+
     /* opacity */
     item = cJSON_GetObjectItemCaseSensitive(style, "opacity");
     if (cJSON_IsNumber(item)) {
@@ -480,11 +487,86 @@ static lv_obj_t *create_line(lv_obj_t *parent, const cJSON *comp) {
     return line;
 }
 
+/* ---- raw images sent by the editor: {"images": {"<id>": {"w":..,"h":..,"data":"<base64 BGRA>"}}} ---- */
+#define MAX_IMAGES 32
+typedef struct {
+    char id[64];
+    lv_image_dsc_t dsc;
+    uint8_t *pix;
+} img_entry_t;
+static img_entry_t img_store[MAX_IMAGES];
+static int img_count = 0;
+
+static void images_free(void) {
+    for (int i = 0; i < img_count; i++) free(img_store[i].pix);
+    img_count = 0;
+}
+
+static int b64v(int c) {
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if (c >= '0' && c <= '9') return c - '0' + 52;
+    if (c == '+') return 62;
+    if (c == '/') return 63;
+    return -1;
+}
+
+static size_t b64_decode(const char *in, uint8_t *out, size_t cap) {
+    size_t n = 0;
+    int acc = 0, bits = 0;
+    for (; *in; in++) {
+        int v = b64v((unsigned char)*in);
+        if (v < 0) continue;
+        acc = (acc << 6) | v;
+        bits += 6;
+        if (bits >= 8) {
+            bits -= 8;
+            if (n < cap) out[n++] = (uint8_t)((acc >> bits) & 0xFF);
+        }
+    }
+    return n;
+}
+
+static void images_load(const cJSON *images) {
+    if (!cJSON_IsObject(images)) return;
+    cJSON *it;
+    cJSON_ArrayForEach(it, images) {
+        if (img_count >= MAX_IMAGES || !it->string) continue;
+        int w = cjson_get_int(it, "w", 0), h = cjson_get_int(it, "h", 0);
+        const char *data = cjson_get_string(it, "data");
+        if (w <= 0 || h <= 0 || !data) continue;
+        size_t size = (size_t)w * h * 4;
+        uint8_t *pix = (uint8_t *)malloc(size);
+        if (!pix) continue;
+        if (b64_decode(data, pix, size) != size) { free(pix); continue; }
+        img_entry_t *e = &img_store[img_count++];
+        memset(e, 0, sizeof(*e));
+        strncpy(e->id, it->string, 63);
+        e->pix = pix;
+        e->dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+        e->dsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
+        e->dsc.header.w = (uint32_t)w;
+        e->dsc.header.h = (uint32_t)h;
+        e->dsc.header.stride = (uint32_t)w * 4;
+        e->dsc.data_size = size;
+        e->dsc.data = pix;
+    }
+}
+
 static lv_obj_t *create_img(lv_obj_t *parent, const cJSON *comp) {
-    (void)comp;
-    /* Image source handling would require asset management;
-       for now just create the widget */
-    return lv_image_create(parent);
+    lv_obj_t *img = lv_image_create(parent);
+    cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    const char *src = props ? cjson_get_string(props, "src") : NULL;
+    if (src) {
+        for (int i = 0; i < img_count; i++) {
+            if (strcmp(img_store[i].id, src) == 0) {
+                lv_image_set_src(img, &img_store[i].dsc);
+                break;
+            }
+        }
+    }
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_STRETCH);
+    return img;
 }
 
 /* ------------------------------------------------------------------ */
@@ -543,6 +625,9 @@ void ui_from_json(const char *json_str) {
 
     lv_obj_t *screen = lv_screen_active();
     id_map_reset();
+
+    images_free();
+    images_load(cJSON_GetObjectItemCaseSensitive(root, "images"));
 
     /* LVGL default theme with the project's colors (same as lv-theme-set on the board) */
     cJSON *theme_cfg = cJSON_GetObjectItemCaseSensitive(root, "theme");

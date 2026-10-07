@@ -59,6 +59,8 @@ export interface StyleProps {
   borderWidth?: number;
   borderRadius?: number;
   textColor?: string;
+  /** recolors an image with this color (LVGL image_recolor); library icons default to the theme text color */
+  imageRecolor?: string;
   opacity?: number;
   padding?: number;
   // Shadow

@@ -1,5 +1,10 @@
 import type { Page, CanvasState, LvglComponent, Theme } from '../../types';
 import { isDarkTheme } from '../../utils/isDarkTheme';
+import { isIconImage } from '../../utils/iconRecolor';
+import { useResourceStore } from '../../resources/resourceStore';
+
+/** theme text color used to recolor library icons while building the JSON */
+let iconColor: string | undefined;
 
 interface WasmUIJson {
   screen: {
@@ -8,6 +13,7 @@ interface WasmUIJson {
     bgColor: string;
   };
   theme?: { primary: string; secondary: string; dark: boolean };
+  images?: Record<string, { w: number; h: number; data: string }>;
   components: WasmComponent[];
 }
 
@@ -102,6 +108,14 @@ function flattenTree(
       },
     };
 
+    if (comp.type === 'img' && comp.props.src) {
+      const res = useResourceStore.getState().images.find(i => i.id === comp.props.src || i.name === comp.props.src || i.cArrayName === comp.props.src);
+      if (res) wc.props.src = res.id;
+    }
+    if (comp.type === 'img' && iconColor && !wc.styles.default.imageRecolor && isIconImage(comp.props.src, useResourceStore.getState().images)) {
+      wc.styles.default.imageRecolor = iconColor;
+    }
+
     if (comp.widthMode) wc.widthMode = comp.widthMode;
     if (comp.heightMode) wc.heightMode = comp.heightMode;
     if (comp.align && comp.align !== 'default') {
@@ -136,8 +150,10 @@ export function editorStateToJson(
   currentPageId: string,
   canvas: CanvasState,
   theme?: Theme,
+  images?: Record<string, { w: number; h: number; data: string }>,
 ): string {
   const page = pages.find((p) => p.id === currentPageId);
+  iconColor = theme?.colors.text;
 
   const json: WasmUIJson = {
     screen: {
@@ -145,6 +161,7 @@ export function editorStateToJson(
       height: canvas.height,
       bgColor: page?.backgroundColor || '#ffffff',
     },
+    ...(images && Object.keys(images).length > 0 ? { images } : {}),
     ...(theme ? { theme: { primary: theme.colors.primary, secondary: theme.colors.secondary, dark: isDarkTheme(theme) } } : {}),
     components: page ? flattenTree(page.components, null) : [],
   };
