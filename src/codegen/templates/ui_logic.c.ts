@@ -545,14 +545,13 @@ function generateIfElseCode(
   indentLevel: number
 ): string {
   const indent = getIndent(options).repeat(indentLevel);
-  const condition = getInputValue(node, '条件', graph);
+  const condition = getInputValue(node, 'Condition', graph);
   const lines: string[] = [];
   
   lines.push(`${indent}if (${condition}) {`);
   
-  // Follow "True" / "真" execution output
-  const trueNodeId = getOutputTargetNode(node, 'True', graph)
-    || getOutputTargetNode(node, '真', graph);
+  // Follow "True" execution output
+  const trueNodeId = getOutputTargetNode(node, 'True', graph);
   if (trueNodeId) {
     const visited = new Set<string>();
     const trueCode = generateExecutionChain(trueNodeId, graph, options, indentLevel + 1, visited);
@@ -565,9 +564,8 @@ function generateIfElseCode(
     lines.push(`${indent}${getIndent(options)}// True branch`);
   }
   
-  // Follow "False" / "假" execution output
-  const falseNodeId = getOutputTargetNode(node, 'False', graph)
-    || getOutputTargetNode(node, '假', graph);
+  // Follow "False" execution output
+  const falseNodeId = getOutputTargetNode(node, 'False', graph);
   if (falseNodeId) {
     lines.push(`${indent}} else {`);
     const visited = new Set<string>();
@@ -594,7 +592,7 @@ function generateSwitchCode(
   const indent = getIndent(options).repeat(indentLevel);
   const innerIndent = getIndent(options).repeat(indentLevel + 1);
   const bodyIndent = getIndent(options).repeat(indentLevel + 2);
-  const value = getInputValue(node, '值', graph);
+  const value = getInputValue(node, 'Value', graph);
   const cases = node.params.cases || [0, 1, 2];
   const lines: string[] = [];
   
@@ -619,8 +617,7 @@ function generateSwitchCode(
   }
   
   // Default case
-  const defaultNodeId = getOutputTargetNode(node, 'Default', graph)
-    || getOutputTargetNode(node, '默认', graph);
+  const defaultNodeId = getOutputTargetNode(node, 'Default', graph);
   lines.push(`${innerIndent}default: {`);
   if (defaultNodeId) {
     const visited = new Set<string>();
@@ -698,7 +695,7 @@ function generateShowHideCode(node: LogicNode, indent: string): string {
 
 function generateSetTextCode(node: LogicNode, graph: LogicGraph, indent: string): string {
   const target = node.params.targetComponent || 'label';
-  const text = getInputValue(node, '文本', graph);
+  const text = getInputValue(node, 'Text', graph);
   const targetName = `ui_${toSnakeCase(target)}`;
   
   return `${indent}lv_label_set_text(${targetName}, ${text});`;
@@ -706,7 +703,7 @@ function generateSetTextCode(node: LogicNode, graph: LogicGraph, indent: string)
 
 function generateSetValueCode(node: LogicNode, graph: LogicGraph, indent: string): string {
   const target = node.params.targetComponent || 'slider';
-  const value = getInputValue(node, '数值', graph);
+  const value = getInputValue(node, 'Number', graph);
   const targetName = `ui_${toSnakeCase(target)}`;
   const compType = node.params.componentType || 'slider';
   
@@ -743,7 +740,7 @@ function generateDelayCode(node: LogicNode, indent: string, options: CodeGenOpti
 
 function generateVarWriteCode(node: LogicNode, graph: LogicGraph, indent: string): string {
   const varName = node.params.variableName || node.params.variableId || 'unknown';
-  const value = getInputValue(node, '值', graph);
+  const value = getInputValue(node, 'Value', graph);
   const cVarName = toSnakeCase(`var_${varName}`);
   
   return `${indent}${cVarName} = ${value};`;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../i18n';
 import './CodeEditor.css';
 
 interface CodeEditorProps {
@@ -13,7 +14,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   value,
   onChange,
   language = 'c',
-  placeholder = '// 输入代码...',
+  placeholder = '// Enter code...',
   readOnly = false,
 }) => {
   return (
@@ -31,7 +32,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       />
       <div className="code-editor-footer">
         <span className="line-count">
-          {value.split('\n').length} 行
+          {value.split('\n').length} {t('Line')}
         </span>
       </div>
     </div>

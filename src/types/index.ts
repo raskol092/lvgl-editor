@@ -180,14 +180,14 @@ export interface LvglFlags {
 export interface LvglComponent {
   id: string;
   type: string; // 'btn', 'label', etc.
-  name: string; // 用户可编辑的名称
+  name: string; // user-editable name
   x: number;
   y: number;
   width: number;
   height: number;
   children: LvglComponent[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  props: Record<string, any>; // 组件特有属性
+  props: Record<string, any>; // component-specific props
   styles: {
     default: StyleProps;
     pressed?: StyleProps;

@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { NODE_CATEGORIES, getNodesByCategory, NODE_DEFINITIONS } from './nodeDefinitions';
 import type { LogicNodeDefinition } from './types';
+import { t } from '../../i18n';
 import './NodePalette.css';
 
 interface NodePaletteProps {
@@ -47,14 +48,14 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
   return (
     <div className="node-palette">
       <div className="palette-header">
-        <h3>节点</h3>
+        <h3>{t('Nodes')}</h3>
       </div>
 
       {/* Search */}
       <div className="palette-search">
         <input
           type="text"
-          placeholder="搜索节点..."
+          placeholder={t('Search nodes...')}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
@@ -71,7 +72,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
           // Search results
           <div className="search-results">
             {filteredDefinitions.length === 0 ? (
-              <div className="no-results">未找到匹配的节点</div>
+              <div className="no-results">{t('No matching nodes found')}</div>
             ) : (
               filteredDefinitions.map(def => (
                 <NodeItem
@@ -92,7 +93,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
                 style={{ borderLeftColor: category.color }}
               >
                 <span className="category-icon">{category.icon}</span>
-                <span className="category-name">{category.name}</span>
+                <span className="category-name">{t(category.name)}</span>
                 <span className="category-toggle">
                   {expandedCategories[category.id] ? '▼' : '▶'}
                 </span>

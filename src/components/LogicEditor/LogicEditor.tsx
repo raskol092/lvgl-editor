@@ -32,6 +32,7 @@ import NodeEditDialog from './NodeEditDialog';
 import type { LogicNodeDefinition, LogicNode as LogicNodeType, LogicConnection as LogicConnectionType } from './types';
 import { NODE_COLORS } from './nodeDefinitions';
 import { modal } from '../Modal';
+import { t } from '../../i18n';
 import './LogicEditor.css';
 
 // Custom node types
@@ -214,7 +215,7 @@ const LogicEditorInner: React.FC = () => {
 
   // Create new graph
   const handleCreateGraph = useCallback(async () => {
-    const name = await modal.prompt('请输入逻辑图名称:', '新逻辑图');
+    const name = await modal.prompt(t('Enter logic graph name:'), t('New logic graph'));
     if (name) {
       createGraph(name);
       setShowGraphList(false);
@@ -223,7 +224,7 @@ const LogicEditorInner: React.FC = () => {
 
   // Delete current graph
   const handleDeleteGraph = useCallback(async () => {
-    if (currentGraphId && await modal.confirm('确定删除此逻辑图吗？')) {
+    if (currentGraphId && await modal.confirm(t('Delete this logic graph?'))) {
       deleteGraph(currentGraphId);
     }
   }, [currentGraphId, deleteGraph]);
@@ -256,9 +257,9 @@ const LogicEditorInner: React.FC = () => {
       >
         {!currentGraph ? (
           <div className="no-graph-message">
-            <h3>没有选中的逻辑图</h3>
-            <p>创建或选择一个逻辑图开始编辑</p>
-            <button onClick={handleCreateGraph}>+ 创建逻辑图</button>
+            <h3>{t('No logic graph selected')}</h3>
+            <p>{t('Create or select a logic graph to start editing')}</p>
+            <button onClick={handleCreateGraph}>{t('+ Create logic graph')}</button>
           </div>
         ) : (
           <ReactFlow
@@ -292,7 +293,7 @@ const LogicEditorInner: React.FC = () => {
                   className="graph-dropdown-btn"
                   onClick={() => setShowGraphList(!showGraphList)}
                 >
-                  📊 {currentGraph?.name || '选择逻辑图'}
+                  📊 {currentGraph?.name || t('Select logic graph')}
                   <span className="dropdown-arrow">▼</span>
                 </button>
                 {showGraphList && (
@@ -310,14 +311,14 @@ const LogicEditorInner: React.FC = () => {
                       </div>
                     ))}
                     <div className="graph-item create" onClick={handleCreateGraph}>
-                      + 新建逻辑图
+                      {t('+ New logic graph')}
                     </div>
                   </div>
                 )}
               </div>
               
               {currentGraph && (
-                <button className="delete-graph-btn" onClick={handleDeleteGraph} title="删除逻辑图">
+                <button className="delete-graph-btn" onClick={handleDeleteGraph} title={t('Delete logic graph')}>
                   🗑️
                 </button>
               )}
@@ -328,22 +329,22 @@ const LogicEditorInner: React.FC = () => {
               {debugState.isDebugging ? (
                 <>
                   <button className="debug-btn stop" onClick={stopDebug}>
-                    ⏹️ 停止
+                    {t('⏹️ Stop')}
                   </button>
                   <button 
                     className="debug-btn step" 
                     onClick={stepDebug}
                     disabled={!debugState.currentNodeId}
                   >
-                    ⏭️ 单步
+                    {t('⏭️ Step')}
                   </button>
                   <span className="debug-status">
-                    {debugState.isPaused ? '⏸️ 已暂停' : '▶️ 运行中'}
+                    {debugState.isPaused ? t('⏸️ Paused') : t('▶️ Running')}
                   </span>
                 </>
               ) : (
                 <button className="debug-btn start" onClick={startDebug}>
-                  🐛 调试
+                  {t('🐛 Debug')}
                 </button>
               )}
             </Panel>

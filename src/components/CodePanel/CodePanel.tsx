@@ -9,6 +9,7 @@ import { generateCode, getGeneratedFileNames, downloadAsZip } from '../../codege
 import type { CodeGenOptions, GeneratedCode } from '../../codegen/types';
 import { DEFAULT_CODEGEN_OPTIONS } from '../../codegen/types';
 import { toast } from '../Toast';
+import { t } from '../../i18n';
 import './CodePanel.css';
 
 type FileName = keyof GeneratedCode;
@@ -57,7 +58,7 @@ const CodePanel: React.FC = () => {
       await downloadAsZip(pages, options, logicGraphs, 'lvgl_ui.zip', undefined, imageResources);
     } catch (error) {
       console.error('Export failed:', error);
-      toast.error('导出失败，请重试');
+      toast.error(t('Export failed, please try again'));
     } finally {
       setIsExporting(false);
     }
@@ -93,26 +94,26 @@ const CodePanel: React.FC = () => {
           <button 
             className="toolbar-btn"
             onClick={handleCopy}
-            title="复制代码"
+            title={t('Copy code')}
           >
-            📋 复制
+            {t('📋 Copy')}
           </button>
           
           <button 
             className="toolbar-btn"
             onClick={() => setShowOptions(!showOptions)}
-            title="代码生成选项"
+            title={t('Code generation options')}
           >
-            ⚙️ 选项
+            {t('⚙️ Options')}
           </button>
           
           <button 
             className="toolbar-btn export-btn"
             onClick={handleExport}
             disabled={isExporting}
-            title="导出为 ZIP"
+            title={t('Export as ZIP')}
           >
-            {isExporting ? '导出中...' : '📦 导出 ZIP'}
+            {isExporting ? t('Exporting...') : t('📦 Export ZIP')}
           </button>
         </div>
       </div>
@@ -122,7 +123,7 @@ const CodePanel: React.FC = () => {
         <div className="options-panel">
           <div className="options-grid">
             <div className="option-item">
-              <label>LVGL 版本</label>
+              <label>{t('LVGL version')}</label>
               <select 
                 value={options.lvglVersion}
                 onChange={(e) => handleOptionChange('lvglVersion', e.target.value as '8' | '9')}
@@ -133,7 +134,7 @@ const CodePanel: React.FC = () => {
             </div>
             
             <div className="option-item">
-              <label>命名风格</label>
+              <label>{t('Naming style')}</label>
               <select 
                 value={options.namingStyle}
                 onChange={(e) => handleOptionChange('namingStyle', e.target.value as 'snake_case' | 'camelCase')}
@@ -144,18 +145,18 @@ const CodePanel: React.FC = () => {
             </div>
             
             <div className="option-item">
-              <label>缩进风格</label>
+              <label>{t('Indent style')}</label>
               <select 
                 value={options.indentStyle}
                 onChange={(e) => handleOptionChange('indentStyle', e.target.value as 'spaces' | 'tabs')}
               >
-                <option value="spaces">空格</option>
+                <option value="spaces">{t('Spaces')}</option>
                 <option value="tabs">Tab</option>
               </select>
             </div>
             
             <div className="option-item">
-              <label>缩进大小</label>
+              <label>{t('Indent size')}</label>
               <select 
                 value={options.indentSize}
                 onChange={(e) => handleOptionChange('indentSize', parseInt(e.target.value))}
@@ -174,7 +175,7 @@ const CodePanel: React.FC = () => {
                   checked={options.generateComments}
                   onChange={(e) => handleOptionChange('generateComments', e.target.checked)}
                 />
-                生成注释
+                {t('Generate comments')}
               </label>
             </div>
             
@@ -185,7 +186,7 @@ const CodePanel: React.FC = () => {
                   checked={options.userCodeMarkers}
                   onChange={(e) => handleOptionChange('userCodeMarkers', e.target.checked)}
                 />
-                用户代码标记
+                {t('User code markers')}
               </label>
             </div>
           </div>

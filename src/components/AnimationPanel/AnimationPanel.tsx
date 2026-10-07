@@ -2,18 +2,19 @@ import React, { useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { Animation, AnimationType } from '../../types';
 import AnimationEditDialog from './AnimationEditDialog';
+import { t } from '../../i18n';
 import './AnimationPanel.css';
 
 const ANIM_TYPE_LABELS: Record<AnimationType, string> = {
-  fade_in: '淡入',
-  fade_out: '淡出',
-  slide_left: '左滑入',
-  slide_right: '右滑入',
-  slide_up: '上滑入',
-  slide_down: '下滑入',
-  zoom_in: '放大',
-  zoom_out: '缩小',
-  custom: '自定义',
+  fade_in: t('Fade in'),
+  fade_out: t('Fade out'),
+  slide_left: t('Slide in from left'),
+  slide_right: t('Slide in from right'),
+  slide_up: t('Slide in from top'),
+  slide_down: t('Slide in from bottom'),
+  zoom_in: t('Zoom in'),
+  zoom_out: t('Zoom out'),
+  custom: t('Custom'),
 };
 
 const ANIM_TYPE_ICONS: Record<AnimationType, string> = {
@@ -72,11 +73,11 @@ const AnimationPanel: React.FC = () => {
     return (
       <div className="animation-panel">
         <div className="panel-header">
-          <h3>🎬 动画</h3>
+          <h3>{t('🎬 Animations')}</h3>
         </div>
         <div className="anim-no-selection">
-          <p>请选择一个组件</p>
-          <p className="hint">选中组件后可添加动画</p>
+          <p>{t('Select a component')}</p>
+          <p className="hint">{t('Select a component to add animations')}</p>
         </div>
       </div>
     );
@@ -85,15 +86,15 @@ const AnimationPanel: React.FC = () => {
   return (
     <div className="animation-panel">
       <div className="panel-header">
-        <h3>🎬 动画</h3>
-        <button className="add-anim-btn" onClick={handleAddAnim} title="添加动画">+</button>
+        <h3>{t('🎬 Animations')}</h3>
+        <button className="add-anim-btn" onClick={handleAddAnim} title={t('Add animation')}>+</button>
       </div>
       <div className="anim-list">
         {animations.length === 0 ? (
           <div className="no-anims">
-            <p>暂无动画</p>
+            <p>{t('No animations')}</p>
             <button className="add-first-anim" onClick={handleAddAnim}>
-              + 添加第一个动画
+              {t('+ Add the first animation')}
             </button>
           </div>
         ) : (
@@ -109,8 +110,8 @@ const AnimationPanel: React.FC = () => {
                 </div>
               </div>
               <div className="anim-actions">
-                <button className="anim-edit-btn" onClick={() => handleEditAnim(anim)} title="编辑">✏️</button>
-                <button className="anim-delete-btn" onClick={() => handleDeleteAnim(anim.id)} title="删除">🗑️</button>
+                <button className="anim-edit-btn" onClick={() => handleEditAnim(anim)} title={t('Edit')}>✏️</button>
+                <button className="anim-delete-btn" onClick={() => handleDeleteAnim(anim.id)} title={t('Delete')}>🗑️</button>
               </div>
             </div>
           ))

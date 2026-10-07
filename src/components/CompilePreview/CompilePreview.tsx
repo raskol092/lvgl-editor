@@ -10,6 +10,7 @@ import { getCharsetRanges } from '../../resources/converters/fontConverter';
 import type { LvglComponent } from '../../types';
 import type { FontResource, ImageResource } from '../../resources/types';
 import { loadImageFromBase64, generateImageCCode, DEFAULT_IMAGE_OPTIONS } from '../../resources/converters/imageConverter';
+import { t } from '../../i18n';
 import './CompilePreview.css';
 
 /**
@@ -281,7 +282,7 @@ const CompilePreview: React.FC = () => {
       runtimeRef.current = result.runtime;
       setRunning(true);
       setStatus('done');
-      setStatusMessage('运行中 — 点击画布可交互');
+      setStatusMessage(t('Running — click the canvas to interact'));
 
       // Render initial frame
       const fb = result.runtime.getFramebuffer();
@@ -299,7 +300,7 @@ const CompilePreview: React.FC = () => {
       setStatus('error');
     } else {
       setStatus('done');
-      setStatusMessage('编译成功（无运行时）');
+      setStatusMessage(t('Compiled successfully (no runtime)'));
     }
   }, [status, generateCCode, canvas.width, canvas.height, renderFramebuffer, stopRuntime, startEventLoop, pages, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize]);
 
@@ -307,7 +308,7 @@ const CompilePreview: React.FC = () => {
   const handleStop = useCallback(() => {
     stopRuntime();
     setStatus('idle');
-    setStatusMessage('已停止');
+    setStatusMessage(t('Stopped'));
   }, [stopRuntime]);
 
   // Get mouse position relative to canvas, accounting for CSS scaling
@@ -398,7 +399,7 @@ const CompilePreview: React.FC = () => {
       ctx.fillStyle = '#666';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('点击"编译运行"查看 LVGL 渲染结果', canvas.width / 2, canvas.height / 2);
+      ctx.fillText(t('Click "Compile & run" to see the LVGL render'), canvas.width / 2, canvas.height / 2);
     }
   }, [canvas.width, canvas.height]);
 
@@ -433,17 +434,17 @@ const CompilePreview: React.FC = () => {
           onClick={handleCompile}
           disabled={isWorking}
         >
-          {isWorking ? '⏳ 处理中...' : '🔨 编译运行'}
+          {isWorking ? t('⏳ Processing...') : t('🔨 Compile & run')}
         </button>
 
         {running && (
           <button className="compile-stop-btn" onClick={handleStop}>
-            ⏹ 停止
+            {t('⏹ Stop')}
           </button>
         )}
 
         <span className="compile-status">
-          {statusIcon} {statusMessage || (status === 'idle' ? '就绪' : '')}
+          {statusIcon} {statusMessage || (status === 'idle' ? t('Ready') : '')}
         </span>
 
         <div className="compile-toolbar-right">
@@ -451,7 +452,7 @@ const CompilePreview: React.FC = () => {
             className={`compile-output-toggle ${showOutput ? 'active' : ''}`}
             onClick={() => setShowOutput(!showOutput)}
           >
-            📋 {showOutput ? '隐藏输出' : '编译输出'}
+            📋 {showOutput ? t('Hide output') : t('Compile output')}
           </button>
         </div>
       </div>
@@ -485,18 +486,18 @@ const CompilePreview: React.FC = () => {
         {showOutput && (
           <div className="compile-output-panel">
             <div className="compile-output-header">
-              <span>编译输出</span>
-              <button onClick={() => setCompileOutput('')}>清除</button>
+              <span>{t('Compile output')}</span>
+              <button onClick={() => setCompileOutput('')}>{t('Clear')}</button>
             </div>
             <pre className="compile-output-content">
-              {compileOutput || '（无输出）'}
+              {compileOutput || t('(no output)')}
             </pre>
           </div>
         )}
       </div>
 
       <div className="compile-preview-footer">
-        服务端 emcc 编译，LVGL 真实渲染 · 支持鼠标和键盘交互
+        {t('Server-side emcc compilation, real LVGL rendering · mouse and keyboard interaction supported')}
       </div>
     </div>
   );

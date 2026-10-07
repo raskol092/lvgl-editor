@@ -2,10 +2,10 @@ import type { ComponentDefinition, ComponentCategory } from '../types';
 
 // Component Categories
 export const componentCategories: ComponentCategory[] = [
-  { id: 'basic', name: '基础', icon: '📦', collapsed: false },
-  { id: 'input', name: '输入', icon: '✏️', collapsed: false },
-  { id: 'container', name: '容器', icon: '📁', collapsed: false },
-  { id: 'display', name: '显示', icon: '📊', collapsed: false },
+  { id: 'basic', name: 'Basic', icon: '📦', collapsed: false },
+  { id: 'input', name: 'Input', icon: '✏️', collapsed: false },
+  { id: 'container', name: 'Container', icon: '📁', collapsed: false },
+  { id: 'display', name: 'Display', icon: '📊', collapsed: false },
 ];
 
 // LVGL default theme colors (Light mode)
@@ -407,14 +407,14 @@ export const componentDefinitions: ComponentDefinition[] = [
     defaultProps: { 
       type: 'line', 
       series: [
-        { name: '系列1', data: [10, 20, 30, 25, 40], color: '#2196F3', lineWidth: 2, pointSize: 4 }
+        { name: 'Series 1', data: [10, 20, 30, 25, 40], color: '#2196F3', lineWidth: 2, pointSize: 4 }
       ],
       yAxisMin: 0,
       yAxisMax: 100,
       xLabels: [],
       showLegend: false,
       showGrid: true,
-      // 保留旧字段向后兼容
+      // keep legacy fields for backward compatibility
       data: [10, 20, 30, 25, 40],
       lineColor: '#2196F3'
     },

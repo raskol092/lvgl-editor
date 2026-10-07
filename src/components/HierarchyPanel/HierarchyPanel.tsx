@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { LvglComponent } from '../../types';
+import { t } from '../../i18n';
 import './HierarchyPanel.css';
 
 interface TreeNodeProps {
@@ -167,7 +168,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
               e.stopPropagation();
               onToggleVisibility(component.id);
             }}
-            title={component.visible ? '可见' : '隐藏'}
+            title={component.visible ? t('Visible') : t('Hide')}
           >
             {component.visible ? '👁️' : '👁️‍🗨️'}
           </span>
@@ -177,7 +178,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
               e.stopPropagation();
               onToggleLock(component.id);
             }}
-            title={component.locked ? '已锁定' : '未锁定'}
+            title={component.locked ? t('Locked') : t('Unlocked')}
           >
             {component.locked ? '🔒' : '🔓'}
           </span>
@@ -329,19 +330,19 @@ const HierarchyPanel: React.FC = () => {
   return (
     <div className="hierarchy-panel">
       <div className="hierarchy-header">
-        <h3>📋 层级</h3>
+        <h3>{t('📋 Hierarchy')}</h3>
         <div className="hierarchy-actions">
           <button
             className="hierarchy-btn"
             onClick={handleExpandAll}
-            title="展开全部"
+            title={t('Expand all')}
           >
             ⊞
           </button>
           <button
             className="hierarchy-btn"
             onClick={handleCollapseAll}
-            title="折叠全部"
+            title={t('Collapse all')}
           >
             ⊟
           </button>
@@ -355,7 +356,7 @@ const HierarchyPanel: React.FC = () => {
       >
         {components.length === 0 ? (
           <div className="empty-message">
-            暂无组件
+            {t('No components')}
           </div>
         ) : (
           components.map(comp => (

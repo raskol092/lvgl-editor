@@ -439,7 +439,7 @@ export default function compilePlugin(): Plugin {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({
               success: false,
-              error: `LVGL 库编译失败: ${String(libErr)}`,
+              error: `LVGL library build failed: ${String(libErr)}`,
               buildId: '',
             }));
             return;
@@ -479,7 +479,7 @@ export default function compilePlugin(): Plugin {
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({
                 success: false,
-                error: `字体转换失败: ${String(fontErr)}`,
+                error: `Font conversion failed: ${String(fontErr)}`,
                 buildId: '',
               }));
               return;

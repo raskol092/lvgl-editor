@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../i18n';
 import './HelpPanel.css';
 
 interface HelpPanelProps {
@@ -13,47 +14,47 @@ interface ShortcutGroup {
 
 const shortcutGroups: ShortcutGroup[] = [
   {
-    title: '基本操作',
+    title: t('Basic operations'),
     shortcuts: [
-      { keys: 'Ctrl + Z', description: '撤销' },
-      { keys: 'Ctrl + Shift + Z', description: '重做' },
-      { keys: 'Ctrl + Y', description: '重做' },
-      { keys: 'Delete / Backspace', description: '删除选中组件' },
-      { keys: 'Escape', description: '取消选择' },
+      { keys: 'Ctrl + Z', description: t('Undo') },
+      { keys: 'Ctrl + Shift + Z', description: t('Redo') },
+      { keys: 'Ctrl + Y', description: t('Redo') },
+      { keys: 'Delete / Backspace', description: t('Delete selected components') },
+      { keys: 'Escape', description: t('Deselect') },
     ],
   },
   {
-    title: '选择操作',
+    title: t('Selection'),
     shortcuts: [
-      { keys: 'Ctrl + A', description: '全选' },
-      { keys: 'Ctrl + 点击', description: '多选/切换选择' },
-      { keys: '鼠标拖拽', description: '框选多个组件' },
+      { keys: 'Ctrl + A', description: t('Select all') },
+      { keys: 'Ctrl + Click', description: t('Multi-select / toggle selection') },
+      { keys: t('Mouse drag'), description: t('Box-select multiple components') },
     ],
   },
   {
-    title: '剪贴板',
+    title: t('Clipboard'),
     shortcuts: [
-      { keys: 'Ctrl + C', description: '复制' },
-      { keys: 'Ctrl + X', description: '剪切' },
-      { keys: 'Ctrl + V', description: '粘贴' },
-      { keys: 'Ctrl + D', description: '复制并粘贴（快速复制）' },
+      { keys: 'Ctrl + C', description: t('Copy') },
+      { keys: 'Ctrl + X', description: t('Cut') },
+      { keys: 'Ctrl + V', description: t('Paste') },
+      { keys: 'Ctrl + D', description: t('Duplicate (quick copy)') },
     ],
   },
   {
-    title: '画布操作',
+    title: t('Canvas operations'),
     shortcuts: [
-      { keys: 'Space + 拖拽', description: '平移画布' },
-      { keys: '鼠标中键拖拽', description: '平移画布' },
-      { keys: 'Ctrl + 滚轮', description: '缩放画布' },
+      { keys: 'Space + ' + t('Drag'), description: t('Pan canvas') },
+      { keys: t('Middle mouse drag'), description: t('Pan canvas') },
+      { keys: 'Ctrl + ' + t('Scroll wheel'), description: t('Zoom canvas') },
     ],
   },
   {
-    title: '其他',
+    title: t('Other'),
     shortcuts: [
-      { keys: 'F1 / ?', description: '显示快捷键帮助' },
-      { keys: 'Ctrl + S', description: '保存项目' },
-      { keys: 'Ctrl + O', description: '打开项目' },
-      { keys: 'Ctrl + N', description: '新建项目' },
+      { keys: 'F1 / ?', description: t('Show keyboard shortcuts help') },
+      { keys: 'Ctrl + S', description: t('Save project') },
+      { keys: 'Ctrl + O', description: t('Open project') },
+      { keys: 'Ctrl + N', description: t('New project') },
     ],
   },
 ];
@@ -65,7 +66,7 @@ const HelpPanel: React.FC<HelpPanelProps> = ({ isOpen, onClose }) => {
     <div className="help-panel-overlay" onClick={onClose}>
       <div className="help-panel" onClick={e => e.stopPropagation()}>
         <div className="help-panel-header">
-          <h2>⌨️ 快捷键帮助</h2>
+          <h2>{t('⌨️ Keyboard shortcuts')}</h2>
           <button className="help-panel-close" onClick={onClose}>×</button>
         </div>
         <div className="help-panel-content">
@@ -84,7 +85,7 @@ const HelpPanel: React.FC<HelpPanelProps> = ({ isOpen, onClose }) => {
           ))}
         </div>
         <div className="help-panel-footer">
-          <span>按 Escape 或点击外部关闭</span>
+          <span>{t('Press Escape or click outside to close')}</span>
         </div>
       </div>
     </div>

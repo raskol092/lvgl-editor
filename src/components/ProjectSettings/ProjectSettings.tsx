@@ -5,6 +5,7 @@ import type { ProjectConfig } from '../../store/projectStore';
 import { useEditorStore } from '../../store/editorStore';
 import { useResourceStore } from '../../resources/resourceStore';
 import { toast } from '../Toast';
+import { t } from '../../i18n';
 import './ProjectSettings.css';
 
 const FONT_OPTIONS = [
@@ -87,9 +88,9 @@ const ProjectSettings: React.FC = () => {
     const fontRes = fonts.find(f => f.cFontName === defaultFont);
     setDefaultFontSize(parseFontSize(defaultFont, fontRes?.sizes, isCustomFont ? defaultFontSize : undefined));
     setShowProjectSettings(false);
-    toast.success('项目设置已保存');
+    toast.success(t('Project settings saved'));
     if (lvglChanged) {
-      toast.info('LVGL 配置已更改，编译预览时将使用新配置');
+      toast.info(t('LVGL configuration changed; the new configuration will be used for compile preview'));
     }
   };
 
@@ -100,28 +101,28 @@ const ProjectSettings: React.FC = () => {
   return (
     <div className="modal-global-overlay" onClick={handleClose}>
       <div className="modal-dialog project-settings-dialog" onClick={e => e.stopPropagation()}>
-        <div className="ps-title">项目设置</div>
+        <div className="ps-title">{t('Project settings')}</div>
         <div className="ps-body">
           <label className="npd-label">
-            项目名称
+            {t('Project name')}
             <input className="npd-input" type="text" value={name} onChange={e => setName(e.target.value)} />
           </label>
 
-          <div className="npd-section-title">显示配置</div>
+          <div className="npd-section-title">{t('Display configuration')}</div>
 
           <div className="npd-row">
             <label className="npd-label npd-half">
-              宽度
+              {t('Width')}
               <input className="npd-input" type="number" min={100} max={2048} value={width} onChange={e => setWidth(Number(e.target.value))} />
             </label>
             <label className="npd-label npd-half">
-              高度
+              {t('Height')}
               <input className="npd-input" type="number" min={100} max={2048} value={height} onChange={e => setHeight(Number(e.target.value))} />
             </label>
           </div>
 
           <label className="npd-label">
-            色深
+            {t('Color depth')}
             <select className="npd-select" value={colorDepth} onChange={e => setColorDepth(Number(e.target.value) as 16 | 24 | 32)}>
               <option value={16}>16 bit (RGB565)</option>
               <option value={24}>24 bit (RGB888)</option>
@@ -129,23 +130,23 @@ const ProjectSettings: React.FC = () => {
             </select>
           </label>
 
-          <div className="npd-section-title">LVGL 配置</div>
+          <div className="npd-section-title">{t('LVGL configuration')}</div>
 
           <label className="npd-label npd-checkbox-label">
             <input type="checkbox" checked={fontLarge} onChange={e => setFontLarge(e.target.checked)} />
-            LV_FONT_FMT_TXT_LARGE（大字体支持）
+            {t('LV_FONT_FMT_TXT_LARGE (large font support)')}
           </label>
 
           <label className="npd-label">
-            默认字体
+            {t('Default font')}
             <select className="npd-select" value={defaultFont} onChange={e => setDefaultFont(e.target.value)}>
-              <optgroup label="内置字体">
+              <optgroup label={t('Built-in fonts')}>
                 {FONT_OPTIONS.map(f => (
                   <option key={f} value={f}>{f}</option>
                 ))}
               </optgroup>
               {fonts.length > 0 && (
-                <optgroup label="已上传字体">
+                <optgroup label={t('Uploaded fonts')}>
                   {fonts.map(f => (
                     <option key={f.id} value={f.cFontName}>{f.name} ({f.family})</option>
                   ))}
@@ -156,7 +157,7 @@ const ProjectSettings: React.FC = () => {
 
           {!/^montserrat_\d+$/.test(defaultFont) && (
             <label className="npd-label">
-              默认字体大小
+              {t('Default font size')}
               <select className="npd-select" value={defaultFontSize} onChange={e => setDefaultFontSizeLocal(Number(e.target.value))}>
                 {FONT_SIZE_OPTIONS.map(s => (
                   <option key={s} value={s}>{s}px</option>
@@ -167,12 +168,12 @@ const ProjectSettings: React.FC = () => {
 
           <label className="npd-label npd-checkbox-label">
             <input type="checkbox" checked={useBuiltinSymbols} onChange={e => setUseBuiltinSymbols(e.target.checked)} />
-            注入 LVGL 内置图标（FontAwesome Symbols）
+            {t('Inject LVGL built-in icons (FontAwesome Symbols)')}
           </label>
 
           {useBuiltinSymbols && (
             <label className="npd-label">
-              图标字体
+              {t('Icon font')}
               <select className="npd-select" value={symbolFont} onChange={e => setSymbolFont(e.target.value)}>
                 {FONT_OPTIONS.map(f => (
                   <option key={f} value={f}>{f}</option>
@@ -182,14 +183,14 @@ const ProjectSettings: React.FC = () => {
           )}
 
           <label className="npd-label">
-            内存大小 (KB)
+            {t('Memory size (KB)')}
             <input className="npd-input" type="number" min={16} max={1024} step={8} value={memSize} onChange={e => setMemSize(Number(e.target.value))} />
           </label>
         </div>
 
         <div className="modal-dialog-footer">
-          <button className="modal-dialog-btn modal-btn-cancel" onClick={handleClose}>取消</button>
-          <button className="modal-dialog-btn modal-btn-confirm" onClick={handleSave}>保存</button>
+          <button className="modal-dialog-btn modal-btn-cancel" onClick={handleClose}>{t('Cancel')}</button>
+          <button className="modal-dialog-btn modal-btn-confirm" onClick={handleSave}>{t('Save')}</button>
         </div>
       </div>
     </div>

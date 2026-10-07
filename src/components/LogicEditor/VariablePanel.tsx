@@ -4,14 +4,15 @@ import React, { useState, useCallback } from 'react';
 import { useLogicEditorStore } from './logicEditorStore';
 import type { LogicVariable, VariableType } from './types';
 import { modal } from '../Modal';
+import { t } from '../../i18n';
 import './VariablePanel.css';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const VARIABLE_TYPES: { type: VariableType; label: string; icon: string; defaultValue: any }[] = [
-  { type: 'int', label: '整数', icon: '🔢', defaultValue: 0 },
-  { type: 'float', label: '浮点数', icon: '📊', defaultValue: 0.0 },
-  { type: 'string', label: '字符串', icon: '📝', defaultValue: '' },
-  { type: 'bool', label: '布尔值', icon: '✓', defaultValue: false },
+  { type: 'int', label: t('Integer'), icon: '🔢', defaultValue: 0 },
+  { type: 'float', label: t('Float'), icon: '📊', defaultValue: 0.0 },
+  { type: 'string', label: t('String'), icon: '📝', defaultValue: '' },
+  { type: 'bool', label: t('Boolean'), icon: '✓', defaultValue: false },
 ];
 
 const VariablePanel: React.FC = () => {
@@ -36,7 +37,7 @@ const VariablePanel: React.FC = () => {
   }, [newVarName, newVarType, addVariable]);
 
   const handleDeleteVariable = useCallback(async (id: string) => {
-    if (await modal.confirm('确定删除此变量吗？')) {
+    if (await modal.confirm(t('Delete this variable?'))) {
       deleteVariable(id);
     }
   }, [deleteVariable]);
@@ -68,10 +69,10 @@ const VariablePanel: React.FC = () => {
     return (
       <div className="variable-panel">
         <div className="panel-header">
-          <h3>变量</h3>
+          <h3>{t('Variables')}</h3>
         </div>
         <div className="no-graph">
-          <p>请先选择或创建逻辑图</p>
+          <p>{t('Select or create a logic graph first')}</p>
         </div>
       </div>
     );
@@ -80,11 +81,11 @@ const VariablePanel: React.FC = () => {
   return (
     <div className="variable-panel">
       <div className="panel-header">
-        <h3>变量</h3>
+        <h3>{t('Variables')}</h3>
         <button 
           className="add-var-btn" 
           onClick={() => setIsAdding(true)}
-          title="添加变量"
+          title={t('Add variable')}
         >
           +
         </button>
@@ -95,7 +96,7 @@ const VariablePanel: React.FC = () => {
         <div className="add-var-form">
           <input
             type="text"
-            placeholder="变量名"
+            placeholder={t('Variable name')}
             value={newVarName}
             onChange={e => setNewVarName(e.target.value)}
             autoFocus
@@ -112,10 +113,10 @@ const VariablePanel: React.FC = () => {
           </select>
           <div className="form-actions">
             <button className="btn-confirm" onClick={handleAddVariable}>
-              添加
+              {t('Add')}
             </button>
             <button className="btn-cancel" onClick={() => setIsAdding(false)}>
-              取消
+              {t('Cancel')}
             </button>
           </div>
         </div>
@@ -125,8 +126,8 @@ const VariablePanel: React.FC = () => {
       <div className="variable-list">
         {variables.length === 0 ? (
           <div className="no-variables">
-            <p>暂无变量</p>
-            <button onClick={() => setIsAdding(true)}>+ 添加变量</button>
+            <p>{t('No variables')}</p>
+            <button onClick={() => setIsAdding(true)}>{t('+ Add variable')}</button>
           </div>
         ) : (
           variables.map(variable => (
@@ -220,7 +221,7 @@ const VariableItem: React.FC<VariableItemProps> = ({
         )}
       </div>
       <div className="var-actions">
-        <button className="btn-delete" onClick={onDelete} title="删除">
+        <button className="btn-delete" onClick={onDelete} title={t('Delete')}>
           🗑️
         </button>
       </div>

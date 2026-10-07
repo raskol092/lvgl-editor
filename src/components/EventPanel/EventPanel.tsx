@@ -2,20 +2,21 @@ import React, { useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { EventBinding, LvglEventType } from '../../types';
 import EventEditDialog from './EventEditDialog';
+import { t } from '../../i18n';
 import './EventPanel.css';
 
 // LVGL Event type definitions
 // eslint-disable-next-line react-refresh/only-export-components
 export const LVGL_EVENTS: { type: LvglEventType; label: string; description: string }[] = [
-  { type: 'LV_EVENT_CLICKED', label: '点击', description: '组件被点击时触发' },
-  { type: 'LV_EVENT_PRESSED', label: '按下', description: '组件被按下时触发' },
-  { type: 'LV_EVENT_RELEASED', label: '释放', description: '组件被释放时触发' },
-  { type: 'LV_EVENT_LONG_PRESSED', label: '长按', description: '组件被长按时触发' },
-  { type: 'LV_EVENT_VALUE_CHANGED', label: '值改变', description: '组件值改变时触发' },
-  { type: 'LV_EVENT_FOCUSED', label: '获得焦点', description: '组件获得焦点时触发' },
-  { type: 'LV_EVENT_DEFOCUSED', label: '失去焦点', description: '组件失去焦点时触发' },
-  { type: 'LV_EVENT_READY', label: '就绪', description: '组件准备就绪时触发' },
-  { type: 'LV_EVENT_CANCEL', label: '取消', description: '操作被取消时触发' },
+  { type: 'LV_EVENT_CLICKED', label: t('Click'), description: t('Triggered when the component is clicked') },
+  { type: 'LV_EVENT_PRESSED', label: t('Press'), description: t('Triggered when the component is pressed') },
+  { type: 'LV_EVENT_RELEASED', label: t('Release'), description: t('Triggered when the component is released') },
+  { type: 'LV_EVENT_LONG_PRESSED', label: t('Long press'), description: t('Triggered when the component is long-pressed') },
+  { type: 'LV_EVENT_VALUE_CHANGED', label: t('Value changed'), description: t('Triggered when the component value changes') },
+  { type: 'LV_EVENT_FOCUSED', label: t('Focused'), description: t('Triggered when the component gains focus') },
+  { type: 'LV_EVENT_DEFOCUSED', label: t('Defocused'), description: t('Triggered when the component loses focus') },
+  { type: 'LV_EVENT_READY', label: t('Ready'), description: t('Triggered when the component is ready') },
+  { type: 'LV_EVENT_CANCEL', label: t('Cancel'), description: t('Triggered when the operation is cancelled') },
 ];
 
 const EventPanel: React.FC = () => {
@@ -77,42 +78,42 @@ const EventPanel: React.FC = () => {
 
   const getHandlerDescription = (event: EventBinding): string => {
     if (event.handlerType === 'custom') {
-      return '自定义代码';
+      return t('Custom code');
     }
     if (event.action) {
       switch (event.action.type) {
         case 'navigate':
-          return `导航到: ${event.action.targetPage || '未设置'}`;
+          return `${t('Navigate to')}: ${event.action.targetPage || t('Not set')}`;
         case 'setProperty':
-          return `设置属性: ${event.action.property || '未设置'}`;
+          return `${t('Set property')}: ${event.action.property || t('Not set')}`;
         case 'show':
-          return `显示: ${event.action.targetComponent || '未设置'}`;
+          return `${t('Show')}: ${event.action.targetComponent || t('Not set')}`;
         case 'hide':
-          return `隐藏: ${event.action.targetComponent || '未设置'}`;
+          return `${t('Hide')}: ${event.action.targetComponent || t('Not set')}`;
         case 'enable':
-          return `启用: ${event.action.targetComponent || '未设置'}`;
+          return `${t('Enable')}: ${event.action.targetComponent || t('Not set')}`;
         case 'disable':
-          return `禁用: ${event.action.targetComponent || '未设置'}`;
+          return `${t('Disable')}: ${event.action.targetComponent || t('Not set')}`;
         case 'setText':
-          return `设置文本: "${event.action.value || ''}"`;
+          return `${t('Set text')}: "${event.action.value || ''}"`;
         case 'setValue':
-          return `设置数值: ${event.action.value ?? '未设置'}`;
+          return `${t('Set value')}: ${event.action.value ?? t('Not set')}`;
         default:
-          return '内置动作';
+          return t('Built-in action');
       }
     }
-    return '未配置';
+    return t('Not configured');
   };
 
   if (!component) {
     return (
       <div className="event-panel">
         <div className="panel-header">
-          <h3>事件</h3>
+          <h3>{t('Events')}</h3>
         </div>
         <div className="no-selection">
-          <p>未选中组件</p>
-          <p className="hint">选择组件后可添加事件</p>
+          <p>{t('No component selected')}</p>
+          <p className="hint">{t('Select a component to add events')}</p>
         </div>
       </div>
     );
@@ -121,8 +122,8 @@ const EventPanel: React.FC = () => {
   return (
     <div className="event-panel">
       <div className="panel-header">
-        <h3>事件</h3>
-        <button className="add-event-btn" onClick={handleAddEvent} title="添加事件">
+        <h3>{t('Events')}</h3>
+        <button className="add-event-btn" onClick={handleAddEvent} title={t('Add event')}>
           <span>+</span>
         </button>
       </div>
@@ -130,9 +131,9 @@ const EventPanel: React.FC = () => {
       <div className="event-list">
         {component.events.length === 0 ? (
           <div className="no-events">
-            <p>暂无事件绑定</p>
+            <p>{t('No event bindings')}</p>
             <button className="add-first-event" onClick={handleAddEvent}>
-              + 添加事件
+              {t('+ Add event')}
             </button>
           </div>
         ) : (
@@ -151,14 +152,14 @@ const EventPanel: React.FC = () => {
                 <button 
                   className="event-edit-btn" 
                   onClick={() => handleEditEvent(event)}
-                  title="编辑"
+                  title={t('Edit')}
                 >
                   ✏️
                 </button>
                 <button 
                   className="event-delete-btn" 
                   onClick={() => handleDeleteEvent(event.id)}
-                  title="删除"
+                  title={t('Delete')}
                 >
                   🗑️
                 </button>

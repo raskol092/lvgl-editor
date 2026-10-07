@@ -30,8 +30,8 @@ body {
   border-bottom: 1px solid #334155;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 16px;
+  padding: 0 12px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -76,6 +76,7 @@ body {
 
 /* Main tabs */
 .app-tabs {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -83,10 +84,12 @@ body {
 }
 
 .tab-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
   border-radius: 6px;
@@ -109,6 +112,9 @@ body {
 }
 
 .app-toolbar {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -116,10 +122,12 @@ body {
 }
 
 .toolbar-button {
+  white-space: nowrap;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 8px;
   border: none;
   background: transparent;
   border-radius: 4px;
@@ -337,4 +345,14 @@ body {
 .preview-sub-content > * {
   flex: 1;
   min-height: 0;
+}
+
+/* Compact header: icon-only toolbar buttons on narrower screens */
+@media (max-width: 1700px) {
+  .toolbar-button .toolbar-label {
+    display: none;
+  }
+  .project-name-display {
+    max-width: 140px;
+  }
 }

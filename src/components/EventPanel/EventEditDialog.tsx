@@ -4,6 +4,7 @@ import { useEditorStore } from '../../store/editorStore';
 import type { EventBinding, LvglEventType, BuiltinActionType, BuiltinAction } from '../../types';
 import { LVGL_EVENTS } from './EventPanel';
 import CodeEditor from './CodeEditor';
+import { t } from '../../i18n';
 import './EventEditDialog.css';
 
 interface EventEditDialogProps {
@@ -14,23 +15,23 @@ interface EventEditDialogProps {
 }
 
 const BUILTIN_ACTIONS: { type: BuiltinActionType; label: string; description: string }[] = [
-  { type: 'navigate', label: '导航到页面', description: '切换到指定页面' },
-  { type: 'setProperty', label: '设置属性', description: '设置组件的属性值' },
-  { type: 'show', label: '显示组件', description: '显示指定组件' },
-  { type: 'hide', label: '隐藏组件', description: '隐藏指定组件' },
-  { type: 'enable', label: '启用组件', description: '启用指定组件' },
-  { type: 'disable', label: '禁用组件', description: '禁用指定组件' },
-  { type: 'setText', label: '设置文本', description: '设置组件的文本内容' },
-  { type: 'setValue', label: '设置数值', description: '设置组件的数值' },
+  { type: 'navigate', label: t('Navigate to page'), description: t('Switch to the specified page') },
+  { type: 'setProperty', label: t('Set property'), description: t('Set a component property value') },
+  { type: 'show', label: t('Show component'), description: t('Show the specified component') },
+  { type: 'hide', label: t('Hide component'), description: t('Hide the specified component') },
+  { type: 'enable', label: t('Enable component'), description: t('Enable the specified component') },
+  { type: 'disable', label: t('Disable component'), description: t('Disable the specified component') },
+  { type: 'setText', label: t('Set text'), description: t('Set the component\'s text content') },
+  { type: 'setValue', label: t('Set value'), description: t('Set the component\'s numeric value') },
 ];
 
-const CODE_TEMPLATE = `// 事件处理代码
-// 可用变量: e (lv_event_t*), obj (触发事件的对象)
+const CODE_TEMPLATE = `// Event handler code
+// Available variables: e (lv_event_t*), obj (the object that triggered the event)
 
-// 示例: 打印日志
+// Example: print a log message
 // LV_LOG_USER("Button clicked!");
 
-// 示例: 修改标签文本
+// Example: change label text
 // lv_label_set_text(my_label, "Clicked!");
 
 `;
@@ -137,35 +138,35 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
 
     switch (actionType) {
       case 'navigate':
-        code += `        // 导航到页面: ${targetPage || 'page_name'}\n`;
+        code += `        // Navigate to page: ${targetPage || 'page_name'}\n`;
         code += `        lv_scr_load(${targetPage || 'page_name'});\n`;
         break;
       case 'setProperty':
-        code += `        // 设置属性: ${property || 'property'} = ${value || 'value'}\n`;
+        code += `        // Set property: ${property || 'property'} = ${value || 'value'}\n`;
         code += `        lv_obj_set_style_${property || 'bg_color'}(${targetComponent || 'target'}, ${value || '0'}, 0);\n`;
         break;
       case 'show':
-        code += `        // 显示组件\n`;
+        code += `        // Show component\n`;
         code += `        lv_obj_clear_flag(${targetComponent || 'target'}, LV_OBJ_FLAG_HIDDEN);\n`;
         break;
       case 'hide':
-        code += `        // 隐藏组件\n`;
+        code += `        // Hide component\n`;
         code += `        lv_obj_add_flag(${targetComponent || 'target'}, LV_OBJ_FLAG_HIDDEN);\n`;
         break;
       case 'enable':
-        code += `        // 启用组件\n`;
+        code += `        // Enable component\n`;
         code += `        lv_obj_clear_state(${targetComponent || 'target'}, LV_STATE_DISABLED);\n`;
         break;
       case 'disable':
-        code += `        // 禁用组件\n`;
+        code += `        // Disable component\n`;
         code += `        lv_obj_add_state(${targetComponent || 'target'}, LV_STATE_DISABLED);\n`;
         break;
       case 'setText':
-        code += `        // 设置文本\n`;
+        code += `        // Set text\n`;
         code += `        lv_label_set_text(${targetComponent || 'target'}, "${value || ''}");\n`;
         break;
       case 'setValue':
-        code += `        // 设置数值\n`;
+        code += `        // Set value\n`;
         code += `        lv_slider_set_value(${targetComponent || 'target'}, ${value || '0'}, LV_ANIM_ON);\n`;
         break;
     }
@@ -182,12 +183,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
         return (
           <div className="action-config">
             <div className="config-row">
-              <label>目标页面</label>
+              <label>{t('Target page')}</label>
               <select 
                 value={targetPage} 
                 onChange={(e) => setTargetPage(e.target.value)}
               >
-                <option value="">选择页面...</option>
+                <option value="">{t('Select page...')}</option>
                 {pages?.map(page => (
                   <option key={page.id} value={page.name}>
                     {page.name}
@@ -202,12 +203,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
         return (
           <div className="action-config">
             <div className="config-row">
-              <label>目标组件</label>
+              <label>{t('Target component')}</label>
               <select 
                 value={targetComponent} 
                 onChange={(e) => setTargetComponent(e.target.value)}
               >
-                <option value="">选择组件...</option>
+                <option value="">{t('Select component...')}</option>
                 {allComponents.map(comp => (
                   <option key={comp.id} value={comp.name}>
                     {comp.name} ({comp.type})
@@ -216,30 +217,30 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
               </select>
             </div>
             <div className="config-row">
-              <label>属性名</label>
+              <label>{t('Property name')}</label>
               <select 
                 value={property} 
                 onChange={(e) => setProperty(e.target.value)}
               >
-                <option value="">选择属性...</option>
-                <option value="bg_color">背景色 (bg_color)</option>
-                <option value="border_color">边框色 (border_color)</option>
-                <option value="border_width">边框宽度 (border_width)</option>
-                <option value="radius">圆角 (radius)</option>
-                <option value="opa">透明度 (opa)</option>
-                <option value="x">X 坐标 (x)</option>
-                <option value="y">Y 坐标 (y)</option>
-                <option value="width">宽度 (width)</option>
-                <option value="height">高度 (height)</option>
+                <option value="">{t('Select property...')}</option>
+                <option value="bg_color">{t('Background color (bg_color)')}</option>
+                <option value="border_color">{t('Border color (border_color)')}</option>
+                <option value="border_width">{t('Border width (border_width)')}</option>
+                <option value="radius">{t('Radius (radius)')}</option>
+                <option value="opa">{t('Opacity (opa)')}</option>
+                <option value="x">{t('X coordinate (x)')}</option>
+                <option value="y">{t('Y coordinate (y)')}</option>
+                <option value="width">{t('Width (width)')}</option>
+                <option value="height">{t('Height (height)')}</option>
               </select>
             </div>
             <div className="config-row">
-              <label>属性值</label>
+              <label>{t('Property value')}</label>
               <input 
                 type="text" 
                 value={value} 
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="输入属性值"
+                placeholder={t('Enter property value')}
               />
             </div>
           </div>
@@ -252,12 +253,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
         return (
           <div className="action-config">
             <div className="config-row">
-              <label>目标组件</label>
+              <label>{t('Target component')}</label>
               <select 
                 value={targetComponent} 
                 onChange={(e) => setTargetComponent(e.target.value)}
               >
-                <option value="">选择组件...</option>
+                <option value="">{t('Select component...')}</option>
                 {allComponents.map(comp => (
                   <option key={comp.id} value={comp.name}>
                     {comp.name} ({comp.type})
@@ -272,12 +273,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
         return (
           <div className="action-config">
             <div className="config-row">
-              <label>目标组件</label>
+              <label>{t('Target component')}</label>
               <select 
                 value={targetComponent} 
                 onChange={(e) => setTargetComponent(e.target.value)}
               >
-                <option value="">选择组件...</option>
+                <option value="">{t('Select component...')}</option>
                 {allComponents.filter(c => ['label', 'btn', 'textarea'].includes(c.type)).map(comp => (
                   <option key={comp.id} value={comp.name}>
                     {comp.name} ({comp.type})
@@ -286,12 +287,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
               </select>
             </div>
             <div className="config-row">
-              <label>文本内容</label>
+              <label>{t('Text content')}</label>
               <input 
                 type="text" 
                 value={value} 
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="输入文本"
+                placeholder={t('Enter text')}
               />
             </div>
           </div>
@@ -301,12 +302,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
         return (
           <div className="action-config">
             <div className="config-row">
-              <label>目标组件</label>
+              <label>{t('Target component')}</label>
               <select 
                 value={targetComponent} 
                 onChange={(e) => setTargetComponent(e.target.value)}
               >
-                <option value="">选择组件...</option>
+                <option value="">{t('Select component...')}</option>
                 {allComponents.filter(c => ['slider', 'bar', 'arc'].includes(c.type)).map(comp => (
                   <option key={comp.id} value={comp.name}>
                     {comp.name} ({comp.type})
@@ -315,12 +316,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
               </select>
             </div>
             <div className="config-row">
-              <label>数值</label>
+              <label>{t('Value')}</label>
               <input 
                 type="number" 
                 value={value} 
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="输入数值"
+                placeholder={t('Enter value')}
               />
             </div>
           </div>
@@ -335,14 +336,14 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
     <div className="event-dialog-overlay" onClick={onClose}>
       <div className="event-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h3>{isCreating ? '添加事件' : '编辑事件'}</h3>
+          <h3>{isCreating ? t('Add event') : t('Edit event')}</h3>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <div className="dialog-content">
           {/* Event Type Selection */}
           <div className="form-section">
-            <label className="section-label">事件类型</label>
+            <label className="section-label">{t('Event type')}</label>
             <select 
               value={eventType} 
               onChange={(e) => setEventType(e.target.value as LvglEventType)}
@@ -361,19 +362,19 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
 
           {/* Handler Type Selection */}
           <div className="form-section">
-            <label className="section-label">处理方式</label>
+            <label className="section-label">{t('Handler')}</label>
             <div className="handler-type-tabs">
               <button 
                 className={`tab-btn ${handlerType === 'builtin' ? 'active' : ''}`}
                 onClick={() => setHandlerType('builtin')}
               >
-                内置动作
+                {t('Built-in action')}
               </button>
               <button 
                 className={`tab-btn ${handlerType === 'custom' ? 'active' : ''}`}
                 onClick={() => setHandlerType('custom')}
               >
-                自定义代码
+                {t('Custom code')}
               </button>
             </div>
           </div>
@@ -381,7 +382,7 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
           {/* Handler Configuration */}
           {handlerType === 'builtin' ? (
             <div className="form-section">
-              <label className="section-label">动作类型</label>
+              <label className="section-label">{t('Action type')}</label>
               <select 
                 value={actionType} 
                 onChange={(e) => setActionType(e.target.value as BuiltinActionType)}
@@ -401,7 +402,7 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
             </div>
           ) : (
             <div className="form-section">
-              <label className="section-label">C 代码</label>
+              <label className="section-label">{t('C code')}</label>
               <CodeEditor 
                 value={customCode}
                 onChange={setCustomCode}
@@ -413,12 +414,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
           {/* Code Preview */}
           <div className="form-section">
             <div className="preview-header">
-              <label className="section-label">代码预览</label>
+              <label className="section-label">{t('Code preview')}</label>
               <button 
                 className="toggle-preview-btn"
                 onClick={() => setShowCodePreview(!showCodePreview)}
               >
-                {showCodePreview ? '隐藏' : '显示'}
+                {showCodePreview ? t('Hide') : t('Show')}
               </button>
             </div>
             {showCodePreview && (
@@ -430,8 +431,8 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
         </div>
 
         <div className="dialog-footer">
-          <button className="cancel-btn" onClick={onClose}>取消</button>
-          <button className="save-btn" onClick={handleSave}>保存</button>
+          <button className="cancel-btn" onClick={onClose}>{t('Cancel')}</button>
+          <button className="save-btn" onClick={handleSave}>{t('Save')}</button>
         </div>
       </div>
     </div>

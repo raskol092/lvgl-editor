@@ -4,7 +4,7 @@ import type { Theme, ThemePreset, ThemeColors } from '../types';
 
 const lightTheme: Theme = {
   id: 'light',
-  name: '浅色主题',
+  name: 'Light theme',
   colors: {
     primary: '#2196F3',
     secondary: '#03A9F4',
@@ -17,7 +17,7 @@ const lightTheme: Theme = {
 
 const darkTheme: Theme = {
   id: 'dark',
-  name: '深色主题',
+  name: 'Dark theme',
   colors: {
     primary: '#90CAF9',
     secondary: '#4FC3F7',
@@ -65,7 +65,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 }));
 
 /**
- * 根据当前主题返回新建组件的默认样式覆盖
+ * Returns default style overrides for newly created components based on the current theme
  */
 export function getThemeDefaultStyles(theme: Theme) {
   return {

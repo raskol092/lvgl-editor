@@ -6,6 +6,7 @@ import type { NodeProps } from '@xyflow/react';
 import type { LogicNode, LogicPort } from './types';
 import { NODE_COLORS } from './nodeDefinitions';
 import { useLogicEditorStore } from './logicEditorStore';
+import { t } from '../../i18n';
 import './LogicNode.css';
 
 // Port type colors
@@ -102,7 +103,7 @@ const LogicNodeComponent: React.FC<NodeProps> = ({
                   top: `${30 + index * 24}px`,
                 }}
               />
-              <span className="port-label">{input.name}</span>
+              <span className="port-label">{t(input.name)}</span>
               {/* Show debug value */}
               {debugState.isDebugging && debugState.nodeValues[logicNode.id]?.[input.id] !== undefined && (
                 <span className="port-value">
@@ -117,7 +118,7 @@ const LogicNodeComponent: React.FC<NodeProps> = ({
         <div className="logic-node-outputs">
           {logicNode.outputs.map((output: LogicPort, index: number) => (
             <div key={output.id} className="logic-port output-port">
-              <span className="port-label">{output.name}</span>
+              <span className="port-label">{t(output.name)}</span>
               {/* Show debug value */}
               {debugState.isDebugging && debugState.nodeValues[logicNode.id]?.[output.id] !== undefined && (
                 <span className="port-value">
@@ -155,25 +156,25 @@ function renderParamsPreview(node: LogicNode): React.ReactNode {
   
   switch (subType) {
     case 'event_trigger':
-      return <span className="param-preview">事件: {params.eventType?.replace('LV_EVENT_', '')}</span>;
+      return <span className="param-preview">{t('Event:')} {params.eventType?.replace('LV_EVENT_', '')}</span>;
     case 'timer_trigger':
-      return <span className="param-preview">{params.mode === 'delay' ? '延时' : '周期'}: {params.duration}ms</span>;
+      return <span className="param-preview">{params.mode === 'delay' ? t('Delay') : t('Period')}: {params.duration}ms</span>;
     case 'compare':
-      return <span className="param-preview">运算符: {params.operator}</span>;
+      return <span className="param-preview">{t('Operator:')} {params.operator}</span>;
     case 'logic_op':
-      return <span className="param-preview">运算: {params.operator}</span>;
+      return <span className="param-preview">{t('Calculation:')} {params.operator}</span>;
     case 'math_op':
-      return <span className="param-preview">运算: {params.operator}</span>;
+      return <span className="param-preview">{t('Calculation:')} {params.operator}</span>;
     case 'string_op':
-      return <span className="param-preview">操作: {params.operation}</span>;
+      return <span className="param-preview">{t('Operation:')} {params.operation}</span>;
     case 'delay':
-      return <span className="param-preview">延时: {params.duration}ms</span>;
+      return <span className="param-preview">{t('Delay:')} {params.duration}ms</span>;
     case 'show_hide':
-      return <span className="param-preview">动作: {params.action}</span>;
+      return <span className="param-preview">{t('Action:')} {params.action}</span>;
     case 'navigate_page':
-      return params.targetPage ? <span className="param-preview">页面: {params.targetPage}</span> : null;
+      return params.targetPage ? <span className="param-preview">{t('Page:')} {params.targetPage}</span> : null;
     case 'call_function':
-      return params.functionName ? <span className="param-preview">函数: {params.functionName}</span> : null;
+      return params.functionName ? <span className="param-preview">{t('Function:')} {params.functionName}</span> : null;
     default:
       return null;
   }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { t } from '../../i18n';
 import './Modal.css';
 
 type ModalType = 'alert' | 'confirm' | 'prompt';
@@ -117,11 +118,11 @@ const Modal: React.FC = () => {
         <div className="modal-dialog-footer">
           {state.type !== 'alert' && (
             <button className="modal-dialog-btn modal-btn-cancel" onClick={handleCancel}>
-              取消
+              {t('Cancel')}
             </button>
           )}
           <button className="modal-dialog-btn modal-btn-confirm" onClick={handleConfirm} autoFocus={state.type !== 'prompt'}>
-            确定
+            {t('OK')}
           </button>
         </div>
       </div>

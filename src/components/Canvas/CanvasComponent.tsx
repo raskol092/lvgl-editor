@@ -3,6 +3,7 @@ import type { LvglComponent, ResizeHandle } from '../../types';
 import { useEditorStore } from '../../store/editorStore';
 import { useAppStore } from '../../store/appStore';
 import { useResourceStore } from '../../resources/resourceStore';
+import { t } from '../../i18n';
 import './CanvasComponent.css';
 
 interface CanvasComponentProps {
@@ -751,7 +752,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               {props.year || 2024} / {props.month || 1}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', flex: 1, padding: '2px' }}>
-              {['日', '一', '二', '三', '四', '五', '六'].map(d => (
+              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
                 <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', color: '#666', padding: '2px 0' }}>{d}</div>
               ))}
               {Array.from({ length: 28 }).map((_, i) => (
@@ -800,7 +801,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       
       {/* Align badge */}
       {component.align && component.align !== 'default' && (
-        <div className="align-badge" title={`对齐: ${component.align}`}>
+        <div className="align-badge" title={t('Align: {0}', component.align)}>
           {component.align === 'center' ? '⊕' :
            component.align === 'top_mid' ? '⬆' :
            component.align === 'bottom_mid' ? '⬇' :

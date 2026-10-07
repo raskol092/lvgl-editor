@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEditorStore } from '../../store/editorStore';
+import { t } from '../../i18n';
 import './AlignToolbar.css';
 
 type AlignType = 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom' | 'distribute-h' | 'distribute-v';
@@ -197,19 +198,19 @@ const AlignToolbar: React.FC = () => {
         break;
       }
       case 'same-y': {
-        // 所有选中组件 Y 设为最小 Y（排成一行）
+        // Set Y of all selected components to the minimum Y (arrange in a row)
         const minY = Math.min(...components.map(c => c.y));
         components.forEach(comp => updates.set(comp.id, { y: minY }));
         break;
       }
       case 'same-x': {
-        // 所有选中组件 X 设为最小 X（排成一列）
+        // Set X of all selected components to the minimum X (arrange in a column)
         const minX = Math.min(...components.map(c => c.x));
         components.forEach(comp => updates.set(comp.id, { x: minX }));
         break;
       }
       case 'canvas-row': {
-        // 针对画布排成一行，只调整位置不改宽高
+        // Arrange in a row across the canvas; only adjust position, not width/height
         const canvas = useEditorStore.getState().canvas;
         const n = components.length;
         const totalWidth = components.reduce((sum, c) => sum + c.width, 0);
@@ -223,7 +224,7 @@ const AlignToolbar: React.FC = () => {
         break;
       }
       case 'canvas-col': {
-        // 针对画布排成一列，只调整位置不改宽高
+        // Arrange in a column across the canvas; only adjust position, not width/height
         const canvas = useEditorStore.getState().canvas;
         const n = components.length;
         const totalHeight = components.reduce((sum, c) => sum + c.height, 0);
@@ -283,7 +284,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('left')}
           disabled={!hasSelection}
-          title="左对齐"
+          title={t('Align left')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M4 22H2V2h2v20zM22 7H6v3h16V7zm-6 7H6v3h10v-3z"/>
@@ -293,7 +294,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('center-h')}
           disabled={!hasSelection}
-          title="水平居中"
+          title={t('Center horizontally')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M11 2h2v5h8v3h-8v4h6v3h-6v5h-2v-5H5v-3h6v-4H3V7h8V2z"/>
@@ -303,7 +304,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('right')}
           disabled={!hasSelection}
-          title="右对齐"
+          title={t('Align right')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M20 2h2v20h-2V2zM2 7h16v3H2V7zm6 7h10v3H8v-3z"/>
@@ -318,7 +319,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('top')}
           disabled={!hasSelection}
-          title="顶对齐"
+          title={t('Align top')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M22 2v2H2V2h20zM7 22V6h3v16H7zm7-6V6h3v10h-3z"/>
@@ -328,7 +329,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('center-v')}
           disabled={!hasSelection}
-          title="垂直居中"
+          title={t('Center vertically')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M2 11v2h5v8h3v-8h4v6h3v-6h5v-2h-5V5h-3v6h-4V3H7v8H2z"/>
@@ -338,7 +339,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('bottom')}
           disabled={!hasSelection}
-          title="底对齐"
+          title={t('Align bottom')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M22 22v-2H2v2h20zM7 2v16h3V2H7zm7 6v10h3V8h-3z"/>
@@ -353,7 +354,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('distribute-h')}
           disabled={!hasMultipleSelection || selectedIds.length < 3}
-          title="水平分布"
+          title={t('Distribute horizontally')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M4 5v14H2V5h2zm4 2v10h3V7H8zm5 2v6h3V9h-3zm5-2v10h3V7h-3zm4-2v14h-2V5h2z"/>
@@ -363,7 +364,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleAlign('distribute-v')}
           disabled={!hasMultipleSelection || selectedIds.length < 3}
-          title="垂直分布"
+          title={t('Distribute vertically')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="currentColor" d="M5 2h14v2H5V2zm2 4h10v3H7V6zm2 5h6v3H9v-3zm-2 5h10v3H7v-3zm-2 5h14v2H5v-2z"/>
@@ -378,7 +379,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('equal-width')}
           disabled={!hasMultipleSelection}
-          title="等宽"
+          title={t('Same width')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="2" y="6" width="8" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="2"/>
@@ -390,7 +391,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('equal-height')}
           disabled={!hasMultipleSelection}
-          title="等高"
+          title={t('Same height')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="2" y="2" width="8" height="20" rx="1" fill="none" stroke="currentColor" strokeWidth="2"/>
@@ -407,7 +408,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('space-h')}
           disabled={!hasMultipleSelection}
-          title="等间距水平"
+          title={t('Equal spacing horizontal')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="2" y="7" width="5" height="10" rx="1" fill="currentColor"/>
@@ -420,7 +421,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('space-v')}
           disabled={!hasMultipleSelection}
-          title="等间距垂直"
+          title={t('Equal spacing vertical')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="7" y="2" width="10" height="5" rx="1" fill="currentColor"/>
@@ -438,7 +439,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('compact-h')}
           disabled={!hasMultipleSelection}
-          title="紧凑排列水平"
+          title={t('Compact horizontal')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="4" y="6" width="5" height="12" rx="1" fill="currentColor"/>
@@ -452,7 +453,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('compact-v')}
           disabled={!hasMultipleSelection}
-          title="紧凑排列垂直"
+          title={t('Compact vertical')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="6" y="4" width="12" height="5" rx="1" fill="currentColor"/>
@@ -471,7 +472,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('same-y')}
           disabled={!hasMultipleSelection}
-          title="Y相同（排成一行）"
+          title={t('Same Y (arrange in a row)')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="2" y="9" width="5" height="6" rx="1" fill="currentColor"/>
@@ -484,7 +485,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('same-x')}
           disabled={!hasMultipleSelection}
-          title="X相同（排成一列）"
+          title={t('Same X (arrange in a column)')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="9" y="2" width="6" height="5" rx="1" fill="currentColor"/>
@@ -502,7 +503,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('canvas-row')}
           disabled={!hasMultipleSelection}
-          title="画布水平平铺（排成一行，自动调整宽度）"
+          title={t('Tile across canvas horizontally (one row, auto width)')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="1" y="1" width="22" height="22" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3"/>
@@ -515,7 +516,7 @@ const AlignToolbar: React.FC = () => {
           className="align-btn"
           onClick={() => handleLayout('canvas-col')}
           disabled={!hasMultipleSelection}
-          title="画布垂直平铺（排成一列，自动调整高度）"
+          title={t('Tile across canvas vertically (one column, auto height)')}
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <rect x="1" y="1" width="22" height="22" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3"/>

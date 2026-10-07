@@ -9,6 +9,7 @@ import { useProjectStore } from '../../store/projectStore';
 import { generateCode, getGeneratedFileNames } from '../../codegen/generator';
 import type { CodeGenOptions, GeneratedCode } from '../../codegen/types';
 import { toast } from '../Toast';
+import { t } from '../../i18n';
 import './CodePreview.css';
 
 const CodePreview: React.FC = () => {
@@ -54,14 +55,14 @@ const CodePreview: React.FC = () => {
     }
   }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont]);
 
-  const currentCode = generatedCode?.[selectedFile] || '// 代码生成失败';
+  const currentCode = generatedCode?.[selectedFile] || '// Code generation failed';
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(currentCode);
-      toast.success('代码已复制到剪贴板');
+      toast.success(t('Code copied to clipboard'));
     } catch {
-      toast.error('复制失败');
+      toast.error(t('Copy failed'));
     }
   };
 
@@ -75,7 +76,7 @@ const CodePreview: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success(`${selectedFile} 已下载`);
+    toast.success(t('{0} downloaded', selectedFile));
   };
 
   const handleDownloadAll = async () => {
@@ -96,9 +97,9 @@ const CodePreview: React.FC = () => {
         // Small delay between downloads
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      toast.success('所有文件已下载');
+      toast.success(t('All files downloaded'));
     } catch {
-      toast.error('下载失败');
+      toast.error(t('Download failed'));
     }
   };
 
@@ -121,19 +122,19 @@ const CodePreview: React.FC = () => {
             className="code-version-select"
             value={lvglVersion}
             onChange={(e) => setLvglVersion(e.target.value as CodeGenOptions['lvglVersion'])}
-            title="LVGL 版本"
+            title={t('LVGL version')}
           >
             <option value="8">LVGL v8</option>
             <option value="9">LVGL v9</option>
           </select>
-          <button className="code-action-btn" onClick={handleCopy} title="复制代码">
-            📋 复制
+          <button className="code-action-btn" onClick={handleCopy} title={t('Copy code')}>
+            {t('📋 Copy')}
           </button>
-          <button className="code-action-btn" onClick={handleDownload} title="下载当前文件">
-            💾 下载
+          <button className="code-action-btn" onClick={handleDownload} title={t('Download current file')}>
+            {t('💾 Download')}
           </button>
-          <button className="code-action-btn primary" onClick={handleDownloadAll} title="下载所有文件">
-            📦 全部下载
+          <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download all files')}>
+            {t('📦 Download all')}
           </button>
         </div>
       </div>
@@ -163,20 +164,20 @@ const CodePreview: React.FC = () => {
             onMount={() => setIsLoading(false)}
             loading={
               <div className="code-preview-loading">
-                <span>加载编辑器...</span>
+                <span>{t('Loading editor...')}</span>
               </div>
             }
           />
         </div>
         {isLoading && (
           <div className="code-preview-loading">
-            <span>加载编辑器...</span>
+            <span>{t('Loading editor...')}</span>
           </div>
         )}
       </div>
       <div className="code-preview-footer">
         <span className="code-stats">
-          {currentCode.split('\n').length} 行 | {new Blob([currentCode]).size} 字节
+          {currentCode.split('\n').length} {t('lines |')} {new Blob([currentCode]).size} {t('bytes')}
         </span>
       </div>
     </div>

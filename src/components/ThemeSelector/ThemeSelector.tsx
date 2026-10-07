@@ -1,6 +1,7 @@
 import React from 'react';
 import { useThemeStore } from '../../store/themeStore';
 import type { ThemePreset } from '../../types';
+import { t } from '../../i18n';
 import './ThemeSelector.css';
 
 const ThemeSelector: React.FC = () => {
@@ -17,10 +18,10 @@ const ThemeSelector: React.FC = () => {
         className="theme-selector-select"
         value={preset}
         onChange={handleChange}
-        title={`当前主题: ${currentTheme.name}`}
+        title={t('Current theme: {0}', t(currentTheme.name))}
       >
-        <option value="light">☀️ 浅色</option>
-        <option value="dark">🌙 深色</option>
+        <option value="light">{t('☀️ Light')}</option>
+        <option value="dark">{t('🌙 Dark')}</option>
       </select>
     </div>
   );
