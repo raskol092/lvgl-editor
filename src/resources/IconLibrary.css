@@ -13,30 +13,30 @@
   flex-wrap: wrap;
   gap: 6px;
   padding: 8px;
-  background: #f5f5f5;
+  background: #1e293b;
   border-radius: 6px;
 }
 
 .category-btn {
   padding: 6px 12px;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   transition: all 0.2s;
 }
 
 .category-btn:hover {
-  border-color: #4a90d9;
-  color: #4a90d9;
+  border-color: #3b82f6;
+  color: #60a5fa;
 }
 
 .category-btn.active {
-  background: #4a90d9;
+  background: #3b82f6;
   color: white;
-  border-color: #4a90d9;
+  border-color: #3b82f6;
 }
 
 /* Icon Grid */
@@ -66,23 +66,23 @@
   width: 48px;
   height: 48px;
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #334155;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  color: #555;
+  color: #cbd5e1;
 }
 
 .icon-grid.grid .icon-item:hover {
-  border-color: #4a90d9;
-  color: #4a90d9;
+  border-color: #3b82f6;
+  color: #60a5fa;
   transform: scale(1.05);
 }
 
 .icon-grid.grid .icon-item.selected {
-  border-color: #4a90d9;
-  background: #f0f7ff;
-  color: #4a90d9;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.15);
+  color: #60a5fa;
 }
 
 /* Icon Item - List View */
@@ -92,31 +92,31 @@
   gap: 12px;
   padding: 8px 12px;
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #334155;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  color: #555;
+  color: #cbd5e1;
 }
 
 .icon-grid.list .icon-item:hover {
-  border-color: #4a90d9;
-  background: #fafafa;
+  border-color: #3b82f6;
+  background: #1e293b;
 }
 
 .icon-grid.list .icon-item.selected {
-  border-color: #4a90d9;
-  background: #f0f7ff;
-  color: #4a90d9;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.15);
+  color: #60a5fa;
 }
 
 .icon-grid.list .icon-name {
   font-size: 13px;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .icon-grid.list .icon-item.selected .icon-name {
-  color: #4a90d9;
+  color: #60a5fa;
 }
 
 /* Icon Details */
@@ -125,9 +125,9 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #f8f8f8;
+  background: #1e293b;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #334155;
 }
 
 .icon-preview-large {
@@ -138,8 +138,8 @@
   justify-content: center;
   background: white;
   border-radius: 8px;
-  border: 1px solid #ddd;
-  color: #333;
+  border: 1px solid #334155;
+  color: #e2e8f0;
 }
 
 .icon-info {
@@ -149,12 +149,12 @@
 .icon-info h4 {
   margin: 0 0 4px 0;
   font-size: 14px;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .icon-category {
   font-size: 12px;
-  color: #888;
+  color: #94a3b8;
   text-transform: capitalize;
 }
 
@@ -166,7 +166,7 @@
 
 .icon-actions button {
   padding: 6px 12px;
-  background: #4a90d9;
+  background: #3b82f6;
   color: white;
   border: none;
   border-radius: 4px;
@@ -188,7 +188,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #888;
+  color: #94a3b8;
 }
 
 .icon-grid .empty-icon {

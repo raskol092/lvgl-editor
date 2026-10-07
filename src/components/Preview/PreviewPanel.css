@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: #0f172a;
 }
 
 .preview-header {
@@ -10,15 +10,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
 }
 
 .preview-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .preview-controls {
@@ -30,8 +30,8 @@
 .preview-controls button {
   width: 28px;
   height: 28px;
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid #334155;
+  background: #0f172a;
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
@@ -42,12 +42,12 @@
 }
 
 .preview-controls button:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .preview-controls span {
   font-size: 12px;
-  color: #666;
+  color: #94a3b8;
   min-width: 40px;
   text-align: center;
 }
@@ -56,7 +56,7 @@
   flex: 1;
   overflow: auto;
   padding: 20px;
-  background: #e8e8e8;
+  background: #334155;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -68,7 +68,7 @@
 
 .preview-canvas-wrapper canvas {
   display: block;
-  background: #fff;
+  background: #0f172a;
 }
 
 .preview-footer {
@@ -76,10 +76,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
-  background: #f5f5f5;
-  border-top: 1px solid #e0e0e0;
+  background: #1e293b;
+  border-top: 1px solid #334155;
   font-size: 11px;
-  color: #888;
+  color: #94a3b8;
   gap: 12px;
 }
 
@@ -87,8 +87,8 @@
 .preview-btn {
   width: 28px;
   height: 28px;
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid #334155;
+  background: #0f172a;
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
@@ -99,8 +99,8 @@
 }
 
 .preview-btn:hover:not(:disabled) {
-  background: #e3f2fd;
-  border-color: #2196F3;
+  background: rgba(37,99,235,0.22);
+  border-color: #3b82f6;
 }
 
 .preview-btn:disabled {
@@ -111,7 +111,7 @@
 .preview-divider {
   width: 1px;
   height: 20px;
-  background: #ddd;
+  background: #334155;
   min-width: 1px;
 }
 
@@ -124,21 +124,21 @@
 
 .preview-page-btn {
   padding: 2px 10px;
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid #334155;
+  background: #0f172a;
   border-radius: 3px;
   font-size: 11px;
-  color: #666;
+  color: #94a3b8;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .preview-page-btn:hover {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .preview-page-btn.active {
-  background: #2196F3;
+  background: #2563eb;
   color: #fff;
-  border-color: #2196F3;
+  border-color: #3b82f6;
 }

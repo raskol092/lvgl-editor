@@ -4,8 +4,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f8f9fa;
-  color: #333;
+  background: #1e293b;
+  color: #e2e8f0;
   font-size: 13px;
 }
 
@@ -14,15 +14,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  border-bottom: 1px solid #334155;
+  background: #0f172a;
 }
 
 .hierarchy-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .hierarchy-actions {
@@ -33,7 +33,7 @@
 .hierarchy-btn {
   background: transparent;
   border: none;
-  color: #888;
+  color: #94a3b8;
   cursor: pointer;
   padding: 2px 6px;
   font-size: 14px;
@@ -41,8 +41,8 @@
 }
 
 .hierarchy-btn:hover {
-  background: #e8e8e8;
-  color: #333;
+  background: #334155;
+  color: #e2e8f0;
 }
 
 .hierarchy-tree {
@@ -54,7 +54,7 @@
 .empty-message {
   padding: 20px;
   text-align: center;
-  color: #999;
+  color: #94a3b8;
   font-style: italic;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .tree-node:hover {
-  background: #e8e8e8;
+  background: #334155;
 }
 
 .tree-node.selected {
@@ -97,7 +97,7 @@
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  color: #888;
+  color: #94a3b8;
   flex-shrink: 0;
 }
 
@@ -106,7 +106,7 @@
 }
 
 .expand-btn.has-children:hover {
-  color: #333;
+  color: #e2e8f0;
 }
 
 /* Type icon */
@@ -122,15 +122,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #333;
+  color: #e2e8f0;
 }
 
 /* Rename input */
 .rename-input {
   flex: 1;
-  background: #fff;
-  border: 1px solid #2196F3;
-  color: #333;
+  background: #0f172a;
+  border: 1px solid #3b82f6;
+  color: #e2e8f0;
   padding: 2px 4px;
   font-size: 12px;
   border-radius: 2px;
@@ -161,7 +161,7 @@
 
 .status-icon:hover {
   opacity: 1;
-  background: #e0e0e0;
+  background: #334155;
 }
 
 .status-icon.visibility.off {
@@ -180,7 +180,7 @@
 
 /* Drag over indicator */
 .tree-node.drag-over {
-  border: 1px dashed #2196F3;
+  border: 1px dashed #3b82f6;
 }
 
 /* Scrollbar styling */
@@ -189,11 +189,11 @@
 }
 
 .hierarchy-tree::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: #1e293b;
 }
 
 .hierarchy-tree::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #475569;
   border-radius: 4px;
 }
 

@@ -1,5 +1,5 @@
 .component-panel {
-  background: #f8f9fa;
+  background: #1e293b;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -8,15 +8,15 @@
 
 .panel-header {
   padding: 12px 16px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  border-bottom: 1px solid #334155;
+  background: #0f172a;
 }
 
 .panel-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .search-box {
@@ -27,7 +27,7 @@
 .search-box input {
   width: 100%;
   padding: 8px 28px 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   border-radius: 4px;
   font-size: 13px;
   outline: none;
@@ -36,11 +36,11 @@
 }
 
 .search-box input:focus {
-  border-color: #2196F3;
+  border-color: #3b82f6;
 }
 
 .search-box input::placeholder {
-  color: #999;
+  color: #94a3b8;
 }
 
 .clear-search {
@@ -51,14 +51,14 @@
   background: none;
   border: none;
   font-size: 18px;
-  color: #999;
+  color: #94a3b8;
   cursor: pointer;
   padding: 0;
   line-height: 1;
 }
 
 .clear-search:hover {
-  color: #666;
+  color: #94a3b8;
 }
 
 .categories-container {
@@ -81,7 +81,7 @@
 }
 
 .category-header:hover {
-  background: #e8e8e8;
+  background: #334155;
 }
 
 .category-icon {
@@ -93,12 +93,12 @@
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: #444;
+  color: #cbd5e1;
 }
 
 .collapse-icon {
   font-size: 10px;
-  color: #888;
+  color: #94a3b8;
   transition: transform 0.2s;
 }
 
@@ -115,8 +115,8 @@
   align-items: center;
   padding: 8px 12px;
   margin: 2px 0;
-  background: #fff;
-  border: 1px solid #e8e8e8;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: grab;
   transition: all 0.15s;
@@ -124,8 +124,8 @@
 }
 
 .component-item:hover {
-  border-color: #2196F3;
-  background: #f0f7ff;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.15);
   box-shadow: 0 1px 3px rgba(33, 150, 243, 0.15);
 }
 
@@ -135,8 +135,8 @@
 
 .component-item.dragging {
   opacity: 0.5;
-  border-color: #2196F3;
-  background: #e3f2fd;
+  border-color: #3b82f6;
+  background: rgba(37,99,235,0.22);
 }
 
 .component-icon {
@@ -146,5 +146,5 @@
 
 .component-name {
   font-size: 13px;
-  color: #333;
+  color: #e2e8f0;
 }

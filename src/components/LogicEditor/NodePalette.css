@@ -2,7 +2,7 @@
 
 .node-palette {
   width: 240px;
-  background: #1e1e1e;
+  background: #020617;
   border-right: 1px solid #333;
   display: flex;
   flex-direction: column;
@@ -32,9 +32,9 @@
 .palette-search input {
   width: 100%;
   padding: 8px 30px 8px 10px;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 4px;
-  background: #2d2d2d;
+  background: #0f172a;
   color: #fff;
   font-size: 12px;
   outline: none;
@@ -42,11 +42,11 @@
 }
 
 .palette-search input:focus {
-  border-color: #2196f3;
+  border-color: #3b82f6;
 }
 
 .palette-search input::placeholder {
-  color: #666;
+  color: #94a3b8;
 }
 
 .clear-search {
@@ -56,7 +56,7 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #666;
+  color: #94a3b8;
   cursor: pointer;
   font-size: 12px;
   padding: 4px;
@@ -100,12 +100,12 @@
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: #ddd;
+  color: #cbd5e1;
 }
 
 .category-toggle {
   font-size: 10px;
-  color: #666;
+  color: #94a3b8;
 }
 
 /* Nodes */
@@ -146,13 +146,13 @@
 
 .node-label {
   font-size: 12px;
-  color: #ddd;
+  color: #cbd5e1;
   font-weight: 500;
 }
 
 .node-description {
   font-size: 10px;
-  color: #888;
+  color: #94a3b8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -166,7 +166,7 @@
 .no-results {
   padding: 20px;
   text-align: center;
-  color: #666;
+  color: #94a3b8;
   font-size: 12px;
 }
 

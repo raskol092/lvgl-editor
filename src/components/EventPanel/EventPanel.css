@@ -1,6 +1,6 @@
 .event-panel {
-  background: #f8f9fa;
-  border-top: 1px solid #e0e0e0;
+  background: #1e293b;
+  border-top: 1px solid #334155;
   display: flex;
   flex-direction: column;
   max-height: 300px;
@@ -9,8 +9,8 @@
 
 .event-panel .panel-header {
   padding: 10px 16px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fff;
+  border-bottom: 1px solid #334155;
+  background: #0f172a;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,14 +20,14 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #e2e8f0;
 }
 
 .add-event-btn {
   width: 24px;
   height: 24px;
   border: none;
-  background: #2196F3;
+  background: #2563eb;
   color: white;
   border-radius: 4px;
   cursor: pointer;
@@ -40,7 +40,7 @@
 }
 
 .add-event-btn:hover {
-  background: #1976D2;
+  background: #1d4ed8;
 }
 
 .event-list {
@@ -55,7 +55,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  color: #999;
+  color: #94a3b8;
   text-align: center;
 }
 
@@ -66,9 +66,9 @@
 
 .add-first-event {
   padding: 8px 16px;
-  border: 1px dashed #ccc;
+  border: 1px dashed #475569;
   background: transparent;
-  color: #666;
+  color: #94a3b8;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
@@ -76,17 +76,17 @@
 }
 
 .add-first-event:hover {
-  border-color: #2196F3;
-  color: #2196F3;
-  background: #e3f2fd;
+  border-color: #3b82f6;
+  color: #60a5fa;
+  background: rgba(37,99,235,0.22);
 }
 
 .event-item {
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 6px;
   margin-bottom: 8px;
   transition: all 0.2s;
@@ -97,7 +97,7 @@
 }
 
 .event-item:hover {
-  border-color: #2196F3;
+  border-color: #3b82f6;
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
 }
 
@@ -113,7 +113,7 @@
   gap: 6px;
   font-size: 13px;
   font-weight: 500;
-  color: #333;
+  color: #e2e8f0;
   margin-bottom: 4px;
 }
 
@@ -123,7 +123,7 @@
 
 .event-handler {
   font-size: 11px;
-  color: #888;
+  color: #94a3b8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -151,11 +151,11 @@
 }
 
 .event-edit-btn:hover {
-  background: #e3f2fd;
+  background: rgba(37,99,235,0.22);
 }
 
 .event-delete-btn:hover {
-  background: #ffebee;
+  background: rgba(239,68,68,0.15);
 }
 
 .no-selection {
@@ -164,7 +164,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #999;
+  color: #94a3b8;
   padding: 20px;
   text-align: center;
 }
@@ -175,5 +175,5 @@
 
 .no-selection .hint {
   font-size: 12px;
-  color: #bbb;
+  color: #64748b;
 }
