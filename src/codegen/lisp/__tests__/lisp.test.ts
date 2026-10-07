@@ -274,3 +274,29 @@ describe('icon recolor', () => {
     expect(out['ui/ui.lisp']).toContain('(lv-obj-set-style-image-recolor ui-ico 0xE0E0E0 LV_PART_MAIN)')
   })
 })
+
+describe('screen element values in logic', () => {
+  it('reads a slider id-bound value and writes a checkbox state', () => {
+    const slider = createComponent('slider', { id: 'sl-1', name: 'level' })
+    const check = createComponent('checkbox', { id: 'cb-1', name: 'agree' })
+    const pages = [createPage({ id: 'p1', name: 'main', components: [slider, check] })]
+    const trig = createLogicNode('event_trigger', { id: 't', params: { eventType: 'LV_EVENT_CLICKED', targetComponent: 'agree' }, outputs: [createLogicPort({ id: 'to', name: 'Exec', type: 'execution' })] })
+    const get = createLogicNode('get_property', { id: 'g', params: { targetComponent: 'sl-1', property: 'value' }, outputs: [createLogicPort({ id: 'go', name: 'Value', type: 'any' })] })
+    const set = createLogicNode('set_property', {
+      id: 's', params: { targetComponent: 'cb-1', property: 'checked', value: 1 },
+      inputs: [createLogicPort({ id: 'si', name: 'Exec', type: 'execution' }), createLogicPort({ id: 'sv', name: 'Value', type: 'any' })],
+      outputs: [createLogicPort({ id: 'so', name: 'Done', type: 'execution' })],
+    })
+    const g = createLogicGraph({
+      id: 'g1', name: 'elements', nodes: [trig, get, set],
+      connections: [
+        createLogicConnection({ sourceNode: 't', sourceOutput: 'to', targetNode: 's', targetInput: 'si' }),
+        createLogicConnection({ sourceNode: 'g', sourceOutput: 'go', targetNode: 's', targetInput: 'sv', type: 'data' }),
+      ],
+    })
+    const out = generateCode(pages, undefined, [g], undefined, [], [], '', 14)
+    const src = out['ui/ui_logic.lisp']
+    expect(src).toContain('(lv-slider-get-value ui-level)')
+    expect(src).toContain('(lv-obj-add-state ui-agree LV_STATE_CHECKED)')
+  })
+})

@@ -291,6 +291,7 @@ const NodeEditDialog: React.FC<NodeEditDialogProps> = ({ nodeId, onClose }) => {
                 <option value="opacity">{t('Opacity')}</option>
                 <option value="text">{t('Text')}</option>
                 <option value="value">{t('Value')}</option>
+                <option value="checked">{t('Checked state')}</option>
               </select>
             </div>
           </>
