@@ -753,4 +753,5 @@ export const ru: Record<string, string> = {
   'Middle mouse drag': 'Перетаскивание средней кнопкой мыши',
   'Scroll wheel': 'колесо мыши',
   'Properties': 'Свойства',
+  'Drag & drop to add': 'Перетащите, чтобы добавить',
 };

@@ -19,6 +19,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
     custom: true,
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [hovered, setHovered] = useState<LogicNodeDefinition | null>(null);
 
   const toggleCategory = useCallback((categoryId: string) => {
     setExpandedCategories(prev => ({
@@ -79,6 +80,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
                   key={def.subType}
                   definition={def}
                   onDragStart={handleDragStart}
+                  onHover={setHovered}
                 />
               ))
             )}
@@ -90,7 +92,6 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
               <div
                 className="category-header"
                 onClick={() => toggleCategory(category.id)}
-                style={{ borderLeftColor: category.color }}
               >
                 <span className="category-icon">{category.icon}</span>
                 <span className="category-name">{t(category.name)}</span>
@@ -105,12 +106,24 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
                       key={def.subType}
                       definition={def}
                       onDragStart={handleDragStart}
+                      onHover={setHovered}
                     />
                   ))}
                 </div>
               )}
             </div>
           ))
+        )}
+      </div>
+
+      <div className="panel-hint">
+        {hovered ? (
+          <>
+            <strong>{hovered.label}</strong>
+            <span>{hovered.description}</span>
+          </>
+        ) : (
+          t('Drag & drop to add')
         )}
       </div>
     </div>
@@ -121,21 +134,22 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
 interface NodeItemProps {
   definition: LogicNodeDefinition;
   onDragStart: (event: React.DragEvent, definition: LogicNodeDefinition) => void;
+  onHover: (definition: LogicNodeDefinition | null) => void;
 }
 
-const NodeItem: React.FC<NodeItemProps> = ({ definition, onDragStart }) => {
+const NodeItem: React.FC<NodeItemProps> = ({ definition, onDragStart, onHover }) => {
   return (
     <div
       className="node-item"
       draggable
       onDragStart={e => onDragStart(e, definition)}
-      style={{ borderLeftColor: definition.color }}
-      title={definition.description}
+      style={{ '--node-color': definition.color } as React.CSSProperties}
+      onMouseEnter={() => onHover(definition)}
+      onMouseLeave={() => onHover(null)}
     >
       <span className="node-icon">{definition.icon}</span>
       <div className="node-info">
         <span className="node-label">{definition.label}</span>
-        <span className="node-description">{definition.description}</span>
       </div>
     </div>
   );
