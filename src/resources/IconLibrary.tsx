@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { toast } from '../components/Toast';
+import DraggableResource from './DraggableResource';
 import { t } from '../i18n';
 import './IconLibrary.css';
 
@@ -135,11 +136,13 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
           </div>
         ) : (
           filteredIcons.map(icon => (
-            <div
+            <DraggableResource
               key={icon.name}
+              dragId={`icon-${icon.name}`}
+              dragData={{ type: 'new-icon', iconName: icon.name, path: icon.path }}
               className={`icon-item ${selectedIcon === icon.name ? 'selected' : ''}`}
               onClick={() => setSelectedIcon(icon.name)}
-              title={icon.name}
+              title={`${icon.name} — ${t('Drag onto the canvas')}`}
             >
               <svg viewBox="0 0 24 24" width="24" height="24">
                 <path d={icon.path} fill="currentColor" />
@@ -147,7 +150,7 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
               {viewMode === 'list' && (
                 <span className="icon-name">{icon.name}</span>
               )}
-            </div>
+            </DraggableResource>
           ))
         )}
       </div>

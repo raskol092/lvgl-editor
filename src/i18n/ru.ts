@@ -758,4 +758,6 @@ export const ru: Record<string, string> = {
   '🗜️ Download ZIP': '🗜️ Скачать ZIP',
   'Download project as ZIP': 'Скачать проект ZIP-архивом',
   'ZIP downloaded': 'ZIP-архив скачан',
+  'Drag onto the canvas': 'Перетащите на холст',
+  'Failed to add icon': 'Не удалось добавить значок',
 };

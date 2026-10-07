@@ -359,7 +359,7 @@ const PropertyEditor: React.FC = () => {
               </div>
             </div>
             {(component.widthMode || 'px') === 'content' ? (
-              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#f5f5f5', borderRadius: 4 }}>{t('Fit content')}</div>
+              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#1e293b', borderRadius: 4 }}>{t('Fit content')}</div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <input
@@ -398,7 +398,7 @@ const PropertyEditor: React.FC = () => {
               </div>
             </div>
             {(component.heightMode || 'px') === 'content' ? (
-              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#f5f5f5', borderRadius: 4 }}>{t('Fit content')}</div>
+              <div style={{ fontSize: 12, color: '#999', padding: '6px 8px', background: '#1e293b', borderRadius: 4 }}>{t('Fit content')}</div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <input

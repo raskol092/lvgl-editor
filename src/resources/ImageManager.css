@@ -84,7 +84,7 @@
 .image-list.grid .image-item {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: #0f172a;
   border: 2px solid #334155;
   border-radius: 8px;
   overflow: hidden;
@@ -109,7 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1e293b;
+  background: #cbd5e1;
   overflow: hidden;
 }
 
@@ -145,7 +145,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  background: white;
+  background: #0f172a;
   border: 1px solid #334155;
   border-radius: 6px;
   cursor: pointer;
@@ -315,7 +315,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: #1e293b;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   max-width: 90vw;

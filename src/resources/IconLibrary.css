@@ -19,7 +19,7 @@
 
 .category-btn {
   padding: 6px 12px;
-  background: white;
+  background: #0f172a;
   border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
@@ -65,7 +65,7 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: white;
+  background: #0f172a;
   border: 2px solid #334155;
   border-radius: 8px;
   cursor: pointer;
@@ -91,7 +91,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  background: white;
+  background: #0f172a;
   border: 1px solid #334155;
   border-radius: 6px;
   cursor: pointer;
@@ -136,7 +136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: #0f172a;
   border-radius: 8px;
   border: 1px solid #334155;
   color: #e2e8f0;
