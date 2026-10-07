@@ -2,10 +2,14 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import { useEditorStore } from '../../store/editorStore';
 import { useResourceStore } from '../../resources/resourceStore';
 import type { LvglComponent, Animation } from '../../types';
+import { useThemeStore } from '../../store/themeStore';
 import { t } from '../../i18n';
 import './PreviewPanel.css';
 
 // Image cache to avoid reloading images
+/** Project theme colors used by the canvas drawing helpers (refreshed before each draw) */
+const P = { surface: '#f0f0f0', border: '#e0e0e0', text: '#333333', primary: '#2196f3' };
+
 const imageCache = new Map<string, HTMLImageElement>();
 
 // Easing functions
@@ -315,6 +319,8 @@ const PreviewPanel: React.FC = () => {
 
   // Render components to canvas
   useEffect(() => {
+    const th = useThemeStore.getState().currentTheme.colors;
+    P.surface = th.surface; P.border = th.border; P.text = th.text; P.primary = th.primary;
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
 
@@ -353,11 +359,11 @@ const PreviewPanel: React.FC = () => {
 
       // Get styles
       const styles = comp.styles.default;
-      const bgColorStyle = styles.bgColor || '#e0e0e0';
-      const borderColor = styles.borderColor || '#cccccc';
+      const bgColorStyle = styles.bgColor || P.border;
+      const borderColor = styles.borderColor || P.border;
       const borderWidth = styles.borderWidth || 1;
       const borderRadius = styles.borderRadius || 4;
-      const textColor = styles.textColor || '#333333';
+      const textColor = styles.textColor || P.text;
 
       // --- Transform support ---
       const hasTransform = styles.transformAngle || styles.transformZoomX !== undefined || styles.transformZoomY !== undefined;
@@ -889,17 +895,17 @@ function drawSlider(
   const knobX = x + progress * w;
 
   // Track background
-  ctx.fillStyle = '#e0e0e0';
+  ctx.fillStyle = P.border;
   roundRect(ctx, x, trackY, w, trackHeight, 3);
   ctx.fill();
 
   // Track fill
-  ctx.fillStyle = '#2196f3';
+  ctx.fillStyle = P.primary;
   roundRect(ctx, x, trackY, w * progress, trackHeight, 3);
   ctx.fill();
 
   // Knob
-  ctx.fillStyle = '#2196f3';
+  ctx.fillStyle = P.primary;
   ctx.beginPath();
   ctx.arc(knobX, y + h / 2, 8, 0, Math.PI * 2);
   ctx.fill();
@@ -914,9 +920,9 @@ function drawCheckbox(
   const boxY = y + (h - boxSize) / 2;
 
   // Box
-  ctx.strokeStyle = opts.checked ? '#2196f3' : '#999';
+  ctx.strokeStyle = opts.checked ? P.primary : '#999';
   ctx.lineWidth = 2;
-  ctx.fillStyle = opts.checked ? '#2196f3' : '#fff';
+  ctx.fillStyle = opts.checked ? P.primary : '#fff';
   roundRect(ctx, x, boxY, boxSize, boxSize, 3);
   ctx.fill();
   ctx.stroke();
@@ -959,7 +965,7 @@ function drawSwitch(
   const trackY = y + (h - trackHeight) / 2;
 
   // Track
-  ctx.fillStyle = opts.checked ? '#4caf50' : '#ccc';
+  ctx.fillStyle = opts.checked ? '#4caf50' : P.border;
   roundRect(ctx, trackX, trackY, trackWidth, trackHeight, trackHeight / 2);
   ctx.fill();
 
@@ -980,12 +986,12 @@ function drawBar(
   const progress = (opts.value - opts.min) / (opts.max - opts.min);
 
   // Background
-  ctx.fillStyle = '#e0e0e0';
+  ctx.fillStyle = P.border;
   roundRect(ctx, x, y, w, h, 4);
   ctx.fill();
 
   // Fill
-  ctx.fillStyle = '#2196f3';
+  ctx.fillStyle = P.primary;
   roundRect(ctx, x, y, w * progress, h, 4);
   ctx.fill();
 }
@@ -1004,7 +1010,7 @@ function drawArc(
   const currentAngle = startAngle + (endAngle - startAngle) * progress;
 
   // Background arc
-  ctx.strokeStyle = '#e0e0e0';
+  ctx.strokeStyle = P.border;
   ctx.lineWidth = 8;
   ctx.lineCap = 'round';
   ctx.beginPath();
@@ -1012,13 +1018,13 @@ function drawArc(
   ctx.stroke();
 
   // Progress arc
-  ctx.strokeStyle = '#2196f3';
+  ctx.strokeStyle = P.primary;
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, startAngle, currentAngle);
   ctx.stroke();
 
   // Value text
-  ctx.fillStyle = '#333';
+  ctx.fillStyle = P.text;
   ctx.font = 'bold 16px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -1090,7 +1096,7 @@ function drawImage(
   }
 
   // Placeholder for image (when no src or image not loaded)
-  ctx.fillStyle = '#f0f0f0';
+  ctx.fillStyle = P.surface;
   ctx.strokeStyle = '#ddd';
   ctx.lineWidth = 1;
   ctx.fillRect(x, y, w, h);
@@ -1184,7 +1190,7 @@ function drawSpinner(
   const radius = Math.min(w, h) / 2 - 4;
 
   // Background circle
-  ctx.strokeStyle = '#e0e0e0';
+  ctx.strokeStyle = P.border;
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -1304,7 +1310,7 @@ function drawTable(
   }
 
   // Header row
-  ctx.fillStyle = '#f0f0f0';
+  ctx.fillStyle = P.surface;
   ctx.fillRect(x + 1, y + 1, w - 2, cellH - 1);
   ctx.strokeStyle = opts.borderColor;
   ctx.beginPath();
@@ -1399,7 +1405,7 @@ function drawTabview(
   ctx.stroke();
 
   // Tab bar
-  ctx.fillStyle = '#f0f0f0';
+  ctx.fillStyle = P.surface;
   ctx.fillRect(x + 1, y + 1, w - 2, tabH);
   ctx.strokeStyle = opts.borderColor;
   ctx.beginPath();
@@ -1428,7 +1434,7 @@ function drawTabview(
   }
 
   // Content area hint
-  ctx.fillStyle = '#ccc';
+  ctx.fillStyle = P.border;
   ctx.font = '11px sans-serif';
   ctx.fillText('Tab Content', x + w / 2, y + tabH + (h - tabH) / 2);
 }
@@ -1501,7 +1507,7 @@ function drawWindow(
   ctx.stroke();
 
   // Title bar
-  ctx.fillStyle = '#e0e0e0';
+  ctx.fillStyle = P.border;
   ctx.beginPath();
   const r = opts.borderRadius;
   ctx.moveTo(x + r, y);

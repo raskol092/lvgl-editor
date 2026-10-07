@@ -5,6 +5,7 @@ import type { LvglComponent, ResizeHandle } from '../../types';
 import { useEditorStore } from '../../store/editorStore';
 import { useAppStore } from '../../store/appStore';
 import { useResourceStore } from '../../resources/resourceStore';
+import { useThemeStore } from '../../store/themeStore';
 import { t } from '../../i18n';
 import './CanvasComponent.css';
 
@@ -53,6 +54,10 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
   const defaultFontSize = useAppStore(state => state.defaultFontSize);
   const { styles, props, type } = component;
   const defaultStyle = styles.default;
+  // Hard-coded designer colors (table cells, calendar, window header...) follow the project theme
+  const th = useThemeStore(state => state.currentTheme.colors);
+  const tint = `color-mix(in srgb, ${th.surface} 90%, ${th.text})`;
+  const muted = `color-mix(in srgb, ${th.text} 60%, ${th.surface})`;
   const downPos = useRef<{ x: number; y: number } | null>(null);
   const wasSelectedOnDown = useRef(false);
   const [editing, setEditing] = useState(false);
@@ -261,17 +266,17 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
 
     if (isMissing || isTransparent) {
       switch (type) {
-        case 'btn': return '#2196F3';
-        case 'obj': return '#fafafa';
-        case 'textarea': return '#ffffff';
-        case 'dropdown': return '#ffffff';
-        case 'img': return '#f0f0f0';
-        case 'table': return '#ffffff';
-        case 'chart': return '#ffffff';
-        case 'calendar': return '#ffffff';
-        case 'tabview': return '#ffffff';
-        case 'tileview': return '#ffffff';
-        case 'win': return '#ffffff';
+        case 'btn': return th.primary;
+        case 'obj': return th.surface;
+        case 'textarea': return th.surface;
+        case 'dropdown': return th.surface;
+        case 'img': return th.surface;
+        case 'table': return th.surface;
+        case 'chart': return th.surface;
+        case 'calendar': return th.surface;
+        case 'tabview': return th.surface;
+        case 'tileview': return th.surface;
+        case 'win': return th.surface;
         // These types are legitimately transparent — keep them that way
         case 'label': return 'transparent';
         case 'arc': return 'transparent';
@@ -395,8 +400,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       
       case 'label':
         return (
-          editing ? textEditor(defaultStyle.textColor || '#333333', props.fontSize || defaultFontSize) : <span className="lvgl-label" style={{
-            color: defaultStyle.textColor || '#333333',
+          editing ? textEditor(defaultStyle.textColor || th.text, props.fontSize || defaultFontSize) : <span className="lvgl-label" style={{
+            color: defaultStyle.textColor || th.text,
             fontSize: props.fontSize || defaultFontSize,
           }}>{props.text || 'Label'}</span>
         );
@@ -409,7 +414,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           <div className="lvgl-line" style={{
             width: '100%',
             height: '2px',
-            backgroundColor: defaultStyle.borderColor || defaultStyle.textColor || '#333',
+            backgroundColor: defaultStyle.borderColor || defaultStyle.textColor || th.text,
             position: 'absolute',
             top: '50%',
             transform: 'translateY(-50%)',
@@ -422,9 +427,9 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             width: '100%',
             height: '100%',
             fontSize: '12px',
-            color: '#999',
-            backgroundColor: resolvedBgColor === 'transparent' ? '#ffffff' : undefined,
-            border: !defaultStyle.borderWidth ? '1px solid #cccccc' : undefined,
+            color: muted,
+            backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
+            border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             borderRadius: defaultStyle.borderRadius || 4,
             padding: '6px 8px',
             boxSizing: 'border-box',
@@ -442,14 +447,14 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             width: '100%',
             height: '100%',
             padding: '0 8px',
-            backgroundColor: resolvedBgColor === 'transparent' ? '#ffffff' : undefined,
-            border: !defaultStyle.borderWidth ? '1px solid #cccccc' : undefined,
+            backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
+            border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             borderRadius: defaultStyle.borderRadius || 4,
             boxSizing: 'border-box',
-            color: defaultStyle.textColor || '#333',
+            color: defaultStyle.textColor || th.text,
           }}>
             <span>{props.options?.[props.selected || 0] || 'Select...'}</span>
-            <span style={{ color: '#999', fontSize: '10px' }}>▼</span>
+            <span style={{ color: muted, fontSize: '10px' }}>▼</span>
           </div>
         );
       
@@ -459,23 +464,23 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            color: defaultStyle.textColor || '#333',
+            color: defaultStyle.textColor || th.text,
           }}>
             <div style={{
               width: '16px',
               height: '16px',
-              border: '2px solid #666',
+              border: `2px solid ${muted}`,
               borderRadius: '2px',
-              backgroundColor: props.checked ? '#2196F3' : '#fff',
+              backgroundColor: props.checked ? th.primary : th.surface,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}>
-              {props.checked && <span style={{ color: '#fff', fontSize: '12px', lineHeight: 1 }}>✓</span>}
+              {props.checked && <span style={{ color: '#ffffff', fontSize: '12px', lineHeight: 1 }}>✓</span>}
             </div>
             {editing
-              ? textEditor(defaultStyle.textColor || '#333', props.fontSize || defaultFontSize)
+              ? textEditor(defaultStyle.textColor || th.text, props.fontSize || defaultFontSize)
               : <span style={{ fontSize: defaultFontSize }}>{props.text || 'Checkbox'}</span>}
           </div>
         );
@@ -486,7 +491,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             width: '100%',
             height: '100%',
             borderRadius: defaultStyle.borderRadius || 13,
-            backgroundColor: props.checked ? '#2196F3' : '#ccc',
+            backgroundColor: props.checked ? th.primary : th.border,
             position: 'relative',
             minHeight: '20px',
           }}>
@@ -495,7 +500,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               width: '20px',
               height: '20px',
               borderRadius: '50%',
-              backgroundColor: '#fff',
+              backgroundColor: '#ffffff',
               top: '50%',
               marginTop: '-10px',
               left: props.checked ? 'calc(100% - 23px)' : '3px',
@@ -517,14 +522,14 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             <div style={{
               width: '100%',
               height: '4px',
-              backgroundColor: '#e0e0e0',
+              backgroundColor: th.border,
               borderRadius: '2px',
               position: 'relative',
             }}>
               <div style={{
                 width: `${Math.max(0, Math.min(100, ((props.value ?? 50) - (props.min ?? 0)) / ((props.max ?? 100) - (props.min ?? 0)) * 100))}%`,
                 height: '100%',
-                backgroundColor: '#2196F3',
+                backgroundColor: th.primary,
                 borderRadius: '2px',
               }} />
             </div>
@@ -534,7 +539,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               width: '16px',
               height: '16px',
               borderRadius: '50%',
-              backgroundColor: '#2196F3',
+              backgroundColor: th.primary,
               boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
             }} />
           </div>
@@ -571,7 +576,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           <div className="lvgl-obj" style={{
             width: '100%',
             height: '100%',
-            border: !defaultStyle.borderWidth ? '1px solid #e0e0e0' : undefined,
+            border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             position: 'relative',
             ...layoutStyle,
           }}>
@@ -585,8 +590,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           <div className="lvgl-tabview" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{
               display: 'flex',
-              borderBottom: '2px solid #e0e0e0',
-              backgroundColor: '#f5f5f5',
+              borderBottom: `2px solid ${th.border}`,
+              backgroundColor: tint,
               flexShrink: 0,
             }}>
               {(props.tabs || ['Tab 1', 'Tab 2']).map((tab: string, i: number) => (
@@ -594,8 +599,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
                   padding: '8px 16px',
                   fontSize: '12px',
                   cursor: 'pointer',
-                  borderBottom: i === (props.activeTab || 0) ? '2px solid #2196F3' : '2px solid transparent',
-                  color: i === (props.activeTab || 0) ? '#2196F3' : '#666',
+                  borderBottom: i === (props.activeTab || 0) ? `2px solid ${th.primary}` : '2px solid transparent',
+                  color: i === (props.activeTab || 0) ? th.primary : muted,
                   fontWeight: i === (props.activeTab || 0) ? 600 : 400,
                   marginBottom: '-2px',
                 }} onClick={(e) => {
@@ -615,8 +620,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           <div className="lvgl-win" style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{
               padding: '8px 12px',
-              backgroundColor: '#e8e8e8',
-              borderBottom: '1px solid #ccc',
+              backgroundColor: tint,
+              borderBottom: `1px solid ${th.border}`,
               fontSize: '13px',
               fontWeight: 600,
               display: 'flex',
@@ -625,7 +630,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               flexShrink: 0,
             }}>
               <span>{props.title || 'Window'}</span>
-              {props.showCloseBtn !== false && <span style={{ color: '#999', cursor: 'pointer' }}>✕</span>}
+              {props.showCloseBtn !== false && <span style={{ color: muted, cursor: 'pointer' }}>✕</span>}
             </div>
             <div className="lvgl-win-content" style={{ flex: 1, padding: '8px' }}>{children}</div>
           </div>
@@ -640,14 +645,14 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           <div className="lvgl-bar" style={{
             width: '100%',
             height: '100%',
-            backgroundColor: '#e0e0e0',
+            backgroundColor: th.border,
             borderRadius: defaultStyle.borderRadius,
             overflow: 'hidden',
           }}>
             <div style={{
               width: `${barPercent}%`,
               height: '100%',
-              backgroundColor: '#2196F3',
+              backgroundColor: th.primary,
               borderRadius: defaultStyle.borderRadius,
               transition: 'width 0.15s',
             }} />
@@ -720,9 +725,9 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       }
       
       case 'chart': {
-        const series = props.series || (props.data ? [{ data: props.data, color: props.lineColor || '#2196F3' }] : [{ data: [10, 20, 30, 25, 40], color: '#2196F3' }]);
+        const series = props.series || (props.data ? [{ data: props.data, color: props.lineColor || th.primary }] : [{ data: [10, 20, 30, 25, 40], color: th.primary }]);
         const chartData = series[0]?.data || [10, 20, 30, 25, 40];
-        const chartColor = series[0]?.color || '#2196F3';
+        const chartColor = series[0]?.color || th.primary;
         const maxVal = Math.max(...chartData, 1);
         return (
           <div className="lvgl-chart" style={{
@@ -732,8 +737,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             alignItems: 'flex-end',
             justifyContent: 'space-around',
             padding: '8px',
-            backgroundColor: resolvedBgColor === 'transparent' ? '#ffffff' : undefined,
-            border: !defaultStyle.borderWidth ? '1px solid #e0e0e0' : undefined,
+            backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
+            border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             borderRadius: defaultStyle.borderRadius || 4,
             boxSizing: 'border-box',
           }}>
@@ -761,18 +766,18 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             gridTemplateColumns: `repeat(${props.cols || 3}, 1fr)`,
             gridTemplateRows: `repeat(${props.rows || 3}, 1fr)`,
             gap: '1px',
-            backgroundColor: '#ccc',
-            border: '1px solid #ccc',
+            backgroundColor: th.border,
+            border: `1px solid ${th.border}`,
             borderRadius: defaultStyle.borderRadius || 4,
             overflow: 'hidden',
           }}>
             {Array.from({ length: (props.rows || 3) * (props.cols || 3) }).map((_, i) => (
               <div key={i} style={{
-                backgroundColor: i < (props.cols || 3) && props.headerRow !== false ? '#f0f0f0' : '#fff',
+                backgroundColor: i < (props.cols || 3) && props.headerRow !== false ? th.surface : th.surface,
                 padding: '4px',
                 fontSize: '10px',
                 fontWeight: i < (props.cols || 3) && props.headerRow !== false ? 600 : 400,
-                color: '#333',
+                color: th.text,
               }}>
                 {props.cellData?.[Math.floor(i / (props.cols || 3))]?.[i % (props.cols || 3)] || (i + 1)}
               </div>
@@ -788,19 +793,19 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             fontSize: '10px',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: resolvedBgColor === 'transparent' ? '#ffffff' : undefined,
-            border: !defaultStyle.borderWidth ? '1px solid #ddd' : undefined,
+            backgroundColor: resolvedBgColor === 'transparent' ? th.surface : undefined,
+            border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             borderRadius: defaultStyle.borderRadius || 4,
             boxSizing: 'border-box',
             overflow: 'hidden',
-            color: '#333',
+            color: th.text,
           }}>
-            <div style={{ textAlign: 'center', padding: '6px 4px', fontWeight: 'bold', borderBottom: '1px solid #eee', backgroundColor: '#f8f8f8' }}>
+            <div style={{ textAlign: 'center', padding: '6px 4px', fontWeight: 'bold', borderBottom: `1px solid ${th.border}`, backgroundColor: tint }}>
               {props.year || 2024} / {props.month || 1}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', flex: 1, padding: '2px' }}>
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', color: '#666', padding: '2px 0' }}>{d}</div>
+                <div key={d} style={{ textAlign: 'center', fontWeight: 'bold', color: muted, padding: '2px 0' }}>{d}</div>
               ))}
               {Array.from({ length: 28 }).map((_, i) => (
                 <div key={i} style={{ textAlign: 'center', padding: '1px 0' }}>{i + 1}</div>
@@ -818,13 +823,13 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             gridTemplateColumns: `repeat(${props.cols || 2}, 1fr)`,
             gridTemplateRows: `repeat(${props.rows || 2}, 1fr)`,
             gap: '2px',
-            backgroundColor: '#e0e0e0',
-            border: !defaultStyle.borderWidth ? '1px solid #ccc' : undefined,
+            backgroundColor: th.border,
+            border: !defaultStyle.borderWidth ? `1px solid ${th.border}` : undefined,
             borderRadius: defaultStyle.borderRadius || 4,
             overflow: 'hidden',
           }}>
             {Array.from({ length: (props.rows || 2) * (props.cols || 2) }).map((_, i) => (
-              <div key={i} style={{ backgroundColor: '#f8f8f8', border: '1px dashed #bbb' }} />
+              <div key={i} style={{ backgroundColor: tint, border: `1px dashed ${th.border}` }} />
             ))}
           </div>
         );
