@@ -10,9 +10,12 @@ import { generateUiLisp } from './ui';
 import { generateEventsLisp } from './events';
 import { generateLogicLisp } from './logic';
 import { generateMainLisp } from './main';
+import { convertAssets } from './assets/convert';
 
 export * from './types';
 export { lstr, lcolor } from './sexp';
+export { convertAssets } from './assets/convert';
+export type { ConvertedAssets } from './assets/convert';
 
 /**
  * Generate the whole project: `main.lisp` plus the `ui/` folder.
@@ -26,11 +29,12 @@ export function generateCode(
   imageResources: ImageResource[] = [],
   fontResources: FontResource[] = [],
   defaultFont?: string,
-  defaultFontSize?: number
+  defaultFontSize?: number,
+  imagePalettes?: Record<string, Array<number | null>>
 ): GeneratedLisp {
   const opts: LispGenOptions = { ...DEFAULT_LISP_OPTIONS, ...options };
   const names = new NameResolver(pages, opts);
-  const ctx = { options: opts, names, imageResources, fontResources, defaultFont, defaultFontSize };
+  const ctx = { options: opts, names, imageResources, fontResources, defaultFont, defaultFontSize, imagePalettes };
   return {
     'main.lisp': generateMainLisp(pages, opts, imageResources, fontResources, defaultFont, defaultFontSize),
     'ui/ui.lisp': generateUiLisp(pages, ctx, theme),
@@ -56,8 +60,11 @@ export async function generateZipBlob(
 ): Promise<Blob> {
   const JSZip = (await import('jszip')).default;
   const zip = new JSZip();
-  const files = generateCode(pages, options, logicGraphs, theme, imageResources, fontResources, defaultFont, defaultFontSize);
+  const assets = await convertAssets(pages, imageResources, fontResources, defaultFont, defaultFontSize);
+  const files = generateCode(pages, options, logicGraphs, theme, imageResources, fontResources, defaultFont, defaultFontSize, assets.imagePalettes);
   for (const [path, content] of Object.entries(files)) zip.file(path, content);
+  for (const [path, bytes] of Object.entries(assets.files)) zip.file(path, bytes);
+  if (assets.errors.length > 0) zip.file('assets/CONVERSION_ERRORS.txt', assets.errors.join('\n') + '\n');
   return zip.generateAsync({ type: 'blob' });
 }
 

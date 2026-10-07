@@ -6,7 +6,7 @@ import { useLogicEditorStore } from '../LogicEditor';
 import { useResourceStore } from '../../resources/resourceStore';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
-import { generateCode, getGeneratedFileNames, downloadAsZip } from '../../codegen/lisp';
+import { generateCode, getGeneratedFileNames, downloadAsZip, convertAssets } from '../../codegen/lisp';
 import type { LispGenOptions, LispFileName } from '../../codegen/lisp';
 import { toast } from '../Toast';
 import { t } from '../../i18n';
@@ -38,18 +38,28 @@ const CodePreview: React.FC = () => {
 
   const fileNames = getGeneratedFileNames();
 
+  // images are quantised in the browser; the palettes end up in ui.lisp
+  const [imagePalettes, setImagePalettes] = useState<Record<string, Array<number | null>>>({});
+  useEffect(() => {
+    let cancelled = false;
+    convertAssets(pages, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize)
+      .then(r => { if (!cancelled) setImagePalettes(r.imagePalettes); })
+      .catch(() => { /* conversion problems are reported when exporting */ });
+    return () => { cancelled = true; };
+  }, [pages, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize]);
+
   const codeGenOptions: Partial<LispGenOptions> = useMemo(() => ({
     namingStyle,
   }), [namingStyle]);
 
   const generatedCode = useMemo(() => {
     try {
-      return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize);
+      return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, imagePalettes);
     } catch {
       console.error('Code generation error');
       return null;
     }
-  }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize]);
+  }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, imagePalettes]);
 
   const currentCode = generatedCode?.[selectedFile] || ';; Code generation failed';
 

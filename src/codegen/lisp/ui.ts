@@ -13,6 +13,8 @@ export interface UiContext {
   fontResources: FontResource[];
   defaultFont?: string;
   defaultFontSize?: number;
+  /** image resource id -> palette produced by the asset converter (index 0 = transparent) */
+  imagePalettes?: Record<string, Array<number | null>>;
 }
 
 const isBuiltinFont = (name: string) => /^montserrat_\d+$/.test(name);
@@ -308,7 +310,9 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
     case 'img': {
       const img = findImage(props.src, ctx.imageResources);
       if (img) {
-        out.push(`(lv-image-set-vesc ${v} ${imageDataSym(img, o)})`);
+        const pal = ctx.imagePalettes?.[img.id];
+        const colors = pal ? ` (list ${pal.map(c => (c === null ? 'nil' : '0x' + c.toString(16).toUpperCase().padStart(6, '0'))).join(' ')})` : '';
+        out.push(`(lv-image-set-vesc ${v} ${imageDataSym(img, o)}${colors})`);
       } else if (props.src) {
         out.push(comment(`image "${String(props.src).replace(/\n/g, ' ')}" is not a project resource; add it in Resources`));
       }
