@@ -2,6 +2,7 @@ import { richText } from '../../i18n/ti';
 import { ti } from '../../i18n/ti';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
+import { useThemeStore } from '../../store/themeStore';
 import { editorStateToJson } from './editorStateToJson';
 import { t } from '../../i18n';
 import './WasmPreview.css';
@@ -16,14 +17,15 @@ const WasmPreviewInner: React.FC = () => {
   const pages = useEditorStore((s) => s.pages);
   const currentPageId = useEditorStore((s) => s.currentPageId);
   const canvas = useEditorStore((s) => s.canvas);
+  const theme = useThemeStore((s) => s.currentTheme);
 
   // Send UI JSON to iframe
   const sendToWasm = useCallback(() => {
     const iframe = iframeRef.current;
     if (!iframe?.contentWindow || status !== 'ready') return;
-    const json = editorStateToJson(pages, currentPageId, canvas);
+    const json = editorStateToJson(pages, currentPageId, canvas, theme);
     iframe.contentWindow.postMessage({ type: 'load-ui', json }, '*');
-  }, [pages, currentPageId, canvas, status]);
+  }, [pages, currentPageId, canvas, theme, status]);
 
   // Listen for lvgl-ready from iframe
   useEffect(() => {

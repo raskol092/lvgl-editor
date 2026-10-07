@@ -544,6 +544,17 @@ void ui_from_json(const char *json_str) {
     lv_obj_t *screen = lv_screen_active();
     id_map_reset();
 
+    /* LVGL default theme with the project's colors (same as lv-theme-set on the board) */
+    cJSON *theme_cfg = cJSON_GetObjectItemCaseSensitive(root, "theme");
+    if (theme_cfg) {
+        lv_display_t *disp = lv_display_get_default();
+        lv_theme_t *th = lv_theme_default_init(disp,
+            hex_to_color(cjson_get_string(theme_cfg, "primary")),
+            hex_to_color(cjson_get_string(theme_cfg, "secondary")),
+            cjson_get_bool(theme_cfg, "dark", 0), LV_FONT_DEFAULT);
+        if (th) lv_display_set_theme(disp, th);
+    }
+
     /* Apply screen settings */
     cJSON *scr_cfg = cJSON_GetObjectItemCaseSensitive(root, "screen");
     if (scr_cfg) {
@@ -588,6 +599,13 @@ void ui_from_json(const char *json_str) {
         int y = cjson_get_int(comp, "y", 0);
         int w = cjson_get_int(comp, "width", LV_SIZE_CONTENT);
         int h = cjson_get_int(comp, "height", LV_SIZE_CONTENT);
+        /* width/height modes: "content" -> LV_SIZE_CONTENT, "percent" -> lv_pct (same as the generated Lisp) */
+        const char *wm = cjson_get_string(comp, "widthMode");
+        const char *hm = cjson_get_string(comp, "heightMode");
+        if (wm && strcmp(wm, "content") == 0) w = LV_SIZE_CONTENT;
+        else if (wm && strcmp(wm, "percent") == 0) w = lv_pct(w);
+        if (hm && strcmp(hm, "content") == 0) h = LV_SIZE_CONTENT;
+        else if (hm && strcmp(hm, "percent") == 0) h = lv_pct(h);
         lv_obj_set_pos(obj, x, y);
         lv_obj_set_size(obj, w, h);
 

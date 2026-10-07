@@ -4,6 +4,7 @@ import type { Page, LvglComponent, StyleProps, Animation, Theme } from '../../ty
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LispGenOptions } from './types';
 import type { NameResolver } from './names';
+import { isDarkTheme } from '../../utils/isDarkTheme';
 import { getArcStyle, isArcLike } from '../../utils/arcStyle';
 import { sym, lstr, lcolor, lopa, indent, comment, banner, userCode, shift, symbolText } from './sexp';
 
@@ -658,13 +659,6 @@ export function hasAnimations(pages: Page[]): boolean {
 function defun(name: string, params: string, body: string[], options: LispGenOptions): string[] {
   const i = indent(options);
   return [`(defun ${name} (${params})`, `${i}(progn`, ...shift(body, options.indentSize * 2), `${i}${i}nil))`];
-}
-
-/** LVGL's default theme has a light and a dark variant; pick by the theme's background brightness. */
-function isDarkTheme(theme: Theme): boolean {
-  const hex = lcolor(theme.colors.background).slice(2);
-  const [r, g, b] = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
-  return (0.299 * r + 0.587 * g + 0.114 * b) < 128;
 }
 
 export function generateUiLisp(pages: Page[], ctx: UiContext, theme?: Theme): string {

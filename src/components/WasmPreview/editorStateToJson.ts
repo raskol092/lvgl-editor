@@ -1,4 +1,5 @@
-import type { Page, CanvasState, LvglComponent } from '../../types';
+import type { Page, CanvasState, LvglComponent, Theme } from '../../types';
+import { isDarkTheme } from '../../utils/isDarkTheme';
 
 interface WasmUIJson {
   screen: {
@@ -6,6 +7,7 @@ interface WasmUIJson {
     height: number;
     bgColor: string;
   };
+  theme?: { primary: string; secondary: string; dark: boolean };
   components: WasmComponent[];
 }
 
@@ -133,6 +135,7 @@ export function editorStateToJson(
   pages: Page[],
   currentPageId: string,
   canvas: CanvasState,
+  theme?: Theme,
 ): string {
   const page = pages.find((p) => p.id === currentPageId);
 
@@ -142,6 +145,7 @@ export function editorStateToJson(
       height: canvas.height,
       bgColor: page?.backgroundColor || '#ffffff',
     },
+    ...(theme ? { theme: { primary: theme.colors.primary, secondary: theme.colors.secondary, dark: isDarkTheme(theme) } } : {}),
     components: page ? flattenTree(page.components, null) : [],
   };
 
