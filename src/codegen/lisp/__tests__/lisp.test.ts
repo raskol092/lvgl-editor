@@ -6,7 +6,7 @@ import { lstr, lcolor, symbolBody } from '../sexp';
 import {
   createPage, createComponent, createEvent, createBuiltinAction, createAnimation,
   createLogicNode, createLogicPort, createLogicGraph, createLogicConnection, createLogicVariable,
-  createImageResource, createFontResource,
+  createImageResource, createFontResource, createTheme,
 } from '../../__tests__/helpers';
 
 /** Checks that parentheses/strings are balanced; returns an error message or null. */
@@ -258,3 +258,10 @@ describe('ui/ui_logic.lisp', () => {
     expect(empty).toContain('(defun ui-logic-tick ()');
   });
 });
+
+describe('theme', () => {
+  it('calls lv-theme-set with the project theme', () => {
+    const out = generateCode([createPage()], undefined, [], createTheme({ id: 'dark', colors: { primary: '#90CAF9', secondary: '#4FC3F7', background: '#121212', surface: '#1e1e1e', text: '#e0e0e0', border: '#333333' } }), [], [], '', 14)
+    expect(out['ui/ui.lisp']).toContain('(lv-theme-set 0x90CAF9 0x4FC3F7 t)')
+  })
+})
