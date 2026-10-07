@@ -14,6 +14,9 @@ const LIGHT_ALIASES: Record<string, keyof ThemeColors> = {
   '#cccccc': 'border',
 };
 
+/** Theme text color of the mapping currently being applied (set by withMap). */
+const textTarget: { value: string | null } = { value: null };
+
 function norm(c: string): string {
   const h = c.trim().toLowerCase();
   return /^#[0-9a-f]{3}$/.test(h) ? '#' + h.slice(1).split('').map(x => x + x).join('') : h;
@@ -25,21 +28,30 @@ export function buildColorMap(from: ThemeColors, to: ThemeColors): Map<string, s
   const map = new Map<string, string>();
   for (const [hex, role] of Object.entries(LIGHT_ALIASES)) map.set(hex, to[role]);
   for (const role of Object.keys(from) as Array<keyof ThemeColors>) map.set(norm(from[role]), to[role]);
+  map.set('__text', to.text);
   return map;
 }
 
-function mapDeep<T>(value: T, map: Map<string, string>): T {
-  if (isHex(value)) return (map.get(norm(value)) ?? value) as T;
-  if (Array.isArray(value)) return value.map(v => mapDeep(v, map)) as T;
+/** Dark text colors components get by default; as *text* colors they follow the theme's text role. */
+const DARK_TEXT = new Set(['#000000', '#212121', '#222222', '#333333']);
+
+function mapDeep<T>(value: T, map: Map<string, string>, key = ''): T {
+  if (isHex(value)) {
+    const n = norm(value);
+    if (/text|font/i.test(key) && DARK_TEXT.has(n) && textTarget.value) return textTarget.value as T;
+    return (map.get(n) ?? value) as T;
+  }
+  if (Array.isArray(value)) return value.map(v => mapDeep(v, map, key)) as T;
   if (value && typeof value === 'object') {
     const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = mapDeep(v, map);
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = mapDeep(v, map, k);
     return out as T;
   }
   return value;
 }
 
 export function themeComponent(comp: LvglComponent, map: Map<string, string>): LvglComponent {
+  textTarget.value = map.get('__text') ?? null;
   return {
     ...comp,
     styles: mapDeep(comp.styles, map),
