@@ -116,6 +116,23 @@ function expression(node: LogicNode, c: Ctx): string {
         case 'width': return `(lv-obj-get-width ${t})`;
         case 'height': return `(lv-obj-get-height ${t})`;
         case 'opacity': return `(lv-obj-get-style-opa ${t} LV_PART_MAIN)`;
+        case 'visible': return `(not (lv-obj-has-flag ${t} LV_OBJ_FLAG_HIDDEN))`;
+        case 'checked': return `(lv-obj-has-state ${t} LV_STATE_CHECKED)`;
+        case 'value': {
+          const type = c.names.compByName(p.targetComponent || '', c.pageHint)?.type;
+          switch (type) {
+            case 'bar': return `(lv-bar-get-value ${t})`;
+            case 'arc': return `(lv-arc-get-value ${t})`;
+            case 'dropdown': return `(lv-dropdown-get-selected ${t})`;
+            case 'switch':
+            case 'checkbox': return `(if (lv-obj-has-state ${t} LV_STATE_CHECKED) 1 0)`;
+            default: return `(lv-slider-get-value ${t})`;
+          }
+        }
+        case 'text': {
+          const type = c.names.compByName(p.targetComponent || '', c.pageHint)?.type;
+          return type === 'textarea' ? `(lv-textarea-get-text ${t})` : `(lv-label-get-text ${t})`;
+        }
         default: return '0';
       }
     }
@@ -129,6 +146,14 @@ function chain(nodeId: string, c: Ctx, visited: Set<string>): string[] {
   visited.add(nodeId);
   const node = c.graph.nodes.find(n => n.id === nodeId);
   if (!node) return [];
+  if (node.subType === 'delay') {
+    // never block the main loop: the rest of the chain is scheduled and runs from ui-logic-tick
+    const next = nextExecNode(node, c.graph);
+    const rest = next ? chain(next, c, visited) : [];
+    if (rest.length === 0) return [];
+    const secs = num(node.params.duration, 1000) / 1000;
+    return closeLast([`(ui-defer ${Number.isInteger(secs) ? secs.toFixed(1) : String(secs)} (lambda ()`, ...shift(progn(rest), 2)]).map((l, idx, arr) => (idx === arr.length - 1 ? l + ')' : l));
+  }
   const out = [...nodeForms(node, c)];
   if (node.subType !== 'if_else' && node.subType !== 'switch') {
     const next = nextExecNode(node, c.graph);
@@ -179,14 +204,32 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
       return []; // pure expressions, inlined where they are used
     case 'set_property': {
       const prop = p.property || 'x';
-      const value = p.value !== undefined ? p.value : 0;
       const target = t();
+      // the Value input wins when it is wired; otherwise the literal typed in the node
+      const port = node.inputs.find(i => i.name === 'Value');
+      const wired = !!port && c.graph.connections.some(k => k.targetNode === node.id && k.targetInput === port.id);
+      const literal = p.value !== undefined ? p.value : 0;
+      const expr = wired ? inputValue(node, 'Value', c) : null;
+      const val = expr ?? String(num(literal));
+      // LispBM: only nil is false, so 0 has to be tested explicitly
+      const flag = (on: string, off: string) => (expr ? `(let ((v ${expr})) (if (and v (not (eq v 0))) ${on} ${off}))` : literal ? on : off);
+      const hidden = 'LV_OBJ_FLAG_HIDDEN';
       const setters: Record<string, string> = {
-        x: `(lv-obj-set-x ${target} ${num(value)})`,
-        y: `(lv-obj-set-y ${target} ${num(value)})`,
-        width: `(lv-obj-set-width ${target} ${num(value)})`,
-        height: `(lv-obj-set-height ${target} ${num(value)})`,
-        opacity: `(lv-obj-set-style-opa ${target} ${num(value, 255)} LV_PART_MAIN)`,
+        x: `(lv-obj-set-x ${target} ${val})`,
+        y: `(lv-obj-set-y ${target} ${val})`,
+        width: `(lv-obj-set-width ${target} ${val})`,
+        height: `(lv-obj-set-height ${target} ${val})`,
+        opacity: `(lv-obj-set-style-opa ${target} ${expr ?? String(num(literal, 255))} LV_PART_MAIN)`,
+        visible: flag(`(lv-obj-remove-flag ${target} ${hidden})`, `(lv-obj-add-flag ${target} ${hidden})`),
+        checked: flag(`(lv-obj-add-state ${target} LV_STATE_CHECKED)`, `(lv-obj-remove-state ${target} LV_STATE_CHECKED)`),
+        text: `(lv-label-set-text ${target} ${expr ?? lstr(String(literal))})`,
+        value: (() => {
+          switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
+            case 'bar': return `(lv-bar-set-value ${target} ${val} LV_ANIM_ON)`;
+            case 'arc': return `(lv-arc-set-value ${target} ${val})`;
+            default: return `(lv-slider-set-value ${target} ${val} LV_ANIM_ON)`;
+          }
+        })(),
       };
       return [setters[prop] || comment(`Set property: ${prop} on ${target}`)];
     }
@@ -237,10 +280,7 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
       return [`(${[fn, ...args.map(String)].join(' ')})`];
     }
     case 'delay':
-    {
-      const secs = num(p.duration, 1000) / 1000;
-      return [`(sleep ${Number.isInteger(secs) ? secs.toFixed(1) : String(secs)})`];
-    }
+      return []; // handled by chain(): the rest of the chain is deferred
     case 'var_write':
       return [`(setq ${varSym(p.variableName || p.variableId || 'unknown', c)} ${inputValue(node, 'Value', c)})`];
     case 'c_code_block': {
@@ -340,8 +380,31 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
   L.push(...shift(init.length ? init : [comment('No triggers to register')], o.indentSize * 2));
   L.push(`${i}${i}nil))`, '');
 
+  // non-blocking delays: ui-defer queues (start-time seconds fn), ui-defer-tick runs what is due
+  if (o.generateComments) L.push(...banner('Deferred calls (Delay nodes)'));
+  L.push(
+    '(def ui-defer-queue nil)',
+    '',
+    '(defun ui-defer (secs f)',
+    `${i}(setq ui-defer-queue (cons (list (systime) secs f) ui-defer-queue)))`,
+    '',
+    '(defun ui-defer-tick ()',
+    `${i}(if (eq ui-defer-queue nil)`,
+    `${i}${i}nil`,
+    `${i}${i}(let ((q ui-defer-queue))`,
+    `${i}${i}${i}(progn`,
+    `${i}${i}${i}${i}(setq ui-defer-queue nil)`,
+    `${i}${i}${i}${i}(map (lambda (d)`,
+    `${i}${i}${i}${i}${i}${i}(if (>= (secs-since (ix d 0)) (ix d 1))`,
+    `${i}${i}${i}${i}${i}${i}${i}(trap ((ix d 2)))`,
+    `${i}${i}${i}${i}${i}${i}${i}(setq ui-defer-queue (cons d ui-defer-queue))))`,
+    `${i}${i}${i}${i}${i}q)`,
+    `${i}${i}${i}${i}nil))))`,
+    '',
+  );
+
   L.push(`(defun ui-logic-tick ()`, `${i}(progn`);
-  const tick: string[] = [];
+  const tick: string[] = ['(ui-defer-tick)'];
   for (const t of timers) {
     if (t.once) {
       tick.push(`(if (and (not ${t.done}) (>= (secs-since ${t.clock}) ${t.seconds}))`, `    (progn (setq ${t.done} t) (${t.fn})))`);

@@ -5,6 +5,9 @@ import React, { useState, useCallback } from 'react';
 import { useLogicEditorStore } from './logicEditorStore';
 import type { LogicVariable, VariableType } from './types';
 import { modal } from '../Modal';
+import { useEditorStore } from '../../store/editorStore';
+import type { LvglComponent } from '../../types';
+import ToolIcon from '../icons/ToolIcon';
 import { t } from '../../i18n';
 import './VariablePanel.css';
 
@@ -16,8 +19,26 @@ const VARIABLE_TYPES: { type: VariableType; label: string; icon: string; default
   { type: 'bool', label: t('Boolean'), icon: '✓', defaultValue: false },
 ];
 
+/** The property a screen element exposes to the logic by default */
+function mainProperty(type: string): string {
+  switch (type) {
+    case 'slider': case 'bar': case 'arc': case 'dropdown': return 'value';
+    case 'switch': case 'checkbox': return 'checked';
+    case 'label': case 'btn': case 'textarea': return 'text';
+    default: return 'visible';
+  }
+}
+
+const PROPERTY_LABEL: Record<string, string> = { value: 'Value', checked: 'Checked state', text: 'Text', visible: 'Visibility' };
+
+function flatten(list: LvglComponent[], out: LvglComponent[] = []): LvglComponent[] {
+  for (const c of list) { out.push(c); flatten(c.children, out); }
+  return out;
+}
+
 const VariablePanel: React.FC = () => {
-  const { getVariables, addVariable, deleteVariable, updateVariable, getCurrentGraph } = useLogicEditorStore();
+  const { getVariables, addVariable, deleteVariable, updateVariable, getCurrentGraph, addNode, updateNode } = useLogicEditorStore();
+  const pages = useEditorStore(state => state.pages);
   const [isAdding, setIsAdding] = useState(false);
   const [newVarName, setNewVarName] = useState('');
   const [newVarType, setNewVarType] = useState<VariableType>('int');
@@ -66,6 +87,46 @@ const VariablePanel: React.FC = () => {
     setEditingId(null);
   }, [updateVariable]);
 
+  const elements = pages.flatMap(page => flatten(page.components).map(comp => ({ comp, page: page.name })));
+
+  /** Adds a "Get property" / "Set property" node already pointing at the element */
+  const addElementNode = (comp: LvglComponent, mode: 'read' | 'write') => {
+    if (!currentGraph) return;
+    const n = currentGraph.nodes.length;
+    const x = 80 + (n % 4) * 40;
+    const y = 80 + n * 30;
+    const id = mode === 'read' ? addNode('data', 'get_property', x, y) : addNode('action', 'set_property', x, y);
+    if (id) updateNode(id, { params: { targetComponent: comp.id, property: mainProperty(comp.type), ...(mode === 'write' ? { value: 0 } : {}) } });
+  };
+
+  const elementsSection = (
+    <>
+      {/* Elements placed on the screens: read or write their value from the logic */}
+      <div className="panel-header elements-header">
+        <h3>{t('Screen elements')}</h3>
+      </div>
+      <div className="variable-list element-list">
+        {elements.length === 0 ? (
+          <div className="no-variables"><p>{t('No components on the screens yet')}</p></div>
+        ) : (
+          elements.map(({ comp, page }) => (
+            <div className="variable-item element-item" key={comp.id} title={`${page} / ${comp.name}`}>
+              <div className="var-icon"><ToolIcon name={comp.type} size={16} /></div>
+              <div className="var-info">
+                <span className="var-name">{comp.name}</span>
+                <span className="var-type">{t(PROPERTY_LABEL[mainProperty(comp.type)])}</span>
+              </div>
+              <div className="var-actions">
+                <button className="btn-element" disabled={!currentGraph} onClick={() => addElementNode(comp, 'read')} title={t('Add a node that reads it')}>↓</button>
+                <button className="btn-element" disabled={!currentGraph} onClick={() => addElementNode(comp, 'write')} title={t('Add a node that writes it')}>↑</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </>
+  );
+
   if (!currentGraph) {
     return (
       <div className="variable-panel">
@@ -75,6 +136,7 @@ const VariablePanel: React.FC = () => {
         <div className="no-graph">
           <p>{t('Select or create a logic graph first')}</p>
         </div>
+        {elementsSection}
       </div>
     );
   }
@@ -144,6 +206,8 @@ const VariablePanel: React.FC = () => {
           ))
         )}
       </div>
+
+      {elementsSection}
     </div>
   );
 };
