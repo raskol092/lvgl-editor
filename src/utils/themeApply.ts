@@ -29,6 +29,8 @@ export function buildColorMap(from: ThemeColors, to: ThemeColors): Map<string, s
   for (const [hex, role] of Object.entries(LIGHT_ALIASES)) map.set(hex, to[role]);
   for (const role of Object.keys(from) as Array<keyof ThemeColors>) map.set(norm(from[role]), to[role]);
   map.set('__text', to.text);
+  map.set('__primary', to.primary);
+  map.set('__background', to.background);
   return map;
 }
 
@@ -50,11 +52,27 @@ function mapDeep<T>(value: T, map: Map<string, string>, key = ''): T {
   return value;
 }
 
+function isLightColor(hex: string): boolean {
+  const h = norm(hex).slice(1);
+  const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+  return 0.299 * r + 0.587 * g + 0.114 * b > 150;
+}
+
 export function themeComponent(comp: LvglComponent, map: Map<string, string>): LvglComponent {
   textTarget.value = map.get('__text') ?? null;
+  let styles = mapDeep(comp.styles, map);
+  // white button text is unreadable on a light primary color (dark themes): use the theme background instead
+  const primary = map.get('__primary');
+  const bg = map.get('__background');
+  if (comp.type === 'btn' && primary && bg && isLightColor(primary)) {
+    styles = Object.fromEntries(Object.entries(styles).map(([state, st]) => [
+      state,
+      st && typeof st === 'object' && st.textColor && norm(st.textColor) === '#ffffff' ? { ...st, textColor: bg } : st,
+    ])) as typeof styles;
+  }
   return {
     ...comp,
-    styles: mapDeep(comp.styles, map),
+    styles,
     props: mapDeep(comp.props, map),
     children: comp.children.map(c => themeComponent(c, map)),
   };
