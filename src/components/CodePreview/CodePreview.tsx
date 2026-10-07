@@ -6,8 +6,8 @@ import { useLogicEditorStore } from '../LogicEditor';
 import { useResourceStore } from '../../resources/resourceStore';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
-import { generateCode, getGeneratedFileNames } from '../../codegen/generator';
-import type { CodeGenOptions, GeneratedCode } from '../../codegen/types';
+import { generateCode, getGeneratedFileNames, downloadAsZip } from '../../codegen/lisp';
+import type { LispGenOptions, LispFileName } from '../../codegen/lisp';
 import { toast } from '../Toast';
 import { t } from '../../i18n';
 import './CodePreview.css';
@@ -20,13 +20,11 @@ const CodePreview: React.FC = () => {
   const fontResources = useResourceStore((s) => s.fonts);
   const currentProjectId = useAppStore((s) => s.currentProjectId);
   const getProjectConfig = useProjectStore((s) => s.getProjectConfig);
-  const [selectedFile, setSelectedFile] = useState<keyof GeneratedCode>('ui.c');
+  const [selectedFile, setSelectedFile] = useState<LispFileName>('main.lisp');
   const [isLoading, setIsLoading] = useState(true);
-  const [lvglVersion, setLvglVersion] = useState<CodeGenOptions['lvglVersion']>('9');
+  const [namingStyle, setNamingStyle] = useState<LispGenOptions['namingStyle']>('kebab-case');
   const [projectDefaultFont, setProjectDefaultFont] = useState<string | undefined>();
   const [projectDefaultFontSize, setProjectDefaultFontSize] = useState<number | undefined>();
-  const [projectUseBuiltinSymbols, setProjectUseBuiltinSymbols] = useState<boolean>(true);
-  const [projectSymbolFont, setProjectSymbolFont] = useState<string | undefined>();
 
   useEffect(() => {
     if (!currentProjectId) return;
@@ -34,28 +32,26 @@ const CodePreview: React.FC = () => {
       if (cfg) {
         setProjectDefaultFont(cfg.lvglConfig.defaultFont);
         setProjectDefaultFontSize(cfg.lvglConfig.defaultFontSize);
-        setProjectUseBuiltinSymbols(cfg.lvglConfig.useBuiltinSymbols !== false);
-        setProjectSymbolFont(cfg.lvglConfig.symbolFont);
       }
     });
   }, [currentProjectId, getProjectConfig]);
 
   const fileNames = getGeneratedFileNames();
 
-  const codeGenOptions: Partial<CodeGenOptions> = useMemo(() => ({
-    lvglVersion,
-  }), [lvglVersion]);
+  const codeGenOptions: Partial<LispGenOptions> = useMemo(() => ({
+    namingStyle,
+  }), [namingStyle]);
 
   const generatedCode = useMemo(() => {
     try {
-      return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont);
+      return generateCode(pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize);
     } catch {
       console.error('Code generation error');
       return null;
     }
-  }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont]);
+  }, [pages, codeGenOptions, logicGraphs, currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize]);
 
-  const currentCode = generatedCode?.[selectedFile] || '// Code generation failed';
+  const currentCode = generatedCode?.[selectedFile] || ';; Code generation failed';
 
   const handleCopy = async () => {
     try {
@@ -71,7 +67,7 @@ const CodePreview: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = selectedFile;
+    a.download = selectedFile.split('/').pop() || selectedFile;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -80,23 +76,8 @@ const CodePreview: React.FC = () => {
   };
 
   const handleDownloadAll = async () => {
-    if (!generatedCode) return;
-    
     try {
-      // Create a simple zip-like download by downloading each file
-      for (const [fileName, content] of Object.entries(generatedCode)) {
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        // Small delay between downloads
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
+      await downloadAsZip(pages, codeGenOptions, logicGraphs, 'lvgl_ui.zip', currentTheme, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize);
       toast.success(t('All files downloaded'));
     } catch {
       toast.error(t('Download failed'));
@@ -120,12 +101,12 @@ const CodePreview: React.FC = () => {
         <div className="code-preview-actions">
           <select
             className="code-version-select"
-            value={lvglVersion}
-            onChange={(e) => setLvglVersion(e.target.value as CodeGenOptions['lvglVersion'])}
-            title={t('LVGL version')}
+            value={namingStyle}
+            onChange={(e) => setNamingStyle(e.target.value as LispGenOptions['namingStyle'])}
+            title={t('Naming style')}
           >
-            <option value="8">LVGL v8</option>
-            <option value="9">LVGL v9</option>
+            <option value="kebab-case">kebab-case</option>
+            <option value="snake_case">snake_case</option>
           </select>
           <button className="code-action-btn" onClick={handleCopy} title={t('Copy code')}>
             {t('📋 Copy')}
@@ -143,8 +124,8 @@ const CodePreview: React.FC = () => {
           <Editor
             width="100%"
             height="100%"
-            language="c"
-            theme="vs-light"
+            language="scheme"
+            theme="vs-dark"
             value={currentCode}
             options={{
               readOnly: true,

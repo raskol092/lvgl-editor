@@ -25,14 +25,15 @@ const BUILTIN_ACTIONS: { type: BuiltinActionType; label: string; description: st
   { type: 'setValue', label: t('Set value'), description: t('Set the component\'s numeric value') },
 ];
 
-const CODE_TEMPLATE = `// Event handler code
-// Available variables: e (lv_event_t*), obj (the object that triggered the event)
+const CODE_TEMPLATE = `;; Event handler code (LispBM)
+;; The handler receives the event: e
+;;   (lv-event-get-target-obj e), (lv-event-get-code e), (lv-event-get-user-data e)
 
-// Example: print a log message
-// LV_LOG_USER("Button clicked!");
+;; Example: print a message
+;; (print "Button clicked!")
 
-// Example: change label text
-// lv_label_set_text(my_label, "Clicked!");
+;; Example: change label text
+;; (lv-label-set-text ui-my-label "Clicked!")
 
 `;
 
@@ -131,48 +132,47 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
       return customCode;
     }
 
-    let code = `static void event_handler(lv_event_t *e) {\n`;
-    code += `    lv_obj_t *obj = lv_event_get_target(e);\n`;
-    code += `    lv_event_code_t code = lv_event_get_code(e);\n\n`;
-    code += `    if (code == ${eventType}) {\n`;
+    const target = targetComponent ? `ui-${targetComponent.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : 'target';
+    const page = targetPage ? targetPage.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'page-name';
+    let code = `(defun ui-event-handler (e)\n`;
+    code += `  (progn\n`;
 
     switch (actionType) {
       case 'navigate':
-        code += `        // Navigate to page: ${targetPage || 'page_name'}\n`;
-        code += `        lv_scr_load(${targetPage || 'page_name'});\n`;
+        code += `    ;; Navigate to page: ${targetPage || 'page_name'}\n`;
+        code += `    (ui-load-screen-${page})\n`;
         break;
       case 'setProperty':
-        code += `        // Set property: ${property || 'property'} = ${value || 'value'}\n`;
-        code += `        lv_obj_set_style_${property || 'bg_color'}(${targetComponent || 'target'}, ${value || '0'}, 0);\n`;
+        code += `    ;; Set property: ${property || 'property'} = ${value || 'value'}\n`;
+        code += `    (lv-obj-set-style-${(property || 'bg_color').replace(/_/g, '-')} ${target} ${value || '0'} LV_PART_MAIN)\n`;
         break;
       case 'show':
-        code += `        // Show component\n`;
-        code += `        lv_obj_clear_flag(${targetComponent || 'target'}, LV_OBJ_FLAG_HIDDEN);\n`;
+        code += `    ;; Show component\n`;
+        code += `    (lv-obj-remove-flag ${target} LV_OBJ_FLAG_HIDDEN)\n`;
         break;
       case 'hide':
-        code += `        // Hide component\n`;
-        code += `        lv_obj_add_flag(${targetComponent || 'target'}, LV_OBJ_FLAG_HIDDEN);\n`;
+        code += `    ;; Hide component\n`;
+        code += `    (lv-obj-add-flag ${target} LV_OBJ_FLAG_HIDDEN)\n`;
         break;
       case 'enable':
-        code += `        // Enable component\n`;
-        code += `        lv_obj_clear_state(${targetComponent || 'target'}, LV_STATE_DISABLED);\n`;
+        code += `    ;; Enable component\n`;
+        code += `    (lv-obj-remove-state ${target} LV_STATE_DISABLED)\n`;
         break;
       case 'disable':
-        code += `        // Disable component\n`;
-        code += `        lv_obj_add_state(${targetComponent || 'target'}, LV_STATE_DISABLED);\n`;
+        code += `    ;; Disable component\n`;
+        code += `    (lv-obj-add-state ${target} LV_STATE_DISABLED)\n`;
         break;
       case 'setText':
-        code += `        // Set text\n`;
-        code += `        lv_label_set_text(${targetComponent || 'target'}, "${value || ''}");\n`;
+        code += `    ;; Set text\n`;
+        code += `    (lv-label-set-text ${target} "${value || ''}")\n`;
         break;
       case 'setValue':
-        code += `        // Set value\n`;
-        code += `        lv_slider_set_value(${targetComponent || 'target'}, ${value || '0'}, LV_ANIM_ON);\n`;
+        code += `    ;; Set value\n`;
+        code += `    (lv-slider-set-value ${target} ${value || '0'} LV_ANIM_ON)\n`;
         break;
     }
 
-    code += `    }\n`;
-    code += `}\n`;
+    code += `    nil))\n`;
 
     return code;
   };
@@ -402,7 +402,7 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
             </div>
           ) : (
             <div className="form-section">
-              <label className="section-label">{t('C code')}</label>
+              <label className="section-label">{t('Lisp code')}</label>
               <CodeEditor 
                 value={customCode}
                 onChange={setCustomCode}

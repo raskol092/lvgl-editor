@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateCode, generateSingleFile, getGeneratedFileNames } from '../generator';
+import { generateCCode as generateCode, generateSingleFile, getGeneratedFileNames } from '../generator';
 import { defaultOptions, createPage, createComponent, createEvent, createBuiltinAction, createFontResource } from './helpers';
 import type { GeneratedCode } from '../types';
 

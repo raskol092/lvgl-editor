@@ -20,7 +20,7 @@ import {
 /**
  * Generate all LVGL C code files from pages and logic graphs
  */
-export function generateCode(
+export function generateCCode(
   pages: Page[],
   options: Partial<CodeGenOptions> = {},
   logicGraphs: LogicGraph[] = [],
@@ -101,7 +101,7 @@ export async function generateZipBlob(
   // Dynamic import to avoid bundling JSZip if not needed
   const JSZip = (await import('jszip')).default;
   
-  const code = generateCode(pages, options, logicGraphs, theme, imageResources);
+  const code = generateCCode(pages, options, logicGraphs, theme, imageResources);
   const zip = new JSZip();
   
   // Add all files to zip

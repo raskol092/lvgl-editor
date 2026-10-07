@@ -14,7 +14,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   value,
   onChange,
   language = 'c',
-  placeholder = '// Enter code...',
+  placeholder = ';; Enter code...',
   readOnly = false,
 }) => {
   return (

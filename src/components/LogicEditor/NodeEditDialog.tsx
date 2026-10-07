@@ -360,10 +360,10 @@ const NodeEditDialog: React.FC<NodeEditDialogProps> = ({ nodeId, onClose }) => {
       case 'c_code_block':
         return (
           <div className="param-group">
-            <label>{t('C code')}</label>
+            <label>{t('Lisp code')}</label>
             <textarea
               className="code-textarea"
-              placeholder={t('// Custom C code')}
+              placeholder={t(';; Custom Lisp code')}
               value={params.code || ''}
               onChange={e => handleParamChange('code', e.target.value)}
               rows={8}

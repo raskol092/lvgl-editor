@@ -223,7 +223,7 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     type: 'action',
     subType: 'call_function',
     label: t('Call function'),
-    description: t('Call a custom C function'),
+    description: t('Call a custom Lisp function'),
     icon: '📞',
     color: NODE_COLORS.action,
     defaultParams: {
@@ -348,12 +348,12 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
   {
     type: 'custom',
     subType: 'c_code_block',
-    label: t('C code block'),
-    description: t('Embed custom C code'),
+    label: t('Lisp code block'),
+    description: t('Embed custom Lisp code'),
     icon: '💻',
     color: NODE_COLORS.custom,
     defaultParams: {
-      code: '// Custom code\n',
+      code: ';; Custom code\n',
     },
     inputs: [
       { name: 'Exec', type: 'execution' },

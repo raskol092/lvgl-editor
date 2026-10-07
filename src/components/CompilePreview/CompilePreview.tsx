@@ -4,7 +4,7 @@ import { useLogicEditorStore } from '../LogicEditor';
 import { useResourceStore } from '../../resources';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
-import { generateCode } from '../../codegen';
+import { generateCCode as generateCSources } from '../../codegen';
 import { compileCode, type CompileStatus, type WasmRuntime, type FontCompileRequest } from './compilerService';
 import { getCharsetRanges } from '../../resources/converters/fontConverter';
 import type { LvglComponent } from '../../types';
@@ -134,7 +134,7 @@ const CompilePreview: React.FC = () => {
 
   // Generate C code from current editor state
   const generateCCode = useCallback(() => {
-    return generateCode(pages, {}, logicGraphs, undefined, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont);
+    return generateCSources(pages, {}, logicGraphs, undefined, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont);
   }, [pages, logicGraphs, imageResources, fontResources, projectDefaultFont, projectDefaultFontSize, projectUseBuiltinSymbols, projectSymbolFont]);
 
   // Render framebuffer to canvas
