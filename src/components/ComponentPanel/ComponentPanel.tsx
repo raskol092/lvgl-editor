@@ -10,10 +10,9 @@ import './ComponentPanel.css';
 
 interface DraggableComponentProps {
   definition: ComponentDefinition;
-  onHover: (name: string | null) => void;
 }
 
-const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition, onHover }) => {
+const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette-${definition.type}`,
     data: {
@@ -26,8 +25,6 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition, onH
     <div
       ref={setNodeRef}
       className={`component-item ${isDragging ? 'dragging' : ''}`}
-      onMouseEnter={() => onHover(definition.name)}
-      onMouseLeave={() => onHover(null)}
       title={t('Click to add, or drag onto the canvas')}
       onClick={() => quickAddComponent(definition.type)}
       {...listeners}
@@ -44,7 +41,6 @@ interface CategorySectionProps {
   components: ComponentDefinition[];
   isCollapsed: boolean;
   onToggle: () => void;
-  onHover: (name: string | null) => void;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -52,7 +48,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   components,
   isCollapsed,
   onToggle,
-  onHover,
 }) => {
   return (
     <div className="category-section">
@@ -64,7 +59,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       {!isCollapsed && (
         <div className="category-components">
           {components.map(def => (
-            <DraggableComponent key={def.type} definition={def} onHover={onHover} />
+            <DraggableComponent key={def.type} definition={def} />
           ))}
         </div>
       )}
@@ -74,7 +69,6 @@ const CategorySection: React.FC<CategorySectionProps> = ({
 
 const ComponentPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [hovered, setHovered] = useState<string | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   const toggleCategory = (categoryId: string) => {
@@ -137,14 +131,10 @@ const ComponentPanel: React.FC = () => {
             components={components}
             isCollapsed={collapsedCategories.has(category.id)}
             onToggle={() => toggleCategory(category.id)}
-            onHover={setHovered}
           />
         ))}
       </div>
 
-      <div className="panel-hint">
-        {hovered ? <strong>{t(hovered)}</strong> : <>{t('Click or drag to add')}</>}
-      </div>
     </div>
   );
 };
