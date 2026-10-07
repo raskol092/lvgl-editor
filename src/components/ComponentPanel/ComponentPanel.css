@@ -175,3 +175,15 @@
   font-size: 10px;
   color: #94a3b8;
 }
+
+.component-panel .component-icon,
+.component-panel .category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #60a5fa;
+}
+
+.component-panel .component-item:hover .component-icon {
+  color: #93c5fd;
+}

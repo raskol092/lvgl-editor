@@ -6,6 +6,7 @@ import { useProjectStore } from '../../store/projectStore';
 import type { LvglComponent, StyleProps, LvglAlign, LvglFlags } from '../../types';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './PropertyEditor.css';
 
 // Inline CollapsibleSection component
@@ -301,7 +302,7 @@ const PropertyEditor: React.FC = () => {
           <div className="property-row">
             <label>{t('Type')}</label>
             <div className="property-value readonly">
-              <span className="component-type-icon">{definition?.icon}</span>
+              <span className="component-type-icon"><ToolIcon name={component.type} size={16} fallback={definition?.icon} /></span>
               {definition?.name || component.type}
             </div>
           </div>

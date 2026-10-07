@@ -200,3 +200,9 @@
 .hierarchy-tree::-webkit-scrollbar-thumb:hover {
   background: #bbb;
 }
+
+.type-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #60a5fa;
+}

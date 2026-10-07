@@ -7,6 +7,7 @@ import type { LogicNode, LogicPort } from './types';
 import { NODE_COLORS } from './nodeDefinitions';
 import { useLogicEditorStore } from './logicEditorStore';
 import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './LogicNode.css';
 
 // Port type colors
@@ -42,30 +43,9 @@ const LogicNodeComponent: React.FC<NodeProps> = ({
   }, [logicNode.id, onDoubleClick]);
 
   // Get node definition icon
-  const getNodeIcon = () => {
-    switch (logicNode.subType) {
-      case 'event_trigger': return '⚡';
-      case 'timer_trigger': return '⏱️';
-      case 'if_else': return '🔀';
-      case 'switch': return '🔃';
-      case 'compare': return '⚖️';
-      case 'logic_op': return '🔗';
-      case 'set_property': return '🎨';
-      case 'navigate_page': return '📄';
-      case 'show_hide': return '👁️';
-      case 'set_text': return '📝';
-      case 'set_value': return '🔢';
-      case 'call_function': return '📞';
-      case 'delay': return '⏳';
-      case 'var_read': return '📖';
-      case 'var_write': return '✏️';
-      case 'math_op': return '🧮';
-      case 'string_op': return '🔤';
-      case 'get_property': return '🔍';
-      case 'c_code_block': return '💻';
-      default: return '📦';
-    }
-  };
+  const getNodeIcon = () => (
+    <ToolIcon name={logicNode.subType === 'switch' ? 'switch_node' : logicNode.subType} size={16} />
+  );
 
   return (
     <div

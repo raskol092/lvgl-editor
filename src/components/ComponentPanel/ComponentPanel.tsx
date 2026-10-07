@@ -3,6 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { componentCategories, getComponentsByCategory } from '../../utils/componentDefinitions';
 import type { ComponentDefinition, ComponentCategory } from '../../types';
 import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './ComponentPanel.css';
 
 interface DraggableComponentProps {
@@ -28,7 +29,7 @@ const DraggableComponent: React.FC<DraggableComponentProps> = ({ definition, onH
       {...listeners}
       {...attributes}
     >
-      <span className="component-icon">{definition.icon}</span>
+      <span className="component-icon"><ToolIcon name={definition.type} size={22} fallback={definition.icon} /></span>
       <span className="component-name">{t(definition.name)}</span>
     </div>
   );
@@ -52,7 +53,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   return (
     <div className="category-section">
       <div className="category-header" onClick={onToggle}>
-        <span className="category-icon">{category.icon}</span>
+        <span className="category-icon"><ToolIcon name={`cat:${category.id}`} size={14} fallback={category.icon} /></span>
         <span className="category-name">{t(category.name)}</span>
         <span className={`collapse-icon ${isCollapsed ? 'collapsed' : ''}`}>▼</span>
       </div>

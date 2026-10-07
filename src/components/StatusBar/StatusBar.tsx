@@ -3,6 +3,7 @@ import { useEditorStore } from '../../store/editorStore';
 import { useAppStore } from '../../store/appStore';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './StatusBar.css';
 
 const StatusBar: React.FC = () => {
@@ -35,7 +36,7 @@ const StatusBar: React.FC = () => {
           )}
           {selectedCount === 1 && selectedComponent && (
             <span className="status-text">
-              <span className="component-icon">{definition?.icon}</span>
+              <span className="component-icon"><ToolIcon name={selectedComponent.type} size={12} fallback={definition?.icon} /></span>
               {selectedComponent.name}
               <span className="component-size">
                 ({selectedComponent.x}, {selectedComponent.y}) - {selectedComponent.width} × {selectedComponent.height}

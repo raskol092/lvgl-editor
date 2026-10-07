@@ -179,3 +179,8 @@
     stroke-dashoffset: -10;
   }
 }
+
+.logic-node-icon {
+  display: inline-flex;
+  align-items: center;
+}

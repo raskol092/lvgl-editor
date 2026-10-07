@@ -42,6 +42,7 @@ import type { LvglComponent, Page } from './types';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { getComponentDefinition } from './utils/componentDefinitions';
 import { t } from './i18n';
+import ToolIcon from './components/icons/ToolIcon';
 import './App.css';
 
 type TabType = 'design' | 'logic' | 'code' | 'preview';
@@ -419,7 +420,7 @@ const EditorView: React.FC<EditorViewProps> = ({
 
     return (
       <div className="drag-overlay-item">
-        <span className="drag-overlay-icon">{definition.icon}</span>
+        <span className="drag-overlay-icon"><ToolIcon name={definition.type} size={18} fallback={definition.icon} /></span>
         <span className="drag-overlay-name">{definition.name}</span>
       </div>
     );

@@ -5,6 +5,7 @@ import { useEditorStore } from '../../store/editorStore';
 import type { LvglComponent } from '../../types';
 import { t } from '../../i18n';
 import './HierarchyPanel.css';
+import ToolIcon from '../icons/ToolIcon';
 
 interface TreeNodeProps {
   component: LvglComponent;
@@ -94,30 +95,6 @@ const TreeNode: React.FC<TreeNodeProps> = ({
     }
   };
   
-  // Get icon based on component type
-  const getTypeIcon = (type: string): string => {
-    const icons: Record<string, string> = {
-      btn: '🔘',
-      label: '🏷️',
-      img: '🖼️',
-      slider: '🎚️',
-      checkbox: '☑️',
-      switch: '🔀',
-      bar: '📊',
-      arc: '⭕',
-      textarea: '📝',
-      dropdown: '📋',
-      panel: '📦',
-      container: '📦',
-      tabview: '📑',
-      window: '🪟',
-      chart: '📈',
-      table: '📅',
-      calendar: '📆',
-    };
-    return icons[type] || '⬜';
-  };
-  
   return (
     <div className="tree-node-wrapper">
       <div
@@ -142,7 +119,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         </span>
         
         {/* Type icon */}
-        <span className="type-icon">{getTypeIcon(component.type)}</span>
+        <span className="type-icon"><ToolIcon name={component.type} size={14} /></span>
         
         {/* Name */}
         {isEditing ? (

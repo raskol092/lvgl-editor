@@ -4,6 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { NODE_CATEGORIES, getNodesByCategory, NODE_DEFINITIONS } from './nodeDefinitions';
 import type { LogicNodeDefinition } from './types';
 import { t } from '../../i18n';
+import ToolIcon from '../icons/ToolIcon';
 import './NodePalette.css';
 
 interface NodePaletteProps {
@@ -93,7 +94,7 @@ const NodePalette: React.FC<NodePaletteProps> = ({ onDragStart }) => {
                 className="category-header"
                 onClick={() => toggleCategory(category.id)}
               >
-                <span className="category-icon">{category.icon}</span>
+                <span className="category-icon"><ToolIcon name={`cat:${category.id}`} size={14} fallback={category.icon} /></span>
                 <span className="category-name">{t(category.name)}</span>
                 <span className="category-toggle">
                   {expandedCategories[category.id] ? '▼' : '▶'}
@@ -147,7 +148,7 @@ const NodeItem: React.FC<NodeItemProps> = ({ definition, onDragStart, onHover })
       onMouseEnter={() => onHover(definition)}
       onMouseLeave={() => onHover(null)}
     >
-      <span className="node-icon">{definition.icon}</span>
+      <span className="node-icon"><ToolIcon name={definition.subType === 'switch' ? 'switch_node' : definition.subType} size={22} fallback={definition.icon} /></span>
       <div className="node-info">
         <span className="node-label">{definition.label}</span>
       </div>
