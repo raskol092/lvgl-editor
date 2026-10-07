@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
+import { applyThemeToProject } from '../utils/themeApply';
 import type { Theme, ThemePreset, ThemeColors } from '../types';
 
 const lightTheme: Theme = {
@@ -66,14 +67,16 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   ...loadSaved(),
 
   setTheme: (preset, customId) => {
+    const prev = get().currentTheme;
+    let next: Theme | undefined;
     if (preset === 'custom' && customId) {
-      const custom = get().customThemes.find(t => t.id === customId);
-      if (custom) {
-        set({ currentTheme: custom, preset: 'custom' });
-      }
+      next = get().customThemes.find(t => t.id === customId);
+      if (next) set({ currentTheme: next, preset: 'custom' });
     } else if (presetThemes[preset]) {
-      set({ currentTheme: presetThemes[preset], preset });
+      next = presetThemes[preset];
+      set({ currentTheme: next, preset });
     }
+    if (next && next.id !== prev.id) applyThemeToProject(prev.colors, next.colors);
   },
 
   createCustomTheme: (name, colors) => {
@@ -83,6 +86,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   },
 
   updateCustomTheme: (id, patch) => {
+    const before = get().currentTheme;
     set(state => {
       const customThemes = state.customThemes.map(x =>
         x.id === id ? { ...x, name: patch.name ?? x.name, colors: { ...x.colors, ...patch.colors } } : x);
@@ -92,15 +96,19 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
         currentTheme: state.currentTheme.id === id && updated ? updated : state.currentTheme,
       };
     });
+    const after = get().currentTheme;
+    if (after.id === id && before.id === id) applyThemeToProject(before.colors, after.colors, false);
   },
 
   deleteCustomTheme: (id) => {
+    const before = get().currentTheme;
     set(state => {
       const customThemes = state.customThemes.filter(x => x.id !== id);
       return state.currentTheme.id === id
         ? { customThemes, currentTheme: lightTheme, preset: 'light' as ThemePreset }
         : { customThemes };
     });
+    if (before.id === id) applyThemeToProject(before.colors, lightTheme.colors);
   },
 }));
 

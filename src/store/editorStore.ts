@@ -9,6 +9,8 @@ import type {
   AlignmentGuide,
   Page,
 } from '../types';
+import { useThemeStore, builtinThemes } from './themeStore';
+import { themeNewComponent } from '../utils/themeApply';
 import { getComponentDefinition } from '../utils/componentDefinitions';
 
 // Maximum history entries for undo/redo
@@ -444,6 +446,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       visible: true,
     };
     
+    // new components start in the light look; follow the active theme
+    const activeTheme = useThemeStore.getState().currentTheme;
+    const toAdd = activeTheme.id === 'light'
+      ? newComponent
+      : themeNewComponent(newComponent, builtinThemes[0].colors, activeTheme.colors);
+
     get().saveToHistory();
     
     set(state => ({
@@ -451,7 +459,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         if (page.id === currentPageId) {
           return {
             ...page,
-            components: addComponentToTree(page.components, newComponent, parentId),
+            components: addComponentToTree(page.components, toAdd, parentId),
           };
         }
         return page;
