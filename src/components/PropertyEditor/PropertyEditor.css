@@ -75,7 +75,9 @@
 }
 
 .property-row > label {
-  width: 70px;
+  width: 96px;
+  padding-right: 6px;
+  overflow-wrap: anywhere;
   font-size: 12px;
   color: #94a3b8;
   flex-shrink: 0;
@@ -278,7 +280,7 @@
 }
 
 .clear-override-btn:hover {
-  background: #fbe9e7;
+  background: rgba(239, 68, 68, 0.2);
   border-color: #ef4444;
 }
 
@@ -815,7 +817,7 @@
 }
 
 .chart-series-row.expanded {
-  background: #e8f0fe;
+  background: rgba(37, 99, 235, 0.15);
   border-bottom: 1px solid #334155;
 }
 
@@ -1366,7 +1368,7 @@
 }
 
 .dropdown-option-btn.delete:hover:not(:disabled) {
-  background: #fbe9e7;
+  background: rgba(239, 68, 68, 0.2);
   border-color: #ef4444;
   color: #f87171;
 }
@@ -1430,4 +1432,103 @@
 
 .toggle-switch.on .toggle-switch-knob {
   left: 18px;
+}
+
+/* ---- Position and size: two compact columns ---- */
+.geometry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 8px;
+}
+
+.geometry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.geometry-field > label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.geometry-field input,
+.geometry-field select {
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  font-size: 13px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 6px;
+}
+
+.geometry-field input:focus,
+.geometry-field select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.geometry-size {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+
+.geometry-size input {
+  flex: 1;
+  width: 0;
+}
+
+.geometry-size select {
+  width: 58px;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.geometry-auto {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 8px;
+  font-size: 12px;
+  color: #94a3b8;
+  background: #1e293b;
+  border: 1px dashed #334155;
+  border-radius: 6px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ---- Foldable sections ---- */
+.property-section > .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.property-section > .section-header::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+  transform: rotate(45deg);
+  transition: transform 0.15s;
+}
+
+.property-section.collapsed > .section-header::after {
+  transform: rotate(-45deg);
+}
+
+.property-section.collapsed > *:not(.section-header) {
+  display: none;
 }

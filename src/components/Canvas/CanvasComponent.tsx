@@ -1,3 +1,5 @@
+import { Image as ImageIcon } from 'lucide-react';
+import { getArcStyle, isArcLike } from '../../utils/arcStyle';
 import React, { useCallback } from 'react';
 import type { LvglComponent, ResizeHandle } from '../../types';
 import { useEditorStore } from '../../store/editorStore';
@@ -127,6 +129,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
 
   // Build border styles with borderSide support
   const buildBorderStyles = (): React.CSSProperties => {
+    // arcs and spinners are drawn by their arc, not by a box border
+    if (isArcLike(type)) return { borderStyle: 'none' };
     const bw = defaultStyle.borderWidth;
     const bc = defaultStyle.borderColor;
     const side = defaultStyle.borderSide || 'full';
@@ -619,7 +623,13 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         );
       }
       
-      case 'arc':
+      case 'arc': {
+        const arc = getArcStyle(component);
+        const size = Math.max(1, Math.min(component.width, component.height));
+        const stroke = Math.min(48, (arc.width * 100) / size);
+        const r = 50 - stroke / 2;
+        const circumference = 2 * Math.PI * r;
+        const sweep = Math.max(0, Math.min(100, Number(props.value ?? 60)));
         return (
           <div className="lvgl-arc" style={{
             width: '100%',
@@ -629,30 +639,29 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             justifyContent: 'center',
           }}>
             <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
+              <circle cx="50" cy="50" r={r} fill="none" stroke={arc.track} strokeWidth={stroke} />
               <circle
                 cx="50"
                 cy="50"
-                r="40"
+                r={r}
                 fill="none"
-                stroke="#e0e0e0"
-                strokeWidth="8"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="none"
-                stroke={defaultStyle.borderColor || '#2196F3'}
-                strokeWidth="8"
-                strokeDasharray={`${(props.value || 60) * 2.51} 251`}
+                stroke={arc.color}
+                strokeWidth={stroke}
+                strokeDasharray={`${(sweep / 100) * circumference} ${circumference}`}
                 strokeLinecap="round"
                 transform="rotate(-90 50 50)"
               />
             </svg>
           </div>
         );
-      
-      case 'spinner':
+      }
+
+      case 'spinner': {
+        const arc = getArcStyle(component);
+        const size = Math.max(1, Math.min(component.width, component.height));
+        const stroke = Math.min(48, (arc.width * 100) / size);
+        const r = 50 - stroke / 2;
+        const circumference = 2 * Math.PI * r;
         return (
           <div className="lvgl-spinner" style={{
             width: '100%',
@@ -661,16 +670,22 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <div style={{
-              width: '80%',
-              height: '80%',
-              border: '4px solid #e0e0e0',
-              borderTopColor: defaultStyle.borderColor || '#2196F3',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }} />
+            <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', animation: `spin ${(props.speed || 1000) / 1000}s linear infinite` }}>
+              <circle cx="50" cy="50" r={r} fill="none" stroke={arc.track} strokeWidth={stroke} />
+              <circle
+                cx="50"
+                cy="50"
+                r={r}
+                fill="none"
+                stroke={arc.color}
+                strokeWidth={stroke}
+                strokeDasharray={`${((props.arcLength || 60) / 360) * circumference} ${circumference}`}
+                strokeLinecap="round"
+              />
+            </svg>
           </div>
         );
+      }
       
       case 'chart': {
         const series = props.series || (props.data ? [{ data: props.data, color: props.lineColor || '#2196F3' }] : [{ data: [10, 20, 30, 25, 40], color: '#2196F3' }]);
@@ -860,10 +875,10 @@ const CanvasImageContent: React.FC<{ src?: string }> = React.memo(({ src }) => {
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        fontSize: '24px',
+        color: '#94a3b8',
       }}
     >
-      🖼️
+      <ImageIcon size={28} strokeWidth={1.5} />
     </div>
   );
 });

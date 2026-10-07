@@ -43,6 +43,8 @@ import { useProjectStore } from './store/projectStore';
 import type { LvglComponent, Page } from './types';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useZipExport } from './hooks/useZipExport';
+import { useSplit } from './hooks/useSplit';
+import Splitter from './components/Splitter/Splitter';
 import { getIconImageResource } from './resources/iconToImage';
 import { toast } from './components/Toast';
 import { getComponentDefinition } from './utils/componentDefinitions';
@@ -152,6 +154,13 @@ const EditorView: React.FC<EditorViewProps> = ({
 
   // UI State
   const [showResourcePanel, setShowResourcePanel] = useState(false);
+
+  // Resizable panels (sizes are remembered)
+  const leftW = useSplit('left-width', 260, 180, 520, 'x', 1);
+  const rightW = useSplit('right-width', 320, 240, 640, 'x', -1);
+  const compH = useSplit('components-height', 340, 120, 700, 'y', 1);
+  const eventsH = useSplit('events-height', 150, 60, 500, 'y', -1);
+  const animH = useSplit('animations-height', 150, 60, 500, 'y', -1);
   const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('design');
   const [previewMode, setPreviewMode] = useState<'simple' | 'wasm'>('simple');
@@ -464,19 +473,34 @@ const EditorView: React.FC<EditorViewProps> = ({
             onDragEnd={handleDragEnd}
           >
             <div className="app-body">
-              <div className="left-panel">
-                <ComponentPanel />
-                <HierarchyPanel />
+              <div className="left-panel" style={{ width: leftW.size }}>
+                <div className="panel-slot" style={{ height: compH.size }}>
+                  <ComponentPanel />
+                </div>
+                <Splitter orientation="horizontal" onPointerDown={compH.onPointerDown} onReset={compH.reset} />
+                <div className="panel-slot grow">
+                  <HierarchyPanel />
+                </div>
               </div>
+              <Splitter orientation="vertical" onPointerDown={leftW.onPointerDown} onReset={leftW.reset} />
               <div className="canvas-area">
                 <AlignToolbar />
                 <Canvas />
                 <PageManager />
               </div>
-              <div className="right-panel">
-                <PropertyEditor />
-                <EventPanel />
-                <AnimationPanel />
+              <Splitter orientation="vertical" onPointerDown={rightW.onPointerDown} onReset={rightW.reset} />
+              <div className="right-panel" style={{ width: rightW.size }}>
+                <div className="panel-slot grow">
+                  <PropertyEditor />
+                </div>
+                <Splitter orientation="horizontal" onPointerDown={eventsH.onPointerDown} onReset={eventsH.reset} />
+                <div className="panel-slot" style={{ height: eventsH.size }}>
+                  <EventPanel />
+                </div>
+                <Splitter orientation="horizontal" onPointerDown={animH.onPointerDown} onReset={animH.reset} />
+                <div className="panel-slot" style={{ height: animH.size }}>
+                  <AnimationPanel />
+                </div>
               </div>
               {showResourcePanel && (
                 <div className="resource-panel-container">
