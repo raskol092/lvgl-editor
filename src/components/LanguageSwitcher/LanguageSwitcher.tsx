@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 import React from 'react';
 import { LANGS, getLang, setLang, t } from '../../i18n';
 import type { Lang } from '../../i18n';
@@ -5,7 +6,7 @@ import './LanguageSwitcher.css';
 
 const LanguageSwitcher: React.FC = () => (
   <div className="language-switcher">
-    <span className="language-switcher-icon">🌐</span>
+    <span className="language-switcher-icon"><Emoji c="🌐" /></span>
     <select
       className="language-switcher-select"
       value={getLang()}

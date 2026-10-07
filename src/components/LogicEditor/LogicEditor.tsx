@@ -1,3 +1,6 @@
+import Emoji from '../icons/Emoji';
+import { ti } from '../../i18n/ti';
+import { displayGraphName } from '../../i18n/legacy';
 // Logic Editor - Main component with React Flow
 
 import React, { useCallback, useMemo, useState, useRef } from 'react';
@@ -293,8 +296,8 @@ const LogicEditorInner: React.FC = () => {
                   className="graph-dropdown-btn"
                   onClick={() => setShowGraphList(!showGraphList)}
                 >
-                  📊 {currentGraph?.name || t('Select logic graph')}
-                  <span className="dropdown-arrow">▼</span>
+                  <Emoji c="📊" /> {currentGraph?.name || t('Select logic graph')}
+                  <span className="dropdown-arrow"><Emoji c="▼" /></span>
                 </button>
                 {showGraphList && (
                   <div className="graph-dropdown">
@@ -307,7 +310,7 @@ const LogicEditorInner: React.FC = () => {
                           setShowGraphList(false);
                         }}
                       >
-                        {g.name}
+                        {displayGraphName(g.name)}
                       </div>
                     ))}
                     <div className="graph-item create" onClick={handleCreateGraph}>
@@ -319,7 +322,7 @@ const LogicEditorInner: React.FC = () => {
               
               {currentGraph && (
                 <button className="delete-graph-btn" onClick={handleDeleteGraph} title={t('Delete logic graph')}>
-                  🗑️
+                  <Emoji c="🗑" />
                 </button>
               )}
             </Panel>
@@ -329,22 +332,22 @@ const LogicEditorInner: React.FC = () => {
               {debugState.isDebugging ? (
                 <>
                   <button className="debug-btn stop" onClick={stopDebug}>
-                    {t('⏹️ Stop')}
+                    {ti('⏹️ Stop')}
                   </button>
                   <button 
                     className="debug-btn step" 
                     onClick={stepDebug}
                     disabled={!debugState.currentNodeId}
                   >
-                    {t('⏭️ Step')}
+                    {ti('⏭️ Step')}
                   </button>
                   <span className="debug-status">
-                    {debugState.isPaused ? t('⏸️ Paused') : t('▶️ Running')}
+                    {debugState.isPaused ? ti('⏸️ Paused') : ti('▶️ Running')}
                   </span>
                 </>
               ) : (
                 <button className="debug-btn start" onClick={startDebug}>
-                  {t('🐛 Debug')}
+                  {ti('🐛 Debug')}
                 </button>
               )}
             </Panel>

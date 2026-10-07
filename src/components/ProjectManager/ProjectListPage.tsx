@@ -1,3 +1,5 @@
+import Emoji from '../icons/Emoji';
+import { ti } from '../../i18n/ti';
 import React, { useEffect, useState, useRef } from 'react';
 import { useProjectStore } from '../../store/projectStore';
 import type { DisplayConfig, LvglConfig } from '../../store/projectStore';
@@ -116,7 +118,7 @@ const ProjectListPage: React.FC = () => {
     <div className="project-list-page">
       <div className="plp-header">
         <div className="plp-logo">
-          <span className="plp-logo-icon">📐</span>
+          <span className="plp-logo-icon"><Emoji c="📐" /></span>
           <span className="plp-logo-text">LVGL UI Editor</span>
         </div>
         <div style={{ marginLeft: 'auto' }}>
@@ -138,7 +140,7 @@ const ProjectListPage: React.FC = () => {
               {t('+ New project')}
             </button>
             <button className="plp-btn" onClick={() => fileInputRef.current?.click()}>
-              {t('📂 Import project')}
+              {ti('📂 Import project')}
             </button>
           </div>
         </div>

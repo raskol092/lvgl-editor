@@ -1,3 +1,4 @@
+import { ti } from '../../i18n/ti';
 import React, { useState, useMemo, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { useEditorStore } from '../../store/editorStore';
@@ -115,13 +116,13 @@ const CodePreview: React.FC = () => {
             <option value="snake_case">snake_case</option>
           </select>
           <button className="code-action-btn" onClick={handleCopy} title={t('Copy code')}>
-            {t('📋 Copy')}
+            {ti('📋 Copy')}
           </button>
           <button className="code-action-btn" onClick={handleDownload} title={t('Download current file')}>
-            {t('💾 Download')}
+            {ti('💾 Download')}
           </button>
           <button className="code-action-btn primary" onClick={handleDownloadAll} title={t('Download project as ZIP')}>
-            {t('🗜️ Download ZIP')}
+            {ti('🗜️ Download ZIP')}
           </button>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import Emoji from '../components/icons/Emoji';
+import { ti } from '../i18n/ti';
 // Icon Library Component - Built-in icons for LVGL
 
 import React, { useState, useMemo } from 'react';
@@ -131,7 +133,7 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
       <div className={`icon-grid ${viewMode}`}>
         {filteredIcons.length === 0 ? (
           <div className="empty-state">
-            <span className="empty-icon">⭐</span>
+            <span className="empty-icon"><Emoji c="⭐" /></span>
             <p>{t('No icons found')}</p>
           </div>
         ) : (
@@ -168,8 +170,8 @@ const IconLibrary: React.FC<IconLibraryProps> = ({ viewMode }) => {
             <span className="icon-category">{selectedIconData.category}</span>
           </div>
           <div className="icon-actions">
-            <button onClick={handleCopySvg}>{t('📋 Copy SVG')}</button>
-            <button onClick={handleCopyPath}>{t('📝 Copy path')}</button>
+            <button onClick={handleCopySvg}>{ti('📋 Copy SVG')}</button>
+            <button onClick={handleCopyPath}>{ti('📝 Copy path')}</button>
           </div>
         </div>
       )}

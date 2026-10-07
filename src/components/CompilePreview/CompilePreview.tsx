@@ -1,3 +1,5 @@
+import Emoji from '../icons/Emoji';
+import { ti } from '../../i18n/ti';
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useLogicEditorStore } from '../LogicEditor';
@@ -434,17 +436,17 @@ const CompilePreview: React.FC = () => {
           onClick={handleCompile}
           disabled={isWorking}
         >
-          {isWorking ? t('⏳ Processing...') : t('🔨 Compile & run')}
+          {isWorking ? ti('⏳ Processing...') : ti('🔨 Compile & run')}
         </button>
 
         {running && (
           <button className="compile-stop-btn" onClick={handleStop}>
-            {t('⏹ Stop')}
+            {ti('⏹ Stop')}
           </button>
         )}
 
         <span className="compile-status">
-          {statusIcon} {statusMessage || (status === 'idle' ? t('Ready') : '')}
+          <Emoji c={statusIcon} /> {statusMessage || (status === 'idle' ? t('Ready') : '')}
         </span>
 
         <div className="compile-toolbar-right">
@@ -452,7 +454,7 @@ const CompilePreview: React.FC = () => {
             className={`compile-output-toggle ${showOutput ? 'active' : ''}`}
             onClick={() => setShowOutput(!showOutput)}
           >
-            📋 {showOutput ? t('Hide output') : t('Compile output')}
+            <Emoji c="📋" /> {showOutput ? t('Hide output') : t('Compile output')}
           </button>
         </div>
       </div>

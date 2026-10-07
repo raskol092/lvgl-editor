@@ -1,3 +1,5 @@
+import Emoji from '../components/icons/Emoji';
+import { ti } from '../i18n/ti';
 // Font Manager Component
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
@@ -188,7 +190,7 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
           onClick={handleUploadClick}
           disabled={isUploading}
         >
-          {isUploading ? t('Uploading...') : t('📤 Upload font')}
+          {isUploading ? t('Uploading...') : ti('📤 Upload font')}
         </button>
         <input
           ref={fileInputRef}
@@ -204,7 +206,7 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
       <div className={`font-list ${viewMode}`}>
         {fonts.length === 0 ? (
           <div className="empty-state">
-            <span className="empty-icon">🔤</span>
+            <span className="empty-icon"><Emoji c="🔤" /></span>
             <p>{t('No font resources')}</p>
             <p className="empty-hint">{t('Click the button above to upload a TTF/OTF font')}</p>
           </div>
@@ -235,7 +237,7 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
                 onClick={(e) => handleDelete(font.id, e)}
                 title={t('Delete')}
               >
-                🗑️
+                <Emoji c="🗑" />
               </button>
             </div>
           ))
@@ -366,10 +368,10 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
           
           <div className="detail-actions">
             <button onClick={() => handleGenerateCommand(selectedFont)}>
-              {t('🔧 Generate conversion command')}
+              {ti('🔧 Generate conversion command')}
             </button>
             <button onClick={() => handleGenerateHeader(selectedFont)}>
-              {t('📄 Generate header template')}
+              {ti('📄 Generate header template')}
             </button>
           </div>
         </div>
@@ -391,7 +393,7 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
               <pre className="command-preview">{generatedCommand}</pre>
             </div>
             <div className="modal-footer">
-              <button onClick={() => handleCopyText(generatedCommand)}>{t('📋 Copy command')}</button>
+              <button onClick={() => handleCopyText(generatedCommand)}>{ti('📋 Copy command')}</button>
             </div>
           </div>
         </div>
@@ -409,13 +411,13 @@ const FontManager: React.FC<FontManagerProps> = ({ viewMode }) => {
               <p className="command-hint">{t('Header file (.h):')}</p>
               <pre className="command-preview">{generatedHeader}</pre>
               <div className="template-copy-row">
-                <button onClick={() => handleCopyText(generatedHeader)}>{t('📋 Copy header')}</button>
+                <button onClick={() => handleCopyText(generatedHeader)}>{ti('📋 Copy header')}</button>
               </div>
 
               <p className="command-hint" style={{ marginTop: 16 }}>{t('Source file template (.c):')}</p>
               <pre className="command-preview">{generatedSource}</pre>
               <div className="template-copy-row">
-                <button onClick={() => handleCopyText(generatedSource)}>{t('📋 Copy source')}</button>
+                <button onClick={() => handleCopyText(generatedSource)}>{ti('📋 Copy source')}</button>
               </div>
             </div>
             <div className="modal-footer">

@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 import React, { useEffect, useRef } from 'react';
 import './ContextMenu.css';
 
@@ -88,7 +89,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }) => {
             className={`context-menu-item ${item.disabled ? 'disabled' : ''}`}
             onClick={() => handleItemClick(item)}
           >
-            {item.icon && <span className="context-menu-icon">{item.icon}</span>}
+            {item.icon && <span className="context-menu-icon"><Emoji c={item.icon} /></span>}
             <span className="context-menu-label">{item.label}</span>
             {item.shortcut && (
               <span className="context-menu-shortcut">{item.shortcut}</span>

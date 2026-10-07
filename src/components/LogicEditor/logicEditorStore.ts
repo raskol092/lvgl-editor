@@ -12,6 +12,7 @@ import type {
   DebugState,
 } from './types';
 import { getNodeDefinition } from './nodeDefinitions';
+import { hasCjk, legacyCustomCode } from '../../i18n/legacy';
 
 interface LogicEditorStore {
   // State
@@ -92,6 +93,33 @@ const initialDebugState: DebugState = {
   breakpoints: [],
   isPaused: false,
 };
+
+/**
+ * Graphs saved by the original (Chinese) version store Chinese port names and labels in their nodes.
+ * Port ids (and therefore connections) are stable, so the names are replaced by the node definition's.
+ */
+function migrateLegacyGraph(graph: LogicGraph): LogicGraph {
+  const needs = graph.nodes.some(
+    n => hasCjk(n.label) || n.inputs.some(p => hasCjk(p.name)) || n.outputs.some(p => hasCjk(p.name))
+  );
+  if (!needs) return graph;
+  return {
+    ...graph,
+    nodes: graph.nodes.map(n => {
+      const def = getNodeDefinition(n.subType);
+      if (!def) return n;
+      const fix = (ports: typeof n.inputs, defs: typeof def.inputs) =>
+        ports.map((p, i) => (hasCjk(p.name) && defs[i] ? { ...p, name: defs[i].name } : p));
+      return {
+        ...n,
+        label: hasCjk(n.label) ? def.label : n.label,
+        inputs: fix(n.inputs, def.inputs),
+        outputs: fix(n.outputs, def.outputs),
+        params: n.params && 'code' in n.params ? { ...n.params, code: legacyCustomCode(n.params.code) } : n.params,
+      };
+    }),
+  };
+}
 
 export const useLogicEditorStore = create<LogicEditorStore>((set, get) => ({
   // Initial State
@@ -608,7 +636,7 @@ export const useLogicEditorStore = create<LogicEditorStore>((set, get) => ({
 
   setGraphs: (graphs) => {
     set({
-      graphs,
+      graphs: graphs.map(migrateLegacyGraph),
       currentGraphId: graphs.length > 0 ? graphs[0].id : null,
       selectedNodeIds: [],
     });

@@ -1,3 +1,5 @@
+import Emoji from '../icons/Emoji';
+import { displayName } from '../../i18n/legacy';
 import React from 'react';
 import type { ProjectListItem } from '../../store/projectStore';
 import { formatFileSize } from '../../resources/projectManager';
@@ -16,9 +18,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ item, onOpen, onDelete }) => 
 
   return (
     <div className="project-card" onClick={() => onOpen(config.id)} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter') onOpen(config.id); }}>
-      <div className="project-card-icon">📐</div>
+      <div className="project-card-icon"><Emoji c="📐" /></div>
       <div className="project-card-info">
-        <div className="project-card-name">{config.name}</div>
+        <div className="project-card-name">{displayName(config.name)}</div>
         <div className="project-card-meta">
           {config.display.width} × {config.display.height} · {config.display.colorDepth}bit
         </div>
@@ -31,7 +33,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ item, onOpen, onDelete }) => 
         title={t('Delete project')}
         onClick={e => { e.stopPropagation(); onDelete(config.id); }}
       >
-        🗑️
+        <Emoji c="🗑" />
       </button>
     </div>
   );

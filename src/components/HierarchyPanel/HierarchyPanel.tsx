@@ -1,3 +1,5 @@
+import { ChevronDown, ChevronRight, Eye, EyeOff, Lock, Unlock } from 'lucide-react';
+import { ti } from '../../i18n/ti';
 // Hierarchy Panel - Tree view of component structure
 
 import React, { useState, useCallback, useMemo } from 'react';
@@ -115,7 +117,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             if (hasChildren) onToggleExpand(component.id);
           }}
         >
-          {hasChildren ? (isExpanded ? '▼' : '▶') : ''}
+          {hasChildren ? (isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />) : ''}
         </span>
         
         {/* Type icon */}
@@ -147,7 +149,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             }}
             title={component.visible ? t('Visible') : t('Hide')}
           >
-            {component.visible ? '👁️' : '👁️‍🗨️'}
+            {component.visible ? <Eye size={14} /> : <EyeOff size={14} />}
           </span>
           <span
             className={`status-icon lock ${component.locked ? 'on' : ''}`}
@@ -157,7 +159,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             }}
             title={component.locked ? t('Locked') : t('Unlocked')}
           >
-            {component.locked ? '🔒' : '🔓'}
+            {component.locked ? <Lock size={14} /> : <Unlock size={14} />}
           </span>
         </div>
       </div>
@@ -307,7 +309,7 @@ const HierarchyPanel: React.FC = () => {
   return (
     <div className="hierarchy-panel">
       <div className="hierarchy-header">
-        <h3>{t('📋 Hierarchy')}</h3>
+        <h3>{ti('📋 Hierarchy')}</h3>
         <div className="hierarchy-actions">
           <button
             className="hierarchy-btn"

@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 import React, { useState, useCallback } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { t } from '../../i18n';
@@ -95,7 +96,7 @@ const PageManager: React.FC = () => {
               />
             ) : (
               <>
-                <span className="page-icon">📄</span>
+                <span className="page-icon"><Emoji c="📄" /></span>
                 <span className="page-name">{page.name}</span>
               </>
             )}

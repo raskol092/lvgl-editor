@@ -1,3 +1,5 @@
+import Emoji from '../components/icons/Emoji';
+import { ti } from '../i18n/ti';
 // Resource Panel - Main resource management component
 
 import React from 'react';
@@ -30,21 +32,21 @@ const ResourcePanel: React.FC = () => {
     <div className="resource-panel">
       {/* Header */}
       <div className="resource-header">
-        <h3>{t('📦 Resource manager')}</h3>
+        <h3>{ti('📦 Resource manager')}</h3>
         <div className="view-toggle">
           <button
             className={viewMode === 'grid' ? 'active' : ''}
             onClick={() => setViewMode('grid')}
             title={t('Grid view')}
           >
-            ▦
+            <Emoji c="▦" />
           </button>
           <button
             className={viewMode === 'list' ? 'active' : ''}
             onClick={() => setViewMode('list')}
             title={t('List view')}
           >
-            ☰
+            <Emoji c="☰" />
           </button>
         </div>
       </div>
@@ -57,7 +59,7 @@ const ResourcePanel: React.FC = () => {
             className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
-            <span className="tab-icon">{tab.icon}</span>
+            <span className="tab-icon"><Emoji c={tab.icon} /></span>
             <span className="tab-label">{tab.label}</span>
             {tab.count > 0 && (
               <span className="tab-count">{tab.count}</span>

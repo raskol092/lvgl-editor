@@ -10,7 +10,9 @@
 <body>
 <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
 <script>
+  var query = new URLSearchParams(window.location.search);
   var Module = {
+    arguments: [query.get('w') || '480', query.get('h') || '320'],
     canvas: document.getElementById('canvas'),
     onRuntimeInitialized: function() {
       if (window.parent !== window) {

@@ -1,3 +1,6 @@
+import Emoji from './components/icons/Emoji';
+import { ti } from './i18n/ti';
+import { displayName } from './i18n/legacy';
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
@@ -514,20 +517,20 @@ const EditorView: React.FC<EditorViewProps> = ({
                 className={`preview-sub-tab ${resolvedPreviewMode === 'simple' ? 'active' : ''}`}
                 onClick={() => setPreviewMode('simple')}
               >
-                {t('📱 Simple preview')}
+                {ti('📱 Simple preview')}
               </button>
               <button
                 className={`preview-sub-tab ${resolvedPreviewMode === 'wasm' ? 'active' : ''}`}
                 onClick={() => setPreviewMode('wasm')}
               >
-                {t('🖥️ LVGL preview')}
+                {ti('🖥️ LVGL preview')}
               </button>
               {isCompilePreviewEnabled && (
                 <button
                   className={`preview-sub-tab ${resolvedPreviewMode === 'compile' ? 'active' : ''}`}
                   onClick={() => setPreviewMode('compile')}
                 >
-                  {t('🔨 Compile & run')}
+                  {ti('🔨 Compile & run')}
                 </button>
               )}
             </div>
@@ -551,10 +554,10 @@ const EditorView: React.FC<EditorViewProps> = ({
       <div className="app-header">
         <div className="app-logo">
           <button className="back-to-list-btn" onClick={handleBackToList} title={t('Back to project list')}>
-            ◀
+            <Emoji c="◀" />
           </button>
-          <span className="logo-icon">📐</span>
-          <span className="logo-text project-name-display">{projectName || 'LVGL UI Editor'}</span>
+          <span className="logo-icon"><Emoji c="📐" /></span>
+          <span className="logo-text project-name-display">{projectName ? displayName(projectName) : 'LVGL UI Editor'}</span>
         </div>
 
         {/* Main tabs */}
@@ -563,25 +566,25 @@ const EditorView: React.FC<EditorViewProps> = ({
             className={`tab-btn ${activeTab === 'design' ? 'active' : ''}`}
             onClick={() => setActiveTab('design')}
           >
-            {t('🎨 Design')}
+            {ti('🎨 Design')}
           </button>
           <button
             className={`tab-btn ${activeTab === 'logic' ? 'active' : ''}`}
             onClick={() => setActiveTab('logic')}
           >
-            {t('🔗 Logic')}
+            {ti('🔗 Logic')}
           </button>
           <button
             className={`tab-btn ${activeTab === 'code' ? 'active' : ''}`}
             onClick={() => setActiveTab('code')}
           >
-            {t('💻 Code')}
+            {ti('💻 Code')}
           </button>
           <button
             className={`tab-btn ${activeTab === 'preview' ? 'active' : ''}`}
             onClick={() => setActiveTab('preview')}
           >
-            {t('📱 Preview')}
+            {ti('📱 Preview')}
           </button>
         </div>
 
@@ -661,7 +664,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({ icon, label, onClick, dis
     disabled={disabled}
     title={shortcut ? `${label} (${shortcut})` : label}
   >
-    <span className="toolbar-icon">{icon}</span>
+    <span className="toolbar-icon"><Emoji c={icon} /></span>
     <span className="toolbar-label">{label}</span>
   </button>
 );

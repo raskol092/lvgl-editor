@@ -1,3 +1,5 @@
+import Emoji from '../components/icons/Emoji';
+import { ti } from '../i18n/ti';
 // Image Manager Component
 
 import React, { useState, useRef } from 'react';
@@ -113,7 +115,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
           onClick={handleUploadClick}
           disabled={isUploading}
         >
-          {isUploading ? t('Uploading...') : t('📤 Upload image')}
+          {isUploading ? t('Uploading...') : ti('📤 Upload image')}
         </button>
         <input
           ref={fileInputRef}
@@ -129,7 +131,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
       <div className={`image-list ${viewMode}`}>
         {images.length === 0 ? (
           <div className="empty-state">
-            <span className="empty-icon">🖼️</span>
+            <span className="empty-icon"><Emoji c="🖼" /></span>
             <p>{t('No image resources')}</p>
             <p className="empty-hint">{t('Click the button above to upload an image')}</p>
           </div>
@@ -155,7 +157,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
                 onClick={(e) => handleDelete(image.id, e)}
                 title={t('Delete')}
               >
-                🗑️
+                <Emoji c="🗑" />
               </button>
             </DraggableResource>
           ))
@@ -204,7 +206,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
           
           <div className="detail-actions">
             <button onClick={() => handleGenerateCode(selectedImage)}>
-              {t('📝 Generate C code')}
+              {ti('📝 Generate C code')}
             </button>
           </div>
         </div>
@@ -236,8 +238,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
               <pre className="code-preview">{generatedCode}</pre>
             </div>
             <div className="modal-footer">
-              <button onClick={handleCopyCode}>{t('📋 Copy code')}</button>
-              <button onClick={handleDownloadCode}>{t('💾 Download file')}</button>
+              <button onClick={handleCopyCode}>{ti('📋 Copy code')}</button>
+              <button onClick={handleDownloadCode}>{ti('💾 Download file')}</button>
             </div>
           </div>
         </div>

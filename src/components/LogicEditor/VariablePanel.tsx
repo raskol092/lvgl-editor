@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 // Variable Panel - Manage global variables
 
 import React, { useState, useCallback } from 'react';
@@ -107,7 +108,7 @@ const VariablePanel: React.FC = () => {
           >
             {VARIABLE_TYPES.map(t => (
               <option key={t.type} value={t.type}>
-                {t.icon} {t.label}
+                <Emoji c={t.icon} /> {t.label}
               </option>
             ))}
           </select>
@@ -206,7 +207,7 @@ const VariableItem: React.FC<VariableItemProps> = ({
 
   return (
     <div className="variable-item">
-      <div className="var-icon">{typeInfo?.icon || '📦'}</div>
+      <div className="var-icon"><Emoji c={typeInfo?.icon || '📦'} /></div>
       <div className="var-info">
         <span className="var-name">{variable.name}</span>
         <span className="var-type">{typeInfo?.label || variable.type}</span>
@@ -222,7 +223,7 @@ const VariableItem: React.FC<VariableItemProps> = ({
       </div>
       <div className="var-actions">
         <button className="btn-delete" onClick={onDelete} title={t('Delete')}>
-          🗑️
+          <Emoji c="🗑" />
         </button>
       </div>
     </div>

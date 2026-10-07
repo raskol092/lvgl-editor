@@ -1,3 +1,4 @@
+import Emoji from '../icons/Emoji';
 // Custom Logic Node Component for React Flow
 
 import React, { memo, useCallback } from 'react';
@@ -7,6 +8,7 @@ import type { LogicNode, LogicPort } from './types';
 import { NODE_COLORS } from './nodeDefinitions';
 import { useLogicEditorStore } from './logicEditorStore';
 import { t } from '../../i18n';
+import { getNodeDefinition } from './nodeDefinitions';
 import ToolIcon from '../icons/ToolIcon';
 import './LogicNode.css';
 
@@ -58,13 +60,13 @@ const LogicNodeComponent: React.FC<NodeProps> = ({
     >
       {/* Breakpoint indicator */}
       {hasBreakpoint && (
-        <div className="breakpoint-indicator">🔴</div>
+        <div className="breakpoint-indicator"><Emoji c="🔴" /></div>
       )}
 
       {/* Node Header */}
       <div className="logic-node-header" style={{ backgroundColor: nodeColor }}>
         <span className="logic-node-icon">{getNodeIcon()}</span>
-        <span className="logic-node-title">{logicNode.label}</span>
+        <span className="logic-node-title">{getNodeDefinition(logicNode.subType)?.label ?? logicNode.label}</span>
       </div>
 
       {/* Node Body */}
