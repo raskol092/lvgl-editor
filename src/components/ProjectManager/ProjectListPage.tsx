@@ -15,6 +15,7 @@ import NewProjectDialog from './NewProjectDialog';
 import type { Page } from '../../types';
 import { t } from '../../i18n';
 import { LanguageSwitcher } from '../LanguageSwitcher';
+import { UiThemeSelect } from '../ThemeSelector';
 import './ProjectListPage.css';
 
 const ProjectListPage: React.FC = () => {
@@ -121,7 +122,8 @@ const ProjectListPage: React.FC = () => {
           <span className="plp-logo-icon"><Emoji c="📐" /></span>
           <span className="plp-logo-text">LVGL UI Editor</span>
         </div>
-        <div style={{ marginLeft: 'auto' }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <UiThemeSelect />
           <LanguageSwitcher />
         </div>
       </div>

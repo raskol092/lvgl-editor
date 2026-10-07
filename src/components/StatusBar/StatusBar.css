@@ -1,13 +1,13 @@
 .status-bar {
   height: 32px;
-  background: #0f172a;
-  border-top: 1px solid #334155;
+  background: var(--c-900);
+  border-top: 1px solid var(--c-700);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   flex-shrink: 0;
 }
 
@@ -34,14 +34,14 @@
 }
 
 .status-text .component-size {
-  color: #94a3b8;
+  color: var(--c-400);
   margin-left: 4px;
 }
 
 .status-divider {
   width: 1px;
   height: 16px;
-  background: #334155;
+  background: var(--c-700);
   margin: 0 4px;
 }
 
@@ -55,17 +55,17 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
   transition: all 0.15s;
 }
 
 .status-button:hover {
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .status-button.active {
   background: rgba(37,99,235,0.22);
-  color: #60a5fa;
+  color: var(--c-a1);
 }
 
 .status-button .icon {
@@ -82,11 +82,11 @@
   width: 28px;
   height: 24px;
   border: none;
-  background: #1e293b;
+  background: var(--c-800);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--c-400);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,7 +94,7 @@
 }
 
 .zoom-controls button:hover {
-  background: #334155;
+  background: var(--c-700);
 }
 
 .zoom-controls .zoom-level {

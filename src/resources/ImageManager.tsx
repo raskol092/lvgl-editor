@@ -9,6 +9,7 @@ import { toast } from '../components/Toast';
 import { modal } from '../components/Modal';
 import { t } from '../i18n';
 import DraggableResource from './DraggableResource';
+import { chooseImage } from './chooseImage';
 import './ImageManager.css';
 
 interface ImageManagerProps {
@@ -112,8 +113,8 @@ const ImageManager: React.FC<ImageManagerProps> = ({ viewMode }) => {
               dragId={`image-${image.id}`}
               dragData={{ type: 'new-image', imageId: image.id, width: image.width, height: image.height }}
               className={`image-item ${selectedResourceId === image.id ? 'selected' : ''}`}
-              onClick={() => setSelectedResource(image.id)}
-              title={t('Drag onto the canvas')}
+              onClick={() => { setSelectedResource(image.id); chooseImage(image.id, image.width, image.height); }}
+              title={t('Click to use, or drag onto the canvas')}
             >
               <div className="image-preview">
                 <img src={image.data} alt={image.name} />

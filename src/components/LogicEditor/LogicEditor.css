@@ -2,7 +2,7 @@
   display: flex;
   height: 100%;
   width: 100%;
-  background: #0f172a;
+  background: var(--c-900);
   min-height: 0;
 }
 
@@ -23,29 +23,29 @@
   justify-content: center;
   height: 100%;
   gap: 12px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .no-graph-message h3 {
   margin: 0;
   font-size: 18px;
-  color: #cbd5e1;
+  color: var(--c-300);
   font-weight: 600;
 }
 
 .no-graph-message p {
   margin: 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .no-graph-message button {
   margin-top: 8px;
   padding: 10px 20px;
-  border: 1px dashed #475569;
+  border: 1px dashed var(--c-600);
   border-radius: 6px;
   background: transparent;
-  color: #64748b;
+  color: var(--c-500);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -53,7 +53,7 @@
 
 .no-graph-message button:hover {
   border-color: #3b82f6;
-  color: #60a5fa;
+  color: var(--c-a1);
 }
 
 /* Top Panel - Graph Selector */
@@ -72,10 +72,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 6px;
-  background: #0f172a;
-  color: #cbd5e1;
+  background: var(--c-900);
+  color: var(--c-300);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -83,12 +83,12 @@
 
 .graph-dropdown-btn:hover {
   background: #383838;
-  border-color: #475569;
+  border-color: var(--c-600);
 }
 
 .dropdown-arrow {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
   margin-left: 4px;
 }
 
@@ -98,8 +98,8 @@
   left: 0;
   margin-top: 4px;
   min-width: 180px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--c-900);
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 100;
@@ -109,7 +109,7 @@
 .graph-item {
   padding: 8px 14px;
   font-size: 13px;
-  color: #cbd5e1;
+  color: var(--c-300);
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -120,23 +120,23 @@
 
 .graph-item.active {
   background: rgba(33, 150, 243, 0.2);
-  color: #93c5fd;
+  color: var(--c-a2);
 }
 
 .graph-item.create {
-  border-top: 1px solid #334155;
-  color: #94a3b8;
+  border-top: 1px solid var(--c-700);
+  color: var(--c-400);
 }
 
 .graph-item.create:hover {
-  color: #60a5fa;
+  color: var(--c-a1);
 }
 
 .delete-graph-btn {
   padding: 6px 10px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 6px;
-  background: #0f172a;
+  background: var(--c-900);
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
@@ -159,10 +159,10 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 6px;
-  background: #0f172a;
-  color: #cbd5e1;
+  background: var(--c-900);
+  color: var(--c-300);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
@@ -206,23 +206,23 @@
 
 .debug-status {
   font-size: 12px;
-  color: #64748b;
+  color: var(--c-500);
   padding: 0 8px;
 }
 
 /* React Flow dark theme overrides */
 .logic-canvas .react-flow__controls {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 6px;
   overflow: hidden;
 }
 
 .logic-canvas .react-flow__controls-button {
-  background: #0f172a;
-  border-bottom: 1px solid #334155;
-  fill: #cbd5e1;
-  color: #cbd5e1;
+  background: var(--c-900);
+  border-bottom: 1px solid var(--c-700);
+  fill: var(--c-300);
+  color: var(--c-300);
 }
 
 .logic-canvas .react-flow__controls-button:hover {

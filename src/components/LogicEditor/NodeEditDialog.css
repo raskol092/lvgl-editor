@@ -14,7 +14,7 @@
 }
 
 .node-edit-dialog {
-  background: #020617;
+  background: var(--c-950);
   border-radius: 8px;
   width: 420px;
   max-width: 90vw;
@@ -44,7 +44,7 @@
 .close-btn {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--c-400);
   font-size: 18px;
   cursor: pointer;
   padding: 4px 8px;
@@ -83,7 +83,7 @@
 }
 
 .subtype-label {
-  color: #94a3b8;
+  color: var(--c-400);
   font-size: 12px;
   font-family: monospace;
 }
@@ -96,7 +96,7 @@
 .params-section h4 {
   margin: 0 0 12px 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--c-400);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -111,7 +111,7 @@
   display: block;
   margin-bottom: 6px;
   font-size: 12px;
-  color: #64748b;
+  color: var(--c-500);
   font-weight: 500;
 }
 
@@ -120,9 +120,9 @@
 .param-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #334155;
+  border: 1px solid var(--c-700);
   border-radius: 6px;
-  background: #0f172a;
+  background: var(--c-900);
   color: #fff;
   font-size: 13px;
   outline: none;
@@ -138,7 +138,7 @@
 
 .param-group input::placeholder,
 .param-group textarea::placeholder {
-  color: #94a3b8;
+  color: var(--c-400);
 }
 
 .param-group select {
@@ -162,7 +162,7 @@
 .no-params {
   padding: 20px;
   text-align: center;
-  color: #94a3b8;
+  color: var(--c-400);
   background: #252525;
   border-radius: 6px;
 }
@@ -194,7 +194,7 @@
 
 .btn-cancel {
   background: #444;
-  color: #cbd5e1;
+  color: var(--c-300);
 }
 
 .btn-cancel:hover {

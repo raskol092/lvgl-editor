@@ -1,6 +1,6 @@
 import { Image as ImageIcon } from 'lucide-react';
 import { getArcStyle, isArcLike } from '../../utils/arcStyle';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import type { LvglComponent, ResizeHandle } from '../../types';
 import { useEditorStore } from '../../store/editorStore';
 import { useAppStore } from '../../store/appStore';
@@ -53,6 +53,33 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
   const defaultFontSize = useAppStore(state => state.defaultFontSize);
   const { styles, props, type } = component;
   const defaultStyle = styles.default;
+  const downPos = useRef<{ x: number; y: number } | null>(null);
+  const wasSelectedOnDown = useRef(false);
+  const [editing, setEditing] = useState(false);
+  const canEditText = (component.type === 'label' || component.type === 'btn' || component.type === 'checkbox') && !component.locked;
+
+  const commitText = (value: string) => {
+    setEditing(false);
+    if (value !== (component.props.text ?? '')) updateComponent(component.id, { props: { ...component.props, text: value } });
+  };
+  const textEditor = (color: string, fontSize: number | string) => (
+    <input
+      className="lvgl-inline-edit"
+      autoFocus
+      defaultValue={component.props.text ?? ''}
+      style={{ color, fontSize }}
+      onFocus={(e) => e.currentTarget.select()}
+      onBlur={(e) => commitText(e.currentTarget.value)}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+      onDoubleClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter') e.currentTarget.blur();
+        else if (e.key === 'Escape') setEditing(false);
+      }}
+    />
+  );
 
   // Helper: apply shadow opacity to shadow color
   const buildShadowColor = (color?: string, opacity?: number): string => {
@@ -359,13 +386,14 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             fontSize: props.fontSize || defaultFontSize,
           }}>
             {children}
-            {(!children || React.Children.count(children) === 0) && (props.text || 'Button')}
+            {editing && textEditor(defaultStyle.textColor || '#ffffff', props.fontSize || defaultFontSize)}
+            {!editing && (!children || React.Children.count(children) === 0) && (props.text || 'Button')}
           </div>
         );
       
       case 'label':
         return (
-          <span className="lvgl-label" style={{
+          editing ? textEditor(defaultStyle.textColor || '#333333', props.fontSize || defaultFontSize) : <span className="lvgl-label" style={{
             color: defaultStyle.textColor || '#333333',
             fontSize: props.fontSize || defaultFontSize,
           }}>{props.text || 'Label'}</span>
@@ -806,8 +834,23 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
     <div
       className={`canvas-component ${isSelected ? 'selected' : ''} ${isHovered ? 'hovered' : ''} ${component.locked ? 'locked' : ''} ${component.visible === false ? 'hidden-component' : ''}`}
       style={componentStyle}
-      onClick={(e) => onClick(e, component.id)}
-      onMouseDown={(e) => onDragStart(e, component.id)}
+      onClick={(e) => {
+        onClick(e, component.id);
+        // A plain click (not a drag) on an image opens the resource manager to pick its picture
+        const d = downPos.current;
+        const still = !d || Math.hypot(e.clientX - d.x, e.clientY - d.y) < 4;
+        if (component.type === 'img' && !component.locked && still) {
+          window.dispatchEvent(new CustomEvent('pick-image', { detail: { id: component.id } }));
+        } else if (canEditText && still && wasSelectedOnDown.current) {
+          setEditing(true); // second click on a selected label / button: type in place
+        }
+      }}
+      onDoubleClick={() => { if (canEditText) setEditing(true); }}
+      onMouseDown={(e) => {
+        downPos.current = { x: e.clientX, y: e.clientY };
+        wasSelectedOnDown.current = isSelected;
+        onDragStart(e, component.id);
+      }}
       onMouseEnter={() => setHoveredComponent(component.id)}
       onMouseLeave={() => setHoveredComponent(null)}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, component.id) : undefined}

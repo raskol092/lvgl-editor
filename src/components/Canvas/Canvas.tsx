@@ -63,6 +63,9 @@ function getAbsolutePosition(comp: LvglComponent, allComps: LvglComponent[]): { 
   return { x: absX, y: absY };
 }
 
+/** Visual (non-text) components that scale proportionally when dragged by a corner */
+const PROPORTIONAL_TYPES = new Set(['img', 'arc', 'spinner', 'switch', 'bar', 'slider', 'chart', 'calendar']);
+
 const Canvas: React.FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -277,6 +280,16 @@ const Canvas: React.FC = () => {
           newWidth = comp.width + deltaX;
           newHeight = comp.height + deltaY;
           break;
+      }
+
+      // Corner drag of a purely visual (non-text) component keeps its proportions
+      if (PROPORTIONAL_TYPES.has(comp.type) && !handle.match(/^(top|bottom|left|right)$/) && comp.width > 0 && comp.height > 0) {
+        const byWidth = Math.abs(newWidth / comp.width - 1) >= Math.abs(newHeight / comp.height - 1);
+        const scale = byWidth ? newWidth / comp.width : newHeight / comp.height;
+        newWidth = comp.width * scale;
+        newHeight = comp.height * scale;
+        if (handle.includes('left')) newX = comp.x + comp.width - newWidth;
+        if (handle.includes('top')) newY = comp.y + comp.height - newHeight;
       }
 
       // Ensure minimum size

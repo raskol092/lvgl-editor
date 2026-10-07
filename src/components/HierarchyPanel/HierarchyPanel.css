@@ -4,8 +4,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #1e293b;
-  color: #e2e8f0;
+  background: var(--c-800);
+  color: var(--c-200);
   font-size: 13px;
 }
 
@@ -14,15 +14,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #334155;
-  background: #0f172a;
+  border-bottom: 1px solid var(--c-700);
+  background: var(--c-900);
 }
 
 .hierarchy-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 .hierarchy-actions {
@@ -33,7 +33,7 @@
 .hierarchy-btn {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--c-400);
   cursor: pointer;
   padding: 2px 6px;
   font-size: 14px;
@@ -41,8 +41,8 @@
 }
 
 .hierarchy-btn:hover {
-  background: #334155;
-  color: #e2e8f0;
+  background: var(--c-700);
+  color: var(--c-200);
 }
 
 .hierarchy-tree {
@@ -54,7 +54,7 @@
 .empty-message {
   padding: 20px;
   text-align: center;
-  color: #94a3b8;
+  color: var(--c-400);
   font-style: italic;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .tree-node:hover {
-  background: #334155;
+  background: var(--c-700);
 }
 
 .tree-node.selected {
@@ -98,7 +98,7 @@
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--c-400);
   flex-shrink: 0;
 }
 
@@ -107,7 +107,7 @@
 }
 
 .expand-btn.has-children:hover {
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 /* Type icon */
@@ -123,15 +123,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #e2e8f0;
+  color: var(--c-200);
 }
 
 /* Rename input */
 .rename-input {
   flex: 1;
-  background: #0f172a;
+  background: var(--c-900);
   border: 1px solid #3b82f6;
-  color: #e2e8f0;
+  color: var(--c-200);
   padding: 2px 4px;
   font-size: 12px;
   border-radius: 2px;
@@ -162,7 +162,7 @@
 
 .status-icon:hover {
   opacity: 1;
-  background: #334155;
+  background: var(--c-700);
 }
 
 .status-icon.visibility.off {
@@ -190,20 +190,20 @@
 }
 
 .hierarchy-tree::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--c-800);
 }
 
 .hierarchy-tree::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: var(--c-600);
   border-radius: 4px;
 }
 
 .hierarchy-tree::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: var(--c-500);
 }
 
 .type-icon {
   display: inline-flex;
   align-items: center;
-  color: #60a5fa;
+  color: var(--c-a1);
 }
