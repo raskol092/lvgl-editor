@@ -94,3 +94,17 @@ it('Set value uses the real type of the target (arc value -> bar)', () => {
   const out = generateCode(pages, undefined, [g], undefined, [], [], '', 14)
   expect(out['ui/ui_logic.lisp']).toContain('(lv-bar-set-value ui-level (lv-arc-get-value ui-knob) LV_ANIM_ON)')
 })
+
+it('a graph without a trigger runs live: arc value -> bar follows without events', () => {
+  const arc = createComponent('arc', { id: 'a1', name: 'knob' })
+  const bar = createComponent('bar', { id: 'b1', name: 'level' })
+  const pages = [createPage({ id: 'p1', name: 'main', components: [arc, bar] })]
+  const get = createLogicNode('get_property', { id: 'g', params: { targetComponent: 'a1', property: 'value' }, outputs: [val('go', 'Value')] })
+  const set = createLogicNode('set_value', { id: 's', params: { targetComponent: 'b1' }, inputs: [ex('si'), val('sn', 'Number', 'int', 0)], outputs: [ex('so', 'Done')] })
+  const g = createLogicGraph({ id: 'g1', name: 'follow', nodes: [get, set], connections: [conn('g', 'go', 's', 'sn', 'data')] })
+  const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+  expect(src).toContain('(lv-bar-set-value ui-level (lv-arc-get-value ui-knob) LV_ANIM_ON)')
+  expect(src).toContain('(defun logic-follow-live ()')
+  expect(src).toContain('(list (lv-arc-get-value ui-knob))')
+  expect(src).toContain('(logic-follow-live)')
+})
