@@ -812,33 +812,37 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         );
       }
       
-      case 'table':
+      case 'table': {
+        // lv_table: rows separated by horizontal lines, columns have their own widths, a scrollbar when it overflows
+        const rows = Number(props.rows || 3);
+        const cols = Number(props.cols || 3);
+        const widths: number[] = Array.from({ length: cols }, (_, c) => Number(props.columnWidths?.[c]) || 60);
+        const fs = Number(props.fontSize) || defaultFontSize;
+        const rowH = Math.round(fs + 42);
+        const overflowY = rows * rowH > component.height;
         return (
           <div className="lvgl-table" style={{
             width: '100%',
             height: '100%',
-            display: 'grid',
-            gridTemplateColumns: `repeat(${props.cols || 3}, 1fr)`,
-            gridTemplateRows: `repeat(${props.rows || 3}, 1fr)`,
-            gap: '1px',
-            backgroundColor: th.border,
-            border: `1px solid ${th.border}`,
-            borderRadius: defaultStyle.borderRadius || 4,
+            position: 'relative',
             overflow: 'hidden',
+            color: th.text,
+            fontSize: fs,
+            borderRadius: defaultStyle.borderRadius || 0,
           }}>
-            {Array.from({ length: (props.rows || 3) * (props.cols || 3) }).map((_, i) => (
-              <div key={i} style={{
-                backgroundColor: i < (props.cols || 3) && props.headerRow !== false ? th.surface : th.surface,
-                padding: '4px',
-                fontSize: '10px',
-                fontWeight: i < (props.cols || 3) && props.headerRow !== false ? 600 : 400,
-                color: th.text,
-              }}>
-                {props.cellData?.[Math.floor(i / (props.cols || 3))]?.[i % (props.cols || 3)] || ''}
+            {Array.from({ length: rows }).map((_, r) => (
+              <div key={r} style={{ display: 'flex', height: rowH, boxSizing: 'border-box', borderBottom: `1px solid ${th.border}`, width: widths.reduce((a, w) => a + w, 0) }}>
+                {widths.map((w, c) => (
+                  <div key={c} style={{ width: w, flexShrink: 0, padding: '0 12px', display: 'flex', alignItems: 'center', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                    {props.cellData?.[r]?.[c] || ''}
+                  </div>
+                ))}
               </div>
             ))}
+            {overflowY && <div style={{ position: 'absolute', right: 4, top: 4, width: 4, height: '45%', borderRadius: 2, backgroundColor: th.border }} />}
           </div>
         );
+      }
       
       case 'calendar': {
         // like LVGL: weekday row + full month grid, neighbouring months dimmed, "today" boxed
