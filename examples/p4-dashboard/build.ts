@@ -52,7 +52,7 @@ const chart = (name: string, x: number, y: number, w: number, h: number, type: '
   base('chart', name, x, y, w, h, { type, series: [{ name: 'Series 1', data, color: col, lineWidth: 3, pointSize: 0 }], yAxisMin: 0, yAxisMax: 100, xLabels: [] },
     { bgColor: C.CARD, borderRadius: 12, paddingTop: 14, paddingBottom: 14, paddingLeft: 12, paddingRight: 12 });
 const led = (name: string, x: number, y: number, col: string, on: boolean): Comp =>
-  base('obj', name, x, y, 14, 14, {}, { bgColor: on ? col : C.LINE, borderRadius: 7 });
+  base('led', name, x, y, 14, 14, { color: col, checked: on, brightness: 255 }, { borderRadius: 9999 });
 const sw = (name: string, x: number, y: number, on: boolean): Comp =>
   base('switch', name, x, y, 64, 32, { checked: on }, {});
 const card = (name: string, x: number, y: number, w: number, h: number, title: string, value: string, unit: string, col: string): Comp =>

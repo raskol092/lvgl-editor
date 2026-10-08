@@ -2849,22 +2849,25 @@
           "visible": true
         },
         {
-          "id": "obj-84",
-          "type": "obj",
+          "id": "led-84",
+          "type": "led",
           "name": "can_led",
           "x": 44,
           "y": 86,
           "width": 14,
           "height": 14,
           "children": [],
-          "props": {},
+          "props": {
+            "color": "#27AE60",
+            "checked": true,
+            "brightness": 255
+          },
           "styles": {
             "default": {
               "borderWidth": 0,
               "padding": 0,
               "opacity": 1,
-              "bgColor": "#27AE60",
-              "borderRadius": 7
+              "borderRadius": 9999
             }
           },
           "events": [],
@@ -2930,22 +2933,25 @@
           "visible": true
         },
         {
-          "id": "obj-87",
-          "type": "obj",
+          "id": "led-87",
+          "type": "led",
           "name": "bms_led",
           "x": 44,
           "y": 126,
           "width": 14,
           "height": 14,
           "children": [],
-          "props": {},
+          "props": {
+            "color": "#27AE60",
+            "checked": true,
+            "brightness": 255
+          },
           "styles": {
             "default": {
               "borderWidth": 0,
               "padding": 0,
               "opacity": 1,
-              "bgColor": "#27AE60",
-              "borderRadius": 7
+              "borderRadius": 9999
             }
           },
           "events": [],
@@ -3011,22 +3017,25 @@
           "visible": true
         },
         {
-          "id": "obj-90",
-          "type": "obj",
+          "id": "led-90",
+          "type": "led",
           "name": "hall_led",
           "x": 44,
           "y": 166,
           "width": 14,
           "height": 14,
           "children": [],
-          "props": {},
+          "props": {
+            "color": "#F2994A",
+            "checked": true,
+            "brightness": 255
+          },
           "styles": {
             "default": {
               "borderWidth": 0,
               "padding": 0,
               "opacity": 1,
-              "bgColor": "#F2994A",
-              "borderRadius": 7
+              "borderRadius": 9999
             }
           },
           "events": [],
@@ -3092,22 +3101,25 @@
           "visible": true
         },
         {
-          "id": "obj-93",
-          "type": "obj",
+          "id": "led-93",
+          "type": "led",
           "name": "throttle_led",
           "x": 44,
           "y": 206,
           "width": 14,
           "height": 14,
           "children": [],
-          "props": {},
+          "props": {
+            "color": "#27AE60",
+            "checked": true,
+            "brightness": 255
+          },
           "styles": {
             "default": {
               "borderWidth": 0,
               "padding": 0,
               "opacity": 1,
-              "bgColor": "#27AE60",
-              "borderRadius": 7
+              "borderRadius": 9999
             }
           },
           "events": [],
@@ -3173,22 +3185,25 @@
           "visible": true
         },
         {
-          "id": "obj-96",
-          "type": "obj",
+          "id": "led-96",
+          "type": "led",
           "name": "sd_led",
           "x": 44,
           "y": 246,
           "width": 14,
           "height": 14,
           "children": [],
-          "props": {},
+          "props": {
+            "color": "#EB5757",
+            "checked": true,
+            "brightness": 255
+          },
           "styles": {
             "default": {
               "borderWidth": 0,
               "padding": 0,
               "opacity": 1,
-              "bgColor": "#EB5757",
-              "borderRadius": 7
+              "borderRadius": 9999
             }
           },
           "events": [],
@@ -3254,22 +3269,25 @@
           "visible": true
         },
         {
-          "id": "obj-99",
-          "type": "obj",
+          "id": "led-99",
+          "type": "led",
           "name": "fw_led",
           "x": 44,
           "y": 286,
           "width": 14,
           "height": 14,
           "children": [],
-          "props": {},
+          "props": {
+            "color": "#8696A8",
+            "checked": false,
+            "brightness": 255
+          },
           "styles": {
             "default": {
               "borderWidth": 0,
               "padding": 0,
               "opacity": 1,
-              "bgColor": "#243041",
-              "borderRadius": 7
+              "borderRadius": 9999
             }
           },
           "events": [],
@@ -3768,7 +3786,7 @@
             "y": 80
           },
           "params": {
-            "targetComponent": "obj-96",
+            "targetComponent": "led-96",
             "action": "toggle"
           },
           "inputs": [

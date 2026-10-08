@@ -332,6 +332,26 @@ export const componentDefinitions: ComponentDefinition[] = [
 
   // Display Components
   {
+    type: 'led',
+    name: 'LED',
+    icon: '💡',
+    category: 'display',
+    defaultWidth: 24,
+    defaultHeight: 24,
+    // color: empty = theme primary; brightness 255 = on, LVGL dims an "off" LED to 80
+    defaultProps: { color: '', checked: true, brightness: 255 },
+    defaultStyles: {
+      default: {
+        // no bgColor / border: the LED draws its own filled, glowing circle
+        borderRadius: 9999,
+        textColor: '#212121',
+        opacity: 1,
+        padding: 0,
+      },
+    },
+    isContainer: false,
+  },
+  {
     type: 'bar',
     name: 'Progress Bar',
     icon: '📊',

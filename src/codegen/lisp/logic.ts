@@ -141,6 +141,10 @@ function expression(node: LogicNode, c: Ctx): string {
   }
 }
 
+function ledType(c: Ctx, p: Record<string, unknown>): boolean {
+  return c.names.compByName(String(p.targetComponent || ''), c.pageHint)?.type === 'led';
+}
+
 function chain(nodeId: string, c: Ctx, visited: Set<string>): string[] {
   if (visited.has(nodeId)) return [];
   visited.add(nodeId);
@@ -221,7 +225,9 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
         height: `(lv-obj-set-height ${target} ${val})`,
         opacity: `(lv-obj-set-style-opa ${target} ${expr ?? String(num(literal, 255))} LV_PART_MAIN)`,
         visible: flag(`(lv-obj-remove-flag ${target} ${hidden})`, `(lv-obj-add-flag ${target} ${hidden})`),
-        checked: flag(`(lv-obj-add-state ${target} LV_STATE_CHECKED)`, `(lv-obj-remove-state ${target} LV_STATE_CHECKED)`),
+        checked: ledType(c, p)
+          ? flag(`(lv-led-on ${target})`, `(lv-led-off ${target})`)
+          : flag(`(lv-obj-add-state ${target} LV_STATE_CHECKED)`, `(lv-obj-remove-state ${target} LV_STATE_CHECKED)`),
         text: (() => {
           const tv = expr ?? lstr(String(literal));
           switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
@@ -233,6 +239,7 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
         })(),
         value: (() => {
           switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
+            case 'led': return `(lv-led-set-brightness ${target} ${val})`;
             case 'bar': return `(lv-bar-set-value ${target} ${val} LV_ANIM_ON)`;
             case 'arc': return `(lv-arc-set-value ${target} ${val})`;
             default: return `(lv-slider-set-value ${target} ${val} LV_ANIM_ON)`;
@@ -286,6 +293,7 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
       // the setter follows the real type of the target (the node itself has no type setting)
       const type = c.names.compByName(p.targetComponent || '', c.pageHint)?.type ?? p.componentType ?? 'slider';
       switch (type) {
+        case 'led': return [`(lv-led-set-brightness ${target} ${value})`];
         case 'bar': return [`(lv-bar-set-value ${target} ${value} LV_ANIM_ON)`];
         case 'arc': return [`(lv-arc-set-value ${target} ${value})`];
         case 'dropdown': return [`(lv-dropdown-set-selected ${target} ${value})`];

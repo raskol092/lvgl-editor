@@ -1449,18 +1449,18 @@
     (lv-obj-set-style-pad-left ui-diag-panel 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-diag-panel 0 LV_PART_MAIN)
 
-    ;; Create obj: can_led
-    (def ui-can-led (lv-obj-create ui-screen-main2-diagnostics))
+    ;; Create led: can_led
+    (def ui-can-led (lv-led-create ui-screen-main2-diagnostics))
     (lv-obj-set-pos ui-can-led 44 86)
     (lv-obj-set-size ui-can-led 14 14)
-    (lv-obj-set-style-bg-color ui-can-led 0x27AE60 LV_PART_MAIN)
-    (lv-obj-set-style-bg-opa ui-can-led LV_OPA_COVER LV_PART_MAIN)
     (lv-obj-set-style-border-width ui-can-led 0 LV_PART_MAIN)
-    (lv-obj-set-style-radius ui-can-led 7 LV_PART_MAIN)
+    (lv-obj-set-style-radius ui-can-led 9999 LV_PART_MAIN)
     (lv-obj-set-style-pad-top ui-can-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-bottom ui-can-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-left ui-can-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-can-led 0 LV_PART_MAIN)
+    (lv-led-set-color ui-can-led 0x27AE60)
+    (lv-led-on ui-can-led)
 
     ;; Create label: can_name
     (def ui-can-name (lv-label-create ui-screen-main2-diagnostics))
@@ -1490,18 +1490,18 @@
     (lv-label-set-text ui-can-state "OK")
     (lv-obj-set-style-text-font ui-can-state font-montserrat-20 LV_PART_MAIN)
 
-    ;; Create obj: bms_led
-    (def ui-bms-led (lv-obj-create ui-screen-main2-diagnostics))
+    ;; Create led: bms_led
+    (def ui-bms-led (lv-led-create ui-screen-main2-diagnostics))
     (lv-obj-set-pos ui-bms-led 44 126)
     (lv-obj-set-size ui-bms-led 14 14)
-    (lv-obj-set-style-bg-color ui-bms-led 0x27AE60 LV_PART_MAIN)
-    (lv-obj-set-style-bg-opa ui-bms-led LV_OPA_COVER LV_PART_MAIN)
     (lv-obj-set-style-border-width ui-bms-led 0 LV_PART_MAIN)
-    (lv-obj-set-style-radius ui-bms-led 7 LV_PART_MAIN)
+    (lv-obj-set-style-radius ui-bms-led 9999 LV_PART_MAIN)
     (lv-obj-set-style-pad-top ui-bms-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-bottom ui-bms-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-left ui-bms-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-bms-led 0 LV_PART_MAIN)
+    (lv-led-set-color ui-bms-led 0x27AE60)
+    (lv-led-on ui-bms-led)
 
     ;; Create label: bms_name
     (def ui-bms-name (lv-label-create ui-screen-main2-diagnostics))
@@ -1531,18 +1531,18 @@
     (lv-label-set-text ui-bms-state "OK")
     (lv-obj-set-style-text-font ui-bms-state font-montserrat-20 LV_PART_MAIN)
 
-    ;; Create obj: hall_led
-    (def ui-hall-led (lv-obj-create ui-screen-main2-diagnostics))
+    ;; Create led: hall_led
+    (def ui-hall-led (lv-led-create ui-screen-main2-diagnostics))
     (lv-obj-set-pos ui-hall-led 44 166)
     (lv-obj-set-size ui-hall-led 14 14)
-    (lv-obj-set-style-bg-color ui-hall-led 0xF2994A LV_PART_MAIN)
-    (lv-obj-set-style-bg-opa ui-hall-led LV_OPA_COVER LV_PART_MAIN)
     (lv-obj-set-style-border-width ui-hall-led 0 LV_PART_MAIN)
-    (lv-obj-set-style-radius ui-hall-led 7 LV_PART_MAIN)
+    (lv-obj-set-style-radius ui-hall-led 9999 LV_PART_MAIN)
     (lv-obj-set-style-pad-top ui-hall-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-bottom ui-hall-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-left ui-hall-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-hall-led 0 LV_PART_MAIN)
+    (lv-led-set-color ui-hall-led 0xF2994A)
+    (lv-led-on ui-hall-led)
 
     ;; Create label: hall_name
     (def ui-hall-name (lv-label-create ui-screen-main2-diagnostics))
@@ -1572,18 +1572,18 @@
     (lv-label-set-text ui-hall-state "WARN")
     (lv-obj-set-style-text-font ui-hall-state font-montserrat-20 LV_PART_MAIN)
 
-    ;; Create obj: throttle_led
-    (def ui-throttle-led (lv-obj-create ui-screen-main2-diagnostics))
+    ;; Create led: throttle_led
+    (def ui-throttle-led (lv-led-create ui-screen-main2-diagnostics))
     (lv-obj-set-pos ui-throttle-led 44 206)
     (lv-obj-set-size ui-throttle-led 14 14)
-    (lv-obj-set-style-bg-color ui-throttle-led 0x27AE60 LV_PART_MAIN)
-    (lv-obj-set-style-bg-opa ui-throttle-led LV_OPA_COVER LV_PART_MAIN)
     (lv-obj-set-style-border-width ui-throttle-led 0 LV_PART_MAIN)
-    (lv-obj-set-style-radius ui-throttle-led 7 LV_PART_MAIN)
+    (lv-obj-set-style-radius ui-throttle-led 9999 LV_PART_MAIN)
     (lv-obj-set-style-pad-top ui-throttle-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-bottom ui-throttle-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-left ui-throttle-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-throttle-led 0 LV_PART_MAIN)
+    (lv-led-set-color ui-throttle-led 0x27AE60)
+    (lv-led-on ui-throttle-led)
 
     ;; Create label: throttle_name
     (def ui-throttle-name (lv-label-create ui-screen-main2-diagnostics))
@@ -1613,18 +1613,18 @@
     (lv-label-set-text ui-throttle-state "OK")
     (lv-obj-set-style-text-font ui-throttle-state font-montserrat-20 LV_PART_MAIN)
 
-    ;; Create obj: sd_led
-    (def ui-sd-led (lv-obj-create ui-screen-main2-diagnostics))
+    ;; Create led: sd_led
+    (def ui-sd-led (lv-led-create ui-screen-main2-diagnostics))
     (lv-obj-set-pos ui-sd-led 44 246)
     (lv-obj-set-size ui-sd-led 14 14)
-    (lv-obj-set-style-bg-color ui-sd-led 0xEB5757 LV_PART_MAIN)
-    (lv-obj-set-style-bg-opa ui-sd-led LV_OPA_COVER LV_PART_MAIN)
     (lv-obj-set-style-border-width ui-sd-led 0 LV_PART_MAIN)
-    (lv-obj-set-style-radius ui-sd-led 7 LV_PART_MAIN)
+    (lv-obj-set-style-radius ui-sd-led 9999 LV_PART_MAIN)
     (lv-obj-set-style-pad-top ui-sd-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-bottom ui-sd-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-left ui-sd-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-sd-led 0 LV_PART_MAIN)
+    (lv-led-set-color ui-sd-led 0xEB5757)
+    (lv-led-on ui-sd-led)
 
     ;; Create label: sd_name
     (def ui-sd-name (lv-label-create ui-screen-main2-diagnostics))
@@ -1654,18 +1654,18 @@
     (lv-label-set-text ui-sd-state "FAIL")
     (lv-obj-set-style-text-font ui-sd-state font-montserrat-20 LV_PART_MAIN)
 
-    ;; Create obj: fw_led
-    (def ui-fw-led (lv-obj-create ui-screen-main2-diagnostics))
+    ;; Create led: fw_led
+    (def ui-fw-led (lv-led-create ui-screen-main2-diagnostics))
     (lv-obj-set-pos ui-fw-led 44 286)
     (lv-obj-set-size ui-fw-led 14 14)
-    (lv-obj-set-style-bg-color ui-fw-led 0x243041 LV_PART_MAIN)
-    (lv-obj-set-style-bg-opa ui-fw-led LV_OPA_COVER LV_PART_MAIN)
     (lv-obj-set-style-border-width ui-fw-led 0 LV_PART_MAIN)
-    (lv-obj-set-style-radius ui-fw-led 7 LV_PART_MAIN)
+    (lv-obj-set-style-radius ui-fw-led 9999 LV_PART_MAIN)
     (lv-obj-set-style-pad-top ui-fw-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-bottom ui-fw-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-left ui-fw-led 0 LV_PART_MAIN)
     (lv-obj-set-style-pad-right ui-fw-led 0 LV_PART_MAIN)
+    (lv-led-set-color ui-fw-led 0x8696A8)
+    (lv-led-off ui-fw-led)
 
     ;; Create label: fw_name
     (def ui-fw-name (lv-label-create ui-screen-main2-diagnostics))

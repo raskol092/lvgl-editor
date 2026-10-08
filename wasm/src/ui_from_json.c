@@ -509,6 +509,23 @@ static lv_obj_t *create_win(lv_obj_t *parent, const cJSON *comp) {
     return win;
 }
 
+static lv_obj_t *create_led(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *led = lv_led_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    if (props) {
+        const char *col = cjson_get_string(props, "color");
+        if (col && col[0]) lv_led_set_color(led, hex_to_color(col));
+        if (cjson_get_bool(props, "checked", 1)) {
+            lv_led_on(led);
+            int b = cjson_get_int(props, "brightness", 255);
+            if (b != 255) lv_led_set_brightness(led, (uint8_t)b);
+        } else {
+            lv_led_off(led);
+        }
+    }
+    return led;
+}
+
 static lv_obj_t *create_spinner(lv_obj_t *parent, const cJSON *comp) {
     (void)comp;
     return lv_spinner_create(parent);
@@ -653,6 +670,7 @@ static const type_entry_t type_table[] = {
     { "tileview",  create_tileview },
     { "win",       create_win },
     { "spinner",   create_spinner },
+    { "led",       create_led },
     { "line",      create_line },
     { "img",       create_img },
     { NULL, NULL }

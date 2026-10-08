@@ -312,3 +312,17 @@ describe('built-in font sizes', () => {
     expect(out).toContain('(lv-obj-set-style-text-font ui-odd font-montserrat-24 LV_PART_MAIN)')
   })
 })
+
+describe('led', () => {
+  it('creates an LVGL led with color, state and brightness', () => {
+    const a = createComponent('led', { id: 'a', name: 'ok_led', props: { color: '#27AE60', checked: true, brightness: 255 } })
+    const b = createComponent('led', { id: 'b', name: 'off_led', props: { color: '', checked: false } })
+    const c = createComponent('led', { id: 'c', name: 'dim_led', props: { checked: true, brightness: 120 } })
+    const out = generateCode([createPage({ components: [a, b, c] } as never)], undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    expect(out).toContain('(lv-led-create ui-screen-main)')
+    expect(out).toContain('(lv-led-set-color ui-ok-led 0x27AE60)')
+    expect(out).toContain('(lv-led-on ui-ok-led)')
+    expect(out).toContain('(lv-led-off ui-off-led)')
+    expect(out).toContain('(lv-led-set-brightness ui-dim-led 120)')
+  })
+})

@@ -213,6 +213,7 @@ const CREATE_FN: Record<string, string> = {
   tileview: 'lv-tileview-create',
   win: 'lv-win-create',
   bar: 'lv-bar-create',
+  led: 'lv-led-create',
   arc: 'lv-arc-create',
   spinner: 'lv-spinner-create',
   chart: 'lv-chart-create',
@@ -273,6 +274,13 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
         out.push(`(lv-obj-center ${l})`);
         out.push(...textProps(l, props, ctx));
       }
+      break;
+    }
+    case 'led': {
+      if (props.color) out.push(`(lv-led-set-color ${v} ${lcolor(props.color)})`);
+      out.push(props.checked === false ? `(lv-led-off ${v})` : `(lv-led-on ${v})`);
+      const b = Number(props.brightness ?? 255);
+      if (Number.isFinite(b) && b !== 255 && props.checked !== false) out.push(`(lv-led-set-brightness ${v} ${Math.max(0, Math.min(255, Math.round(b)))})`);
       break;
     }
     case 'slider':
