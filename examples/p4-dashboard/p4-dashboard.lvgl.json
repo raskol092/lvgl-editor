@@ -1,0 +1,3844 @@
+{
+  "version": "1.0.0",
+  "name": "P4 Dashboard example",
+  "createdAt": 0,
+  "updatedAt": 0,
+  "canvasSize": {
+    "width": 800,
+    "height": 480
+  },
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "main1_speed",
+      "components": [
+        {
+          "id": "label-1",
+          "type": "label",
+          "name": "m1p1_title",
+          "x": 28,
+          "y": 20,
+          "width": 600,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "MAIN 1  /  PAGE 1   SPEED",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "arc-2",
+          "type": "arc",
+          "name": "speed_ring",
+          "x": 40,
+          "y": 70,
+          "width": 340,
+          "height": 340,
+          "children": [],
+          "props": {
+            "min": 0,
+            "max": 100,
+            "value": 40,
+            "startAngle": 135,
+            "endAngle": 45,
+            "arcWidth": 26,
+            "arcColor": "#2F80ED",
+            "arcTrackColor": "#243041",
+            "hideKnob": true
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-3",
+          "type": "label",
+          "name": "speed_label",
+          "x": 150,
+          "y": 200,
+          "width": 120,
+          "height": 56,
+          "children": [],
+          "props": {
+            "text": "24",
+            "fontSize": 48
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-4",
+          "type": "label",
+          "name": "speed_unit",
+          "x": 160,
+          "y": 262,
+          "width": 100,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "km/h",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-8",
+          "type": "obj",
+          "name": "battery_card",
+          "x": 420,
+          "y": 70,
+          "width": 170,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-5",
+              "type": "label",
+              "name": "battery_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 138,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "BATTERY",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-8",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-6",
+              "type": "label",
+              "name": "battery_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 138,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "78 %",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#27AE60"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-8",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-7",
+              "type": "label",
+              "name": "battery_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 138,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "51.2 V",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-8",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-12",
+          "type": "obj",
+          "name": "range_card",
+          "x": 606,
+          "y": 70,
+          "width": 170,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-9",
+              "type": "label",
+              "name": "range_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 138,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "RANGE",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-12",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-10",
+              "type": "label",
+              "name": "range_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 138,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "41",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#E8EEF5"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-12",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-11",
+              "type": "label",
+              "name": "range_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 138,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "km",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-12",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-16",
+          "type": "obj",
+          "name": "trip_card",
+          "x": 420,
+          "y": 206,
+          "width": 356,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-13",
+              "type": "label",
+              "name": "trip_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 324,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "TRIP",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-16",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-14",
+              "type": "label",
+              "name": "trip_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 324,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "12.6",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#E8EEF5"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-16",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-15",
+              "type": "label",
+              "name": "trip_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 324,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "km   0:38 h",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-16",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "bar-17",
+          "type": "bar",
+          "name": "battery_bar",
+          "x": 420,
+          "y": 350,
+          "width": 356,
+          "height": 14,
+          "children": [],
+          "props": {
+            "min": 0,
+            "max": 100,
+            "value": 78,
+            "indicatorColor": "#27AE60"
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "borderRadius": 7
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-18",
+          "type": "label",
+          "name": "odo_label",
+          "x": 420,
+          "y": 378,
+          "width": 200,
+          "height": 24,
+          "children": [],
+          "props": {
+            "text": "ODO 3412 km",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-104",
+          "type": "btn",
+          "name": "main1_speed_prev",
+          "x": 24,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "<  Prev",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-105",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main2_diagnostics"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-106",
+          "type": "btn",
+          "name": "main1_speed_next",
+          "x": 666,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "Next  >",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-107",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main1_charts"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        }
+      ],
+      "backgroundColor": "#0B0F14"
+    },
+    {
+      "id": "page-2",
+      "name": "main1_charts",
+      "components": [
+        {
+          "id": "label-19",
+          "type": "label",
+          "name": "m1p2_title",
+          "x": 28,
+          "y": 20,
+          "width": 600,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "MAIN 1  /  PAGE 2   CHARTS",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-20",
+          "type": "label",
+          "name": "power_caption",
+          "x": 28,
+          "y": 58,
+          "width": 200,
+          "height": 22,
+          "children": [],
+          "props": {
+            "text": "POWER, kW",
+            "fontSize": 14
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "chart-21",
+          "type": "chart",
+          "name": "power_chart",
+          "x": 24,
+          "y": 80,
+          "width": 370,
+          "height": 170,
+          "children": [],
+          "props": {
+            "type": "line",
+            "series": [
+              {
+                "name": "Series 1",
+                "data": [
+                  10,
+                  25,
+                  40,
+                  35,
+                  60,
+                  72,
+                  55,
+                  80,
+                  66,
+                  40,
+                  30,
+                  45
+                ],
+                "color": "#F2994A",
+                "lineWidth": 3,
+                "pointSize": 0
+              }
+            ],
+            "yAxisMin": 0,
+            "yAxisMax": 100,
+            "xLabels": []
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 12,
+              "paddingTop": 14,
+              "paddingBottom": 14,
+              "paddingLeft": 12,
+              "paddingRight": 12
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-22",
+          "type": "label",
+          "name": "current_caption",
+          "x": 410,
+          "y": 58,
+          "width": 200,
+          "height": 22,
+          "children": [],
+          "props": {
+            "text": "CURRENT, A",
+            "fontSize": 14
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "chart-23",
+          "type": "chart",
+          "name": "current_chart",
+          "x": 406,
+          "y": 80,
+          "width": 370,
+          "height": 170,
+          "children": [],
+          "props": {
+            "type": "bar",
+            "series": [
+              {
+                "name": "Series 1",
+                "data": [
+                  30,
+                  50,
+                  70,
+                  45,
+                  85,
+                  60,
+                  40,
+                  20
+                ],
+                "color": "#2F80ED",
+                "lineWidth": 3,
+                "pointSize": 0
+              }
+            ],
+            "yAxisMin": 0,
+            "yAxisMax": 100,
+            "xLabels": []
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 12,
+              "paddingTop": 14,
+              "paddingBottom": 14,
+              "paddingLeft": 12,
+              "paddingRight": 12
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-24",
+          "type": "label",
+          "name": "temp_caption",
+          "x": 28,
+          "y": 266,
+          "width": 200,
+          "height": 22,
+          "children": [],
+          "props": {
+            "text": "TEMPERATURE, C",
+            "fontSize": 14
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "chart-25",
+          "type": "chart",
+          "name": "temp_chart",
+          "x": 24,
+          "y": 288,
+          "width": 752,
+          "height": 140,
+          "children": [],
+          "props": {
+            "type": "line",
+            "series": [
+              {
+                "name": "Series 1",
+                "data": [
+                  20,
+                  22,
+                  25,
+                  30,
+                  34,
+                  38,
+                  41,
+                  44,
+                  46,
+                  45,
+                  43,
+                  40,
+                  38,
+                  36,
+                  35,
+                  34
+                ],
+                "color": "#EB5757",
+                "lineWidth": 3,
+                "pointSize": 0
+              }
+            ],
+            "yAxisMin": 0,
+            "yAxisMax": 100,
+            "xLabels": []
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 12,
+              "paddingTop": 14,
+              "paddingBottom": 14,
+              "paddingLeft": 12,
+              "paddingRight": 12
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-108",
+          "type": "btn",
+          "name": "main1_charts_prev",
+          "x": 24,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "<  Prev",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-109",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main1_speed"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-110",
+          "type": "btn",
+          "name": "main1_charts_next",
+          "x": 666,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "Next  >",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-111",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main1_temperature"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        }
+      ],
+      "backgroundColor": "#0B0F14"
+    },
+    {
+      "id": "page-3",
+      "name": "main1_temperature",
+      "components": [
+        {
+          "id": "label-26",
+          "type": "label",
+          "name": "m1p3_title",
+          "x": 28,
+          "y": 20,
+          "width": 600,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "MAIN 1  /  PAGE 3   TEMPERATURE & POWER",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-30",
+          "type": "obj",
+          "name": "motor_card",
+          "x": 24,
+          "y": 64,
+          "width": 240,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-27",
+              "type": "label",
+              "name": "motor_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 208,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "MOTOR",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-30",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-28",
+              "type": "label",
+              "name": "motor_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 208,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "62 C",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#F2994A"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-30",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-29",
+              "type": "label",
+              "name": "motor_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 208,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "limit 110 C",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-30",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-34",
+          "type": "obj",
+          "name": "controller_card",
+          "x": 280,
+          "y": 64,
+          "width": 240,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-31",
+              "type": "label",
+              "name": "controller_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 208,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "CONTROLLER",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-34",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-32",
+              "type": "label",
+              "name": "controller_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 208,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "48 C",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#E8EEF5"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-34",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-33",
+              "type": "label",
+              "name": "controller_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 208,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "limit 85 C",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-34",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-38",
+          "type": "obj",
+          "name": "pack_card",
+          "x": 536,
+          "y": 64,
+          "width": 240,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-35",
+              "type": "label",
+              "name": "pack_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 208,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "BATTERY",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-38",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-36",
+              "type": "label",
+              "name": "pack_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 208,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "31 C",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#27AE60"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-38",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-37",
+              "type": "label",
+              "name": "pack_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 208,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "limit 60 C",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-38",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "bar-39",
+          "type": "bar",
+          "name": "motor_bar",
+          "x": 40,
+          "y": 170,
+          "width": 208,
+          "height": 6,
+          "children": [],
+          "props": {
+            "min": 0,
+            "max": 100,
+            "value": 56,
+            "indicatorColor": "#F2994A"
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "borderRadius": 3
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "bar-40",
+          "type": "bar",
+          "name": "controller_bar",
+          "x": 296,
+          "y": 170,
+          "width": 208,
+          "height": 6,
+          "children": [],
+          "props": {
+            "min": 0,
+            "max": 100,
+            "value": 56,
+            "indicatorColor": "#2F80ED"
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "borderRadius": 3
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "bar-41",
+          "type": "bar",
+          "name": "pack_bar",
+          "x": 552,
+          "y": 170,
+          "width": 208,
+          "height": 6,
+          "children": [],
+          "props": {
+            "min": 0,
+            "max": 100,
+            "value": 52,
+            "indicatorColor": "#27AE60"
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "borderRadius": 3
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-47",
+          "type": "obj",
+          "name": "power_panel",
+          "x": 24,
+          "y": 204,
+          "width": 752,
+          "height": 220,
+          "children": [
+            {
+              "id": "label-42",
+              "type": "label",
+              "name": "power_title",
+              "x": 20,
+              "y": 16,
+              "width": 200,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "POWER",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-47",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-43",
+              "type": "label",
+              "name": "power_value",
+              "x": 20,
+              "y": 46,
+              "width": 400,
+              "height": 56,
+              "children": [],
+              "props": {
+                "text": "3.48 kW",
+                "fontSize": 48
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#9B51E0"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-47",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-44",
+              "type": "label",
+              "name": "power_peak",
+              "x": 20,
+              "y": 112,
+              "width": 400,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "peak 7.9 kW   regen 1.2 kW",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-47",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "arc-45",
+              "type": "arc",
+              "name": "power_ring",
+              "x": 520,
+              "y": 20,
+              "width": 180,
+              "height": 180,
+              "children": [],
+              "props": {
+                "min": 0,
+                "max": 100,
+                "value": 64,
+                "startAngle": 135,
+                "endAngle": 45,
+                "arcWidth": 20,
+                "arcColor": "#9B51E0",
+                "arcTrackColor": "#243041",
+                "hideKnob": true
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-47",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "bar-46",
+              "type": "bar",
+              "name": "power_bar",
+              "x": 20,
+              "y": 160,
+              "width": 440,
+              "height": 16,
+              "children": [],
+              "props": {
+                "min": 0,
+                "max": 100,
+                "value": 44,
+                "indicatorColor": "#9B51E0"
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "#243041",
+                  "borderRadius": 8
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-47",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-112",
+          "type": "btn",
+          "name": "main1_temperature_prev",
+          "x": 24,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "<  Prev",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-113",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main1_charts"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-114",
+          "type": "btn",
+          "name": "main1_temperature_next",
+          "x": 666,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "Next  >",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-115",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main2_settings"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        }
+      ],
+      "backgroundColor": "#0B0F14"
+    },
+    {
+      "id": "page-4",
+      "name": "main2_settings",
+      "components": [
+        {
+          "id": "label-48",
+          "type": "label",
+          "name": "m2p1_title",
+          "x": 28,
+          "y": 20,
+          "width": 600,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "MAIN 2  /  PAGE 1   SETTINGS",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-49",
+          "type": "obj",
+          "name": "units_panel",
+          "x": 24,
+          "y": 64,
+          "width": 752,
+          "height": 64,
+          "children": [],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-50",
+          "type": "label",
+          "name": "units_label",
+          "x": 48,
+          "y": 84,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Units: km/h",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "switch-51",
+          "type": "switch",
+          "name": "units_switch",
+          "x": 680,
+          "y": 80,
+          "width": 64,
+          "height": 32,
+          "children": [],
+          "props": {
+            "checked": true
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-52",
+          "type": "obj",
+          "name": "brightness_panel",
+          "x": 24,
+          "y": 138,
+          "width": 752,
+          "height": 64,
+          "children": [],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-53",
+          "type": "label",
+          "name": "brightness_label",
+          "x": 48,
+          "y": 158,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Auto brightness",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "switch-54",
+          "type": "switch",
+          "name": "brightness_switch",
+          "x": 680,
+          "y": 154,
+          "width": 64,
+          "height": 32,
+          "children": [],
+          "props": {
+            "checked": false
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-55",
+          "type": "obj",
+          "name": "sounds_panel",
+          "x": 24,
+          "y": 212,
+          "width": 752,
+          "height": 64,
+          "children": [],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-56",
+          "type": "label",
+          "name": "sounds_label",
+          "x": 48,
+          "y": 232,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Sounds",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "switch-57",
+          "type": "switch",
+          "name": "sounds_switch",
+          "x": 680,
+          "y": 228,
+          "width": 64,
+          "height": 32,
+          "children": [],
+          "props": {
+            "checked": true
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-58",
+          "type": "obj",
+          "name": "speed_limit_panel",
+          "x": 24,
+          "y": 286,
+          "width": 752,
+          "height": 130,
+          "children": [],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-59",
+          "type": "label",
+          "name": "max_speed_caption",
+          "x": 48,
+          "y": 302,
+          "width": 300,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Max speed",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-60",
+          "type": "label",
+          "name": "max_speed_label",
+          "x": 620,
+          "y": 302,
+          "width": 140,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "45 km/h",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#2F80ED"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "slider-61",
+          "type": "slider",
+          "name": "max_speed_slider",
+          "x": 56,
+          "y": 346,
+          "width": 680,
+          "height": 14,
+          "children": [],
+          "props": {
+            "min": 10,
+            "max": 90,
+            "value": 45,
+            "indicatorColor": "#2F80ED"
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "borderRadius": 7
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "bar-62",
+          "type": "bar",
+          "name": "max_speed_bar",
+          "x": 56,
+          "y": 388,
+          "width": 680,
+          "height": 8,
+          "children": [],
+          "props": {
+            "min": 10,
+            "max": 90,
+            "value": 45,
+            "indicatorColor": "#2F80ED"
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "borderRadius": 4
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-116",
+          "type": "btn",
+          "name": "main2_settings_prev",
+          "x": 24,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "<  Prev",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-117",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main1_temperature"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-118",
+          "type": "btn",
+          "name": "main2_settings_next",
+          "x": 666,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "Next  >",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-119",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main2_statistics"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        }
+      ],
+      "backgroundColor": "#0B0F14"
+    },
+    {
+      "id": "page-5",
+      "name": "main2_statistics",
+      "components": [
+        {
+          "id": "label-63",
+          "type": "label",
+          "name": "m2p2_title",
+          "x": 28,
+          "y": 20,
+          "width": 600,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "MAIN 2  /  PAGE 2   STATISTICS",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-67",
+          "type": "obj",
+          "name": "trips_card",
+          "x": 24,
+          "y": 64,
+          "width": 176,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-64",
+              "type": "label",
+              "name": "trips_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 144,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "TRIPS",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-67",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-65",
+              "type": "label",
+              "name": "trips_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 144,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "128",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#E8EEF5"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-67",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-66",
+              "type": "label",
+              "name": "trips_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 144,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "total",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-67",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-71",
+          "type": "obj",
+          "name": "distance_card",
+          "x": 216,
+          "y": 64,
+          "width": 176,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-68",
+              "type": "label",
+              "name": "distance_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 144,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "DISTANCE",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-71",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-69",
+              "type": "label",
+              "name": "distance_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 144,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "3412",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#2F80ED"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-71",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-70",
+              "type": "label",
+              "name": "distance_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 144,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "km",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-71",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-75",
+          "type": "obj",
+          "name": "avg_card",
+          "x": 408,
+          "y": 64,
+          "width": 176,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-72",
+              "type": "label",
+              "name": "avg_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 144,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "AVG SPEED",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-75",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-73",
+              "type": "label",
+              "name": "avg_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 144,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "27.4",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#27AE60"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-75",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-74",
+              "type": "label",
+              "name": "avg_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 144,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "km/h",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-75",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-79",
+          "type": "obj",
+          "name": "energy_card",
+          "x": 600,
+          "y": 64,
+          "width": 176,
+          "height": 120,
+          "children": [
+            {
+              "id": "label-76",
+              "type": "label",
+              "name": "energy_card_title",
+              "x": 16,
+              "y": 12,
+              "width": 144,
+              "height": 22,
+              "children": [],
+              "props": {
+                "text": "ENERGY",
+                "fontSize": 14
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-79",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-77",
+              "type": "label",
+              "name": "energy_card_value",
+              "x": 16,
+              "y": 38,
+              "width": 144,
+              "height": 40,
+              "children": [],
+              "props": {
+                "text": "19.6",
+                "fontSize": 32
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#F2994A"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-79",
+              "locked": false,
+              "visible": true
+            },
+            {
+              "id": "label-78",
+              "type": "label",
+              "name": "energy_card_unit",
+              "x": 16,
+              "y": 80,
+              "width": 144,
+              "height": 24,
+              "children": [],
+              "props": {
+                "text": "Wh/km",
+                "fontSize": 16
+              },
+              "styles": {
+                "default": {
+                  "borderWidth": 0,
+                  "padding": 0,
+                  "opacity": 1,
+                  "bgColor": "transparent",
+                  "textColor": "#8696A8"
+                }
+              },
+              "events": [],
+              "animations": [],
+              "parentId": "obj-79",
+              "locked": false,
+              "visible": true
+            }
+          ],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-80",
+          "type": "label",
+          "name": "days_caption",
+          "x": 28,
+          "y": 200,
+          "width": 300,
+          "height": 22,
+          "children": [],
+          "props": {
+            "text": "DISTANCE BY DAY, km",
+            "fontSize": 14
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "chart-81",
+          "type": "chart",
+          "name": "days_chart",
+          "x": 24,
+          "y": 222,
+          "width": 752,
+          "height": 206,
+          "children": [],
+          "props": {
+            "type": "bar",
+            "series": [
+              {
+                "name": "Series 1",
+                "data": [
+                  32,
+                  18,
+                  44,
+                  60,
+                  25,
+                  70,
+                  52
+                ],
+                "color": "#27AE60",
+                "lineWidth": 3,
+                "pointSize": 0
+              }
+            ],
+            "yAxisMin": 0,
+            "yAxisMax": 100,
+            "xLabels": []
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 12,
+              "paddingTop": 14,
+              "paddingBottom": 14,
+              "paddingLeft": 12,
+              "paddingRight": 12
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-120",
+          "type": "btn",
+          "name": "main2_statistics_prev",
+          "x": 24,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "<  Prev",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-121",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main2_settings"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-122",
+          "type": "btn",
+          "name": "main2_statistics_next",
+          "x": 666,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "Next  >",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-123",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main2_diagnostics"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        }
+      ],
+      "backgroundColor": "#0B0F14"
+    },
+    {
+      "id": "page-6",
+      "name": "main2_diagnostics",
+      "components": [
+        {
+          "id": "label-82",
+          "type": "label",
+          "name": "m2p3_title",
+          "x": 28,
+          "y": 20,
+          "width": 600,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "MAIN 2  /  PAGE 3   DIAGNOSTICS",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "obj-83",
+          "type": "obj",
+          "name": "diag_panel",
+          "x": 24,
+          "y": 60,
+          "width": 752,
+          "height": 300,
+          "children": [],
+          "props": {},
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#161D27",
+              "borderRadius": 14
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "led-84",
+          "type": "led",
+          "name": "can_led",
+          "x": 44,
+          "y": 86,
+          "width": 14,
+          "height": 14,
+          "children": [],
+          "props": {
+            "color": "#27AE60",
+            "checked": true,
+            "brightness": 255
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "borderRadius": 9999
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-85",
+          "type": "label",
+          "name": "can_name",
+          "x": 76,
+          "y": 80,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "CAN bus",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-86",
+          "type": "label",
+          "name": "can_state",
+          "x": 600,
+          "y": 80,
+          "width": 120,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "OK",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#27AE60"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "led-87",
+          "type": "led",
+          "name": "bms_led",
+          "x": 44,
+          "y": 126,
+          "width": 14,
+          "height": 14,
+          "children": [],
+          "props": {
+            "color": "#27AE60",
+            "checked": true,
+            "brightness": 255
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "borderRadius": 9999
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-88",
+          "type": "label",
+          "name": "bms_name",
+          "x": 76,
+          "y": 120,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "BMS link",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-89",
+          "type": "label",
+          "name": "bms_state",
+          "x": 600,
+          "y": 120,
+          "width": 120,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "OK",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#27AE60"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "led-90",
+          "type": "led",
+          "name": "hall_led",
+          "x": 44,
+          "y": 166,
+          "width": 14,
+          "height": 14,
+          "children": [],
+          "props": {
+            "color": "#F2994A",
+            "checked": true,
+            "brightness": 255
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "borderRadius": 9999
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-91",
+          "type": "label",
+          "name": "hall_name",
+          "x": 76,
+          "y": 160,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Motor hall sensors",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-92",
+          "type": "label",
+          "name": "hall_state",
+          "x": 600,
+          "y": 160,
+          "width": 120,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "WARN",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#F2994A"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "led-93",
+          "type": "led",
+          "name": "throttle_led",
+          "x": 44,
+          "y": 206,
+          "width": 14,
+          "height": 14,
+          "children": [],
+          "props": {
+            "color": "#27AE60",
+            "checked": true,
+            "brightness": 255
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "borderRadius": 9999
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-94",
+          "type": "label",
+          "name": "throttle_name",
+          "x": 76,
+          "y": 200,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Throttle input",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-95",
+          "type": "label",
+          "name": "throttle_state",
+          "x": 600,
+          "y": 200,
+          "width": 120,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "OK",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#27AE60"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "led-96",
+          "type": "led",
+          "name": "sd_led",
+          "x": 44,
+          "y": 246,
+          "width": 14,
+          "height": 14,
+          "children": [],
+          "props": {
+            "color": "#EB5757",
+            "checked": true,
+            "brightness": 255
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "borderRadius": 9999
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-97",
+          "type": "label",
+          "name": "sd_name",
+          "x": 76,
+          "y": 240,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "SD card",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-98",
+          "type": "label",
+          "name": "sd_state",
+          "x": 600,
+          "y": 240,
+          "width": 120,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "FAIL",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#EB5757"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "led-99",
+          "type": "led",
+          "name": "fw_led",
+          "x": 44,
+          "y": 286,
+          "width": 14,
+          "height": 14,
+          "children": [],
+          "props": {
+            "color": "#8696A8",
+            "checked": false,
+            "brightness": 255
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "borderRadius": 9999
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-100",
+          "type": "label",
+          "name": "fw_name",
+          "x": 76,
+          "y": 280,
+          "width": 400,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "Firmware",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-101",
+          "type": "label",
+          "name": "fw_state",
+          "x": 600,
+          "y": 280,
+          "width": 120,
+          "height": 28,
+          "children": [],
+          "props": {
+            "text": "6.05",
+            "fontSize": 20
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-102",
+          "type": "label",
+          "name": "uptime_caption",
+          "x": 28,
+          "y": 378,
+          "width": 200,
+          "height": 22,
+          "children": [],
+          "props": {
+            "text": "UPTIME",
+            "fontSize": 14
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#8696A8"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "label-103",
+          "type": "label",
+          "name": "uptime_label",
+          "x": 28,
+          "y": 398,
+          "width": 300,
+          "height": 40,
+          "children": [],
+          "props": {
+            "text": "0 s",
+            "fontSize": 32
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "transparent",
+              "textColor": "#E8EEF5"
+            }
+          },
+          "events": [],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-124",
+          "type": "btn",
+          "name": "main2_diagnostics_prev",
+          "x": 24,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "<  Prev",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-125",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main2_statistics"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        },
+        {
+          "id": "btn-126",
+          "type": "btn",
+          "name": "main2_diagnostics_next",
+          "x": 666,
+          "y": 436,
+          "width": 110,
+          "height": 36,
+          "children": [],
+          "props": {
+            "text": "Next  >",
+            "fontSize": 16
+          },
+          "styles": {
+            "default": {
+              "borderWidth": 0,
+              "padding": 0,
+              "opacity": 1,
+              "bgColor": "#243041",
+              "textColor": "#E8EEF5",
+              "borderRadius": 12
+            }
+          },
+          "events": [
+            {
+              "id": "ev-127",
+              "eventType": "LV_EVENT_CLICKED",
+              "handlerType": "builtin",
+              "action": {
+                "type": "navigate",
+                "targetPage": "main1_speed"
+              }
+            }
+          ],
+          "animations": [],
+          "parentId": null,
+          "locked": false,
+          "visible": true
+        }
+      ],
+      "backgroundColor": "#0B0F14"
+    }
+  ],
+  "resources": {
+    "images": [],
+    "fonts": []
+  },
+  "variables": [],
+  "logicGraphs": [
+    {
+      "id": "graph-max-label",
+      "name": "Max speed caption",
+      "description": "",
+      "nodes": [
+        {
+          "id": "g1t",
+          "type": "trigger",
+          "subType": "event_trigger",
+          "label": "Event trigger",
+          "position": {
+            "x": 60,
+            "y": 80
+          },
+          "params": {
+            "eventType": "LV_EVENT_VALUE_CHANGED",
+            "targetComponent": "slider-61"
+          },
+          "inputs": [],
+          "outputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g1t-out-0"
+            },
+            {
+              "name": "Event",
+              "type": "any",
+              "id": "g1t-out-1"
+            }
+          ]
+        },
+        {
+          "id": "g1c",
+          "type": "custom",
+          "subType": "c_code_block",
+          "label": "Lisp code block",
+          "position": {
+            "x": 360,
+            "y": 80
+          },
+          "params": {
+            "code": "(lv-label-set-text ui-max-speed-label (str-merge (str-from-n (lv-slider-get-value ui-max-speed-slider)) \" km/h\"))"
+          },
+          "inputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g1c-in-0"
+            },
+            {
+              "name": "Input1",
+              "type": "any",
+              "id": "g1c-in-1"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Done",
+              "type": "execution",
+              "id": "g1c-out-0"
+            },
+            {
+              "name": "Output1",
+              "type": "any",
+              "id": "g1c-out-1"
+            }
+          ]
+        }
+      ],
+      "connections": [
+        {
+          "id": "c-128",
+          "sourceNode": "g1t",
+          "sourceOutput": "g1t-out-0",
+          "targetNode": "g1c",
+          "targetInput": "g1c-in-0",
+          "type": "execution"
+        }
+      ],
+      "variables": []
+    },
+    {
+      "id": "graph-max-bar",
+      "name": "Max speed bar follows the slider",
+      "description": "",
+      "nodes": [
+        {
+          "id": "g2g",
+          "type": "data",
+          "subType": "get_property",
+          "label": "Get property",
+          "position": {
+            "x": 60,
+            "y": 80
+          },
+          "params": {
+            "targetComponent": "slider-61",
+            "property": "value"
+          },
+          "inputs": [],
+          "outputs": [
+            {
+              "name": "Value",
+              "type": "any",
+              "id": "g2g-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g2s",
+          "type": "action",
+          "subType": "set_value",
+          "label": "Set value",
+          "position": {
+            "x": 380,
+            "y": 80
+          },
+          "params": {
+            "targetComponent": "bar-62"
+          },
+          "inputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g2s-in-0"
+            },
+            {
+              "name": "Number",
+              "type": "int",
+              "id": "g2s-in-1"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Done",
+              "type": "execution",
+              "id": "g2s-out-0"
+            }
+          ]
+        }
+      ],
+      "connections": [
+        {
+          "id": "c-129",
+          "sourceNode": "g2g",
+          "sourceOutput": "g2g-out-0",
+          "targetNode": "g2s",
+          "targetInput": "g2s-in-1",
+          "type": "data"
+        }
+      ],
+      "variables": []
+    },
+    {
+      "id": "graph-uptime",
+      "name": "Uptime counter",
+      "description": "",
+      "nodes": [
+        {
+          "id": "g3t",
+          "type": "trigger",
+          "subType": "timer_trigger",
+          "label": "Timer trigger",
+          "position": {
+            "x": 60,
+            "y": 80
+          },
+          "params": {
+            "mode": "repeat",
+            "duration": 1000
+          },
+          "inputs": [
+            {
+              "name": "Start",
+              "type": "execution",
+              "id": "g3t-in-0"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g3t-out-0"
+            },
+            {
+              "name": "Count",
+              "type": "int",
+              "id": "g3t-out-1"
+            }
+          ]
+        },
+        {
+          "id": "g3c",
+          "type": "custom",
+          "subType": "c_code_block",
+          "label": "Lisp code block",
+          "position": {
+            "x": 360,
+            "y": 80
+          },
+          "params": {
+            "code": "(lv-label-set-text ui-uptime-label (str-merge (str-from-n (to-i (secs-since 0))) \" s\"))"
+          },
+          "inputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g3c-in-0"
+            },
+            {
+              "name": "Input1",
+              "type": "any",
+              "id": "g3c-in-1"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Done",
+              "type": "execution",
+              "id": "g3c-out-0"
+            },
+            {
+              "name": "Output1",
+              "type": "any",
+              "id": "g3c-out-1"
+            }
+          ]
+        }
+      ],
+      "connections": [
+        {
+          "id": "c-130",
+          "sourceNode": "g3t",
+          "sourceOutput": "g3t-out-0",
+          "targetNode": "g3c",
+          "targetInput": "g3c-in-0",
+          "type": "execution"
+        }
+      ],
+      "variables": []
+    },
+    {
+      "id": "graph-sd-blink",
+      "name": "SD card LED blinks",
+      "description": "",
+      "nodes": [
+        {
+          "id": "g4t",
+          "type": "trigger",
+          "subType": "timer_trigger",
+          "label": "Timer trigger",
+          "position": {
+            "x": 60,
+            "y": 80
+          },
+          "params": {
+            "mode": "repeat",
+            "duration": 500
+          },
+          "inputs": [
+            {
+              "name": "Start",
+              "type": "execution",
+              "id": "g4t-in-0"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g4t-out-0"
+            },
+            {
+              "name": "Count",
+              "type": "int",
+              "id": "g4t-out-1"
+            }
+          ]
+        },
+        {
+          "id": "g4h",
+          "type": "action",
+          "subType": "show_hide",
+          "label": "Show/Hide",
+          "position": {
+            "x": 360,
+            "y": 80
+          },
+          "params": {
+            "targetComponent": "led-96",
+            "action": "toggle"
+          },
+          "inputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g4h-in-0"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Done",
+              "type": "execution",
+              "id": "g4h-out-0"
+            }
+          ]
+        }
+      ],
+      "connections": [
+        {
+          "id": "c-131",
+          "sourceNode": "g4t",
+          "sourceOutput": "g4t-out-0",
+          "targetNode": "g4h",
+          "targetInput": "g4h-in-0",
+          "type": "execution"
+        }
+      ],
+      "variables": []
+    }
+  ],
+  "codeGenOptions": {
+    "outputFormat": "single-file",
+    "includeComments": true,
+    "useStaticAllocation": true,
+    "prefix": "ui",
+    "indentSize": 4,
+    "indentStyle": "spaces"
+  },
+  "display": {
+    "width": 800,
+    "height": 480,
+    "colorDepth": 32,
+    "rotation": 0
+  },
+  "lvglConfig": {
+    "version": "9",
+    "colorFormat": "ARGB8888",
+    "fontLarge": true,
+    "defaultFont": "montserrat_14",
+    "useBuiltinSymbols": true,
+    "symbolFont": "montserrat_14",
+    "memSize": 64
+  }
+}

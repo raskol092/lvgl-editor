@@ -125,6 +125,7 @@ export interface ProjectPage {
   id: string;
   name: string;
   components: LvglComponent[];
+  backgroundColor?: string;
 }
 
 export interface ProjectVariable {

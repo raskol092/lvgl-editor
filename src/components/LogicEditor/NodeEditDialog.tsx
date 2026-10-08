@@ -15,7 +15,7 @@ interface NodeEditDialogProps {
 }
 
 /** Widgets whose value can be read (display widgets such as bar or label only receive values) */
-const READABLE_TYPES = ['slider', 'arc', 'switch', 'checkbox', 'dropdown', 'textarea'];
+const READABLE_TYPES = ['slider', 'arc', 'switch', 'checkbox', 'dropdown', 'textarea', 'roller', 'spinbox'];
 
 const COMPARE_OPERATORS: { value: CompareOperator; label: string }[] = [
   { value: '==', label: t('Equal (==)') },

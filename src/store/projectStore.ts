@@ -336,7 +336,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
       createdAt: config.createdAt,
       updatedAt: config.updatedAt,
       canvasSize: { width: config.display.width, height: config.display.height },
-      pages: data.pages.map(p => ({ id: p.id, name: p.name, components: p.components })),
+      pages: data.pages.map(p => ({ id: p.id, name: p.name, components: p.components, backgroundColor: p.backgroundColor })),
       resources: { images, fonts },
       variables: data.variables.map(v => ({
         id: v.id,
@@ -380,7 +380,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
       id: p.id,
       name: p.name,
       components: p.components,
-      backgroundColor: '#F5F5F5',
+      backgroundColor: p.backgroundColor || '#F5F5F5',
     }));
     await dbUpdateProjectData({
       projectId: id,

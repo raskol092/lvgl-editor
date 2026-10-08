@@ -5,6 +5,16 @@ import { useResourceStore } from '../../resources/resourceStore';
 
 /** theme text color used to recolor library icons while building the JSON */
 let iconColor: string | undefined;
+let allComponents: LvglComponent[] = [];
+
+function findComponent(list: LvglComponent[], nameOrId: string): LvglComponent | undefined {
+  for (const c of list) {
+    if (c.id === nameOrId || c.name === nameOrId) return c;
+    const inner = findComponent(c.children, nameOrId);
+    if (inner) return inner;
+  }
+  return undefined;
+}
 
 interface WasmUIJson {
   screen: {
@@ -108,6 +118,10 @@ function flattenTree(
       },
     };
 
+    if (comp.type === 'keyboard' && comp.props.textarea) {
+      const ta = findComponent(allComponents, String(comp.props.textarea));
+      if (ta) wc.props.textareaId = ta.id;
+    }
     if (comp.type === 'img' && comp.props.src) {
       const res = useResourceStore.getState().images.find(i => i.id === comp.props.src || i.name === comp.props.src || i.cArrayName === comp.props.src);
       if (res) wc.props.src = res.id;
@@ -154,6 +168,7 @@ export function editorStateToJson(
 ): string {
   const page = pages.find((p) => p.id === currentPageId);
   iconColor = theme?.colors.text;
+  allComponents = page?.components ?? [];
 
   const json: WasmUIJson = {
     screen: {

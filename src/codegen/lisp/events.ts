@@ -82,6 +82,9 @@ function actionForms(action: BuiltinAction, page: string, names: NameResolver, o
       const n = num(action.value);
       if (type === 'bar') out.push(`(lv-bar-set-value ${target} ${n} LV_ANIM_ON)`);
       else if (type === 'arc') out.push(`(lv-arc-set-value ${target} ${n})`);
+      else if (type === 'roller') out.push(`(lv-roller-set-selected ${target} ${n} LV_ANIM_ON)`);
+      else if (type === 'spinbox') out.push(`(lv-spinbox-set-value ${target} ${n})`);
+      else if (type === 'led') out.push(`(lv-led-set-brightness ${target} ${n})`);
       else out.push(`(lv-slider-set-value ${target} ${n} LV_ANIM_ON)`);
       break;
     }

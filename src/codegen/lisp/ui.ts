@@ -4,6 +4,7 @@ import type { Page, LvglComponent, StyleProps, Animation, Theme } from '../../ty
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LispGenOptions } from './types';
 import type { NameResolver } from './names';
+import { EXTRA_CREATE_FN, extraPropsForms } from './extraWidgets';
 import { isDarkTheme } from '../../utils/isDarkTheme';
 import { getArcStyle, isArcLike } from '../../utils/arcStyle';
 import { sym, lstr, lcolor, lopa, indent, comment, banner, userCode, shift, symbolText } from './sexp';
@@ -20,6 +21,9 @@ export interface UiContext {
   /** color for library icons (theme text color) */
   iconColor?: string;
 }
+
+/** Built-in Montserrat sizes available on the P4 board */
+const BUILTIN_SIZES = [14, 16, 20, 24, 32, 48];
 
 const isBuiltinFont = (name: string) => /^montserrat_\d+$/.test(name);
 
@@ -124,6 +128,23 @@ function styleForms(v: string, st: StyleProps, selector: string, ctx: UiContext)
     set('image-recolor-opa', 'LV_OPA_COVER');
   }
   if (st.opacity !== undefined && st.opacity < 1) set('opa', lopa(st.opacity));
+  // size limits, margins, gaps, offsets, per-part opacity (all optional)
+  const opt: Array<[keyof StyleProps, string, (n: number) => number]> = [
+    ['minWidth', 'min-width', n => n], ['maxWidth', 'max-width', n => n], ['minHeight', 'min-height', n => n], ['maxHeight', 'max-height', n => n],
+    ['marginTop', 'margin-top', n => n], ['marginBottom', 'margin-bottom', n => n], ['marginLeft', 'margin-left', n => n], ['marginRight', 'margin-right', n => n],
+    ['padRow', 'pad-row', n => n], ['padColumn', 'pad-column', n => n],
+    ['translateX', 'translate-x', n => n], ['translateY', 'translate-y', n => n],
+    ['skewX', 'transform-skew-x', n => Math.round(n * 10)], ['skewY', 'transform-skew-y', n => Math.round(n * 10)],
+    ['bgOpa', 'bg-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['borderOpa', 'border-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
+    ['outlineOpa', 'outline-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['textOpa', 'text-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
+    ['textOutlineWidth', 'text-outline-stroke-width', n => n],
+  ];
+  for (const [key, fn, conv] of opt) {
+    const val = st[key];
+    if (typeof val === 'number' && Number.isFinite(val)) set(fn, conv(val));
+  }
+  if (st.clipCorner === true) set('clip-corner', 't');
+  if (st.textOutlineWidth && st.textOutlineColor) set('text-outline-stroke-color', lcolor(st.textOutlineColor));
   if (st.padding !== undefined) {
     for (const side of ['top', 'bottom', 'left', 'right']) set(`pad-${side}`, st.padding);
   }
@@ -210,6 +231,7 @@ const CREATE_FN: Record<string, string> = {
   tileview: 'lv-tileview-create',
   win: 'lv-win-create',
   bar: 'lv-bar-create',
+  led: 'lv-led-create',
   arc: 'lv-arc-create',
   spinner: 'lv-spinner-create',
   chart: 'lv-chart-create',
@@ -229,6 +251,12 @@ function textProps(v: string, props: Record<string, any>, ctx: UiContext): strin
   } else if (props.fontSize !== undefined && ctx.defaultFont && !isBuiltinFont(ctx.defaultFont)) {
     const s = props.fontSize as number;
     if (s !== (ctx.defaultFontSize || 16)) set('text-font', fontSym(ctx.defaultFont, s, ctx.options));
+  } else if (props.fontSize !== undefined && Number.isFinite(Number(props.fontSize))) {
+    // built-in Montserrat: the nearest size the board has (the P4 firmware ships 14 16 20 24 32 48)
+    const want = Number(props.fontSize);
+    const size = BUILTIN_SIZES.reduce((a, b) => (Math.abs(b - want) < Math.abs(a - want) ? b : a));
+    const def = /^montserrat_(\d+)$/.exec(ctx.defaultFont || '');
+    if (size !== (def ? Number(def[1]) : 14)) set('text-font', `font-montserrat-${size}`);
   }
   if (props.textAlign) {
     const al: Record<string, string> = { left: 'LV_TEXT_ALIGN_LEFT', center: 'LV_TEXT_ALIGN_CENTER', right: 'LV_TEXT_ALIGN_RIGHT' };
@@ -266,12 +294,24 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       }
       break;
     }
+    case 'led': {
+      if (props.color) out.push(`(lv-led-set-color ${v} ${lcolor(props.color)})`);
+      out.push(props.checked === false ? `(lv-led-off ${v})` : `(lv-led-on ${v})`);
+      const b = Number(props.brightness ?? 255);
+      if (Number.isFinite(b) && b !== 255 && props.checked !== false) out.push(`(lv-led-set-brightness ${v} ${Math.max(0, Math.min(255, Math.round(b)))})`);
+      break;
+    }
     case 'slider':
     case 'bar': {
       const p = comp.type === 'slider' ? 'slider' : 'bar';
       if (props.min !== undefined || props.max !== undefined) out.push(`(lv-${p}-set-range ${v} ${num(props.min)} ${num(props.max, 100)})`);
       if (props.value !== undefined) out.push(`(lv-${p}-set-value ${v} ${num(props.value)} LV_ANIM_OFF)`);
       if (props.orientation === 'vertical') out.push(`(lv-obj-set-style-transform-rotation ${v} 900 LV_PART_MAIN)`);
+      if (props.indicatorColor) {
+        out.push(`(lv-obj-set-style-bg-color ${v} ${lcolor(props.indicatorColor)} LV_PART_INDICATOR)`);
+        out.push(`(lv-obj-set-style-bg-opa ${v} LV_OPA_COVER LV_PART_INDICATOR)`);
+        if (comp.type === 'slider') out.push(`(lv-obj-set-style-bg-color ${v} ${lcolor(props.indicatorColor)} LV_PART_KNOB)`);
+      }
       break;
     }
     case 'arc': {
@@ -280,6 +320,7 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       }
       if (props.min !== undefined || props.max !== undefined) out.push(`(lv-arc-set-range ${v} ${num(props.min)} ${num(props.max, 100)})`);
       if (props.value !== undefined) out.push(`(lv-arc-set-value ${v} ${num(props.value)})`);
+      if (props.hideKnob === true) out.push(`(lv-obj-set-style-bg-opa ${v} LV_OPA_TRANSP LV_PART_KNOB)`);
       if (props.mode) {
         const m: Record<string, string> = { normal: 'LV_ARC_MODE_NORMAL', symmetrical: 'LV_ARC_MODE_SYMMETRICAL', reverse: 'LV_ARC_MODE_REVERSE' };
         out.push(`(lv-arc-set-mode ${v} ${m[props.mode] || 'LV_ARC_MODE_NORMAL'})`);
@@ -485,6 +526,7 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
     }
   }
 
+  out.push(...extraPropsForms(comp, v, o, ctx.names));
   if (props.flexGrow !== undefined && props.flexGrow > 0) out.push(`(lv-obj-set-flex-grow ${v} ${num(props.flexGrow)})`);
   return out;
 }
@@ -513,7 +555,9 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
   const out: string[] = [];
   if (o.generateComments) out.push(comment(`Create ${comp.type}: ${comp.name}`));
 
-  out.push(`(def ${v} (${CREATE_FN[comp.type] || 'lv-obj-create'} ${parent}))`);
+  out.push(`(def ${v} (${CREATE_FN[comp.type] || EXTRA_CREATE_FN[comp.type] || 'lv-obj-create'} ${parent}))`);
+  // keyboard and message box come centred / bottom-aligned from LVGL: pin them to the top left like every other widget
+  if (comp.type === 'keyboard' || comp.type === 'msgbox') out.push(`(lv-obj-set-align ${v} LV_ALIGN_TOP_LEFT)`);
   out.push(`(lv-obj-set-pos ${v} ${Math.round(comp.x)} ${Math.round(comp.y)})`);
 
   const w = comp.widthMode === 'content' ? 'LV_SIZE_CONTENT' : comp.widthMode === 'percent' ? `(lv-pct ${comp.width})` : String(Math.round(comp.width));

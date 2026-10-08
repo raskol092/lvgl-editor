@@ -77,7 +77,7 @@ npm run lint        # ESLint
 `public/wasm/`; пересобирать её нужно только при изменении `wasm/`:
 
 ```bash
-# нужен Emscripten SDK (https://emscripten.org) и исходники LVGL v9.2
+# нужен Emscripten SDK (https://emscripten.org) и исходники LVGL v9.5
 export EMSDK=$HOME/emsdk
 export LVGL_DIR=$HOME/lvgl          # путь к LVGL (по умолчанию ищется ../lvgl рядом с wasm/)
 ./wasm/build.sh                     # результат копируется в public/wasm/

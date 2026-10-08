@@ -9,6 +9,7 @@ import { useProjectStore } from '../../store/projectStore';
 import type { LvglComponent, StyleProps, LvglAlign, LvglFlags } from '../../types';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import { t } from '../../i18n';
+import { ExtraWidgetEditor } from './extraEditors';
 import ToolIcon from '../icons/ToolIcon';
 import './PropertyEditor.css';
 
@@ -79,12 +80,12 @@ function GridTemplatePreview({ value }: { value: string }) {
 
 // Style section visibility per component type (Task 2)
 const STYLE_SECTION_VISIBILITY: Record<string, Set<string>> = {
-  shadow: new Set(['btn', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'table', 'chart', 'calendar', 'bar', 'arc']),
-  transform: new Set(['btn', 'label', 'img', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'checkbox', 'switch', 'slider', 'bar', 'arc', 'spinner', 'chart', 'table', 'calendar']),
+  shadow: new Set(['btn', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'table', 'chart', 'calendar', 'bar', 'arc', 'roller', 'spinbox', 'keyboard', 'list', 'msgbox', 'scale']),
+  transform: new Set(['btn', 'label', 'img', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'checkbox', 'switch', 'slider', 'bar', 'arc', 'spinner', 'chart', 'table', 'calendar', 'roller', 'spinbox', 'keyboard', 'list', 'msgbox', 'scale']),
   gradient: new Set(['btn', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'bar', 'slider']),
-  outline: new Set(['btn', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'checkbox', 'switch', 'slider', 'bar', 'arc', 'table', 'chart', 'calendar']),
+  outline: new Set(['btn', 'obj', 'tabview', 'tileview', 'win', 'textarea', 'dropdown', 'checkbox', 'switch', 'slider', 'bar', 'arc', 'table', 'chart', 'calendar', 'roller', 'spinbox', 'keyboard', 'list', 'msgbox', 'scale']),
   scrollbar: new Set(['obj', 'tabview', 'tileview', 'win', 'textarea']),
-  textStyle: new Set(['btn', 'label', 'textarea', 'dropdown', 'checkbox', 'table', 'calendar']),
+  textStyle: new Set(['btn', 'label', 'textarea', 'dropdown', 'checkbox', 'table', 'calendar', 'roller', 'spinbox', 'list', 'msgbox']),
   blendMode: new Set(['btn', 'label', 'img', 'obj', 'chart']),
 };
 
@@ -747,6 +748,45 @@ const PropertyEditor: React.FC = () => {
               <span className="range-value">{currentStyles.shadowOpacity ?? 255}</span>
             </div>
           </CollapsibleSection>}
+
+          {/* Advanced */}
+          <CollapsibleSection title={t('Advanced')} defaultOpen={false}>
+            {([
+              ['minWidth', 'Min width'], ['maxWidth', 'Max width'], ['minHeight', 'Min height'], ['maxHeight', 'Max height'],
+              ['marginTop', 'Margin top'], ['marginBottom', 'Margin bottom'], ['marginLeft', 'Margin left'], ['marginRight', 'Margin right'],
+              ['padRow', 'Row gap'], ['padColumn', 'Column gap'],
+              ['translateX', 'Translate X'], ['translateY', 'Translate Y'], ['skewX', 'Skew X'], ['skewY', 'Skew Y'],
+              ['textOutlineWidth', 'Text outline width'],
+            ] as Array<[string, string]>).map(([k, label]) => (
+              <div className="property-row" key={k}>
+                <label>{t(label)}</label>
+                <input
+                  type="number"
+                  value={(currentStyles as Record<string, number | undefined>)[k] ?? 0}
+                  onChange={(e) => handleStyleChange(k as never, parseInt(e.target.value) || 0)}
+                />
+              </div>
+            ))}
+            <div className="property-row">
+              <label>{t('Text outline color')}</label>
+              <input type="color" value={currentStyles.textOutlineColor || '#000000'} onChange={(e) => handleStyleChange('textOutlineColor' as never, e.target.value)} />
+            </div>
+            {([['bgOpa', 'Background opacity'], ['borderOpa', 'Border opacity'], ['outlineOpa', 'Outline opacity'], ['textOpa', 'Text opacity']] as Array<[string, string]>).map(([k, label]) => (
+              <div className="property-row" key={k}>
+                <label>{t(label)}</label>
+                <input
+                  type="range" min={0} max={255} step={1}
+                  value={(currentStyles as Record<string, number | undefined>)[k] ?? 255}
+                  onChange={(e) => handleStyleChange(k as never, parseInt(e.target.value))}
+                />
+                <span className="range-value">{(currentStyles as Record<string, number | undefined>)[k] ?? 255}</span>
+              </div>
+            ))}
+            <div className="property-row">
+              <label>{t('Clip corner')}</label>
+              <input type="checkbox" checked={currentStyles.clipCorner === true} onChange={(e) => handleStyleChange('clipCorner' as never, e.target.checked as never)} />
+            </div>
+          </CollapsibleSection>
 
           {/* Transform */}
           {isSectionVisible('transform', component.type) && <CollapsibleSection title={t('Transform')}>
@@ -1792,6 +1832,13 @@ function renderComponentProps(
             />
           </div>
           <div className="property-row">
+            <label>{t('Indicator color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={props.indicatorColor || '#2196F3'} onChange={(e) => onChange('indicatorColor', e.target.value)} />
+              <input type="text" value={props.indicatorColor || ''} placeholder={t('Theme')} onChange={(e) => onChange('indicatorColor', e.target.value)} className="color-text" />
+            </div>
+          </div>
+          <div className="property-row">
             <label>{t('Direction')}</label>
             <select
               value={props.orientation || 'horizontal'}
@@ -1800,6 +1847,31 @@ function renderComponentProps(
               <option value="horizontal">{t('Horizontal')}</option>
               <option value="vertical">{t('Vertical')}</option>
             </select>
+          </div>
+        </div>
+      );
+
+    case 'led':
+      return (
+        <div className="property-section">
+          <div className="section-header">{t('LED')}</div>
+          <div className="property-row">
+            <label>{t('Color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={props.color || '#2196F3'} onChange={(e) => onChange('color', e.target.value)} />
+              <input type="text" value={props.color || ''} placeholder={t('Theme')} onChange={(e) => onChange('color', e.target.value)} className="color-text" />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('On')}</label>
+            <input type="checkbox" checked={props.checked !== false} onChange={(e) => onChange('checked', e.target.checked)} />
+          </div>
+          <div className="property-row">
+            <label>{t('Brightness')}</label>
+            <div className="range-with-value">
+              <input type="range" min={0} max={255} value={props.brightness ?? 255} onChange={(e) => onChange('brightness', parseInt(e.target.value) || 0)} />
+              <input type="number" className="range-number-input" min={0} max={255} value={props.brightness ?? 255} onChange={(e) => onChange('brightness', Math.max(0, Math.min(255, parseInt(e.target.value) || 0)))} />
+            </div>
           </div>
         </div>
       );
@@ -1858,6 +1930,13 @@ function renderComponentProps(
                 max={props.max ?? 100}
                 onChange={(e) => onChange('value', parseInt(e.target.value) || 0)}
               />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('Indicator color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={props.indicatorColor || '#2196F3'} onChange={(e) => onChange('indicatorColor', e.target.value)} />
+              <input type="text" value={props.indicatorColor || ''} placeholder={t('Theme')} onChange={(e) => onChange('indicatorColor', e.target.value)} className="color-text" />
             </div>
           </div>
           <div className="property-row">
@@ -1955,6 +2034,10 @@ function renderComponentProps(
               <input type="color" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} />
               <input type="text" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} className="color-text" />
             </div>
+          <div className="property-row">
+            <label>{t('Show knob')}</label>
+            <input type="checkbox" checked={props.hideKnob !== true} onChange={(e) => onChange('hideKnob', !e.target.checked)} />
+          </div>
           </div>
           <div className="property-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
             <label>{t('Start angle:')} {props.startAngle || 135}°</label>
@@ -2098,7 +2181,7 @@ function renderComponentProps(
       return <ContainerLayoutEditor props={props} onChange={onChange} />;
 
     default:
-      return null;
+      return <ExtraWidgetEditor type={type} props={props} onChange={onChange} />;
   }
 }
 
