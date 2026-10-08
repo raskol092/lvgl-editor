@@ -38,6 +38,15 @@ const MATH_OPERATORS: { value: MathOperator; label: string }[] = [
   { value: '*', label: t('Multiply (*)') },
   { value: '/', label: t('Divide (/)') },
   { value: '%', label: t('Modulo (%)') },
+  { value: 'min', label: t('Smaller of A and B') },
+  { value: 'max', label: t('Larger of A and B') },
+  { value: 'pow', label: t('Power (A^B)') },
+];
+
+const MATH_FUNCS: { value: string; label: string }[] = [
+  { value: 'abs', label: t('Absolute value') }, { value: 'sqrt', label: t('Square root') },
+  { value: 'floor', label: t('Round down') }, { value: 'ceil', label: t('Round up') }, { value: 'round', label: t('Round') },
+  { value: 'sin', label: t('Sine (radians)') }, { value: 'cos', label: t('Cosine (radians)') },
 ];
 
 const STRING_OPERATIONS: { value: StringOperation; label: string }[] = [
@@ -183,6 +192,24 @@ const NodeEditDialog: React.FC<NodeEditDialogProps> = ({ nodeId, onClose }) => {
                 <option key={op.value} value={op.value}>{op.label}</option>
               ))}
             </select>
+          </div>
+        );
+
+      case 'math_func':
+        return (
+          <div className="param-group">
+            <label>{t('Function')}</label>
+            <select value={params.func || 'abs'} onChange={e => handleParamChange('func', e.target.value)}>
+              {MATH_FUNCS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+            </select>
+          </div>
+        );
+
+      case 'to_string':
+        return (
+          <div className="param-group">
+            <label>{t('Format (printf)')}</label>
+            <input type="text" value={params.format || '%d'} onChange={e => handleParamChange('format', e.target.value)} placeholder="%.1f" />
           </div>
         );
 

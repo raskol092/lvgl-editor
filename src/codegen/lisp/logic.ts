@@ -84,8 +84,35 @@ function expression(node: LogicNode, c: Ctx): string {
       const b = inputValue(node, 'B', c);
       const op = p.operator || '+';
       if (op === '%') return `(mod ${a} ${b})`;
+      if (op === 'min') return `(if (< ${a} ${b}) ${a} ${b})`;
+      if (op === 'max') return `(if (> ${a} ${b}) ${a} ${b})`;
+      if (op === 'pow') return `(pow ${a} ${b})`;
       return `(${['+', '-', '*', '/'].includes(op) ? op : '+'} ${a} ${b})`;
     }
+    case 'map_range': {
+      const v = inputValue(node, 'Value', c);
+      const i0 = inputValue(node, 'In min', c), i1 = inputValue(node, 'In max', c);
+      const o0 = inputValue(node, 'Out min', c), o1 = inputValue(node, 'Out max', c);
+      return `(+ ${o0} (/ (* (- ${v} ${i0}) (- ${o1} ${o0})) (if (= ${i1} ${i0}) 1 (- ${i1} ${i0}))))`;
+    }
+    case 'clamp': {
+      const v = inputValue(node, 'Value', c);
+      const lo = inputValue(node, 'Min', c), hi = inputValue(node, 'Max', c);
+      return `(if (< ${v} ${lo}) ${lo} (if (> ${v} ${hi}) ${hi} ${v}))`;
+    }
+    case 'math_func': {
+      const a = inputValue(node, 'A', c);
+      const f = ['abs', 'sqrt', 'floor', 'ceil', 'round', 'sin', 'cos'].includes(p.func) ? p.func : 'abs';
+      return `(${f} ${a})`;
+    }
+    case 'to_string':
+      return `(str-from-n ${inputValue(node, 'Value', c)} ${lstr(String(p.format || '%d'))})`;
+    case 'random': {
+      const lo = inputValue(node, 'Min', c), hi = inputValue(node, 'Max', c);
+      return `(+ ${lo} (mod (abs (rand)) (+ 1 (- ${hi} ${lo}))))`;
+    }
+    case 'for_loop':
+      return 'loop-i';
     case 'compare': {
       const a = inputValue(node, 'A', c);
       const b = inputValue(node, 'B', c);
@@ -166,6 +193,13 @@ function chain(nodeId: string, c: Ctx, visited: Set<string>): string[] {
     if (rest.length === 0) return [];
     const secs = num(node.params.duration, 1000) / 1000;
     return closeLast([`(ui-defer ${Number.isInteger(secs) ? secs.toFixed(1) : String(secs)} (lambda ()`, ...shift(progn(rest), 2)]).map((l, idx, arr) => (idx === arr.length - 1 ? l + ')' : l));
+  }
+  if (node.subType === 'for_loop') {
+    const bId = outputTarget(node, 'Body', c.graph);
+    const body = bId ? chain(bId, c, new Set(visited)) : [];
+    const lines = closeLast([`(looprange loop-i 0 ${inputValue(node, 'Count', c)}`, ...shift(progn(body.length ? body : [comment('Body')]), 2)]);
+    const dId = outputTarget(node, 'Done', c.graph);
+    return [...lines, ...(dId ? chain(dId, c, visited) : [])];
   }
   const out = [...nodeForms(node, c)];
   if (node.subType !== 'if_else' && node.subType !== 'switch') {

@@ -436,4 +436,26 @@ describe('extra widgets', () => {
     expect(ui).toContain('-anim (anim ms)')
     expectValid(files)
   })
+
+  it('generates the new logic nodes', () => {
+    const lbl = createComponent('label', { id: 'l', name: 'out' } as never)
+    const pages = [createPage({ components: [lbl] } as never)]
+    const port = (id: string, name: string, type: string, def?: unknown) => createLogicPort({ id, name, type, defaultValue: def } as never)
+    const mapN = createLogicNode('map_range', { id: 'm', inputs: [port('a', 'Value', 'float', 5), port('b', 'In min', 'float', 0), port('c', 'In max', 'float', 10), port('d', 'Out min', 'float', 0), port('e', 'Out max', 'float', 100)], outputs: [port('mo', 'Result', 'float')] })
+    const str = createLogicNode('to_string', { id: 's', params: { format: '%.1f' }, inputs: [port('sv', 'Value', 'float')], outputs: [port('so', 'Result', 'string')] })
+    const setT = createLogicNode('set_text', { id: 't', params: { targetComponent: 'l' }, inputs: [exec('ti'), port('tt', 'Text', 'string')], outputs: [exec('to', 'Done')] })
+    const loop = createLogicNode('for_loop', { id: 'f', params: { count: 3 }, inputs: [exec('fi'), port('fc', 'Count', 'int', 3)], outputs: [port('fb', 'Body', 'execution'), port('fd', 'Done', 'execution'), port('fx', 'Index', 'int')] })
+    const trig = createLogicNode('timer_trigger', { id: 'g', outputs: [exec('go')] })
+    const conn = (a: string, ao: string, b: string, bi: string, type = 'data') => createLogicConnection({ sourceNode: a, sourceOutput: ao, targetNode: b, targetInput: bi, type } as never)
+    const g = createLogicGraph({ id: 'g1', name: 'calc', nodes: [trig, loop, mapN, str, setT], connections: [
+      conn('g', 'go', 'f', 'fi', 'execution'), conn('f', 'fb', 't', 'ti', 'execution'),
+      conn('m', 'mo', 's', 'sv'), conn('s', 'so', 't', 'tt'),
+    ] })
+    const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+    expect(src).toContain('(looprange loop-i 0 3')
+    expect(src).toContain('(str-from-n')
+    expect(src).toContain('"%.1f"')
+    expect(src).toContain('(if (= 10.0 0.0) 1 (- 10.0 0.0))')
+    expectValid({ 'ui_logic.lisp': src })
+  })
 })
