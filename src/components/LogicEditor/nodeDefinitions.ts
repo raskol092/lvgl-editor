@@ -257,6 +257,24 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     ],
   },
 
+  {
+    type: 'action',
+    subType: 'for_loop',
+    label: t('Repeat'),
+    description: t('Run the Body branch several times; "Index" is the counter (0, 1, 2, ...)'),
+    icon: '🔁',
+    color: NODE_COLORS.action,
+    defaultParams: { count: 3 },
+    inputs: [
+      { name: 'Exec', type: 'execution' },
+      { name: 'Count', type: 'int', defaultValue: 3 },
+    ],
+    outputs: [
+      { name: 'Body', type: 'execution' },
+      { name: 'Done', type: 'execution' },
+      { name: 'Index', type: 'int' },
+    ],
+  },
   // ============ DATA NODES (Purple) ============
   {
     type: 'data',
@@ -342,6 +360,75 @@ export const NODE_DEFINITIONS: LogicNodeDefinition[] = [
     outputs: [
       { name: 'Value', type: 'any' },
     ],
+  },
+
+  {
+    type: 'data',
+    subType: 'map_range',
+    label: t('Map range'),
+    description: t('Scale a value from one range to another (e.g. 0..4095 to 0..100)'),
+    icon: '↔️',
+    color: NODE_COLORS.data,
+    defaultParams: {},
+    inputs: [
+      { name: 'Value', type: 'float' },
+      { name: 'In min', type: 'float', defaultValue: 0 },
+      { name: 'In max', type: 'float', defaultValue: 100 },
+      { name: 'Out min', type: 'float', defaultValue: 0 },
+      { name: 'Out max', type: 'float', defaultValue: 255 },
+    ],
+    outputs: [{ name: 'Result', type: 'float' }],
+  },
+  {
+    type: 'data',
+    subType: 'clamp',
+    label: t('Clamp'),
+    description: t('Limit a value to a minimum and a maximum'),
+    icon: '📏',
+    color: NODE_COLORS.data,
+    defaultParams: {},
+    inputs: [
+      { name: 'Value', type: 'float' },
+      { name: 'Min', type: 'float', defaultValue: 0 },
+      { name: 'Max', type: 'float', defaultValue: 100 },
+    ],
+    outputs: [{ name: 'Result', type: 'float' }],
+  },
+  {
+    type: 'data',
+    subType: 'math_func',
+    label: t('Math function'),
+    description: t('Absolute value, square root, rounding, sine, cosine'),
+    icon: 'ƒ',
+    color: NODE_COLORS.data,
+    defaultParams: { func: 'abs' },
+    inputs: [{ name: 'A', type: 'float' }],
+    outputs: [{ name: 'Result', type: 'float' }],
+  },
+  {
+    type: 'data',
+    subType: 'to_string',
+    label: t('Number to text'),
+    description: t('Convert a number to text with a printf-style format, e.g. %.1f'),
+    icon: '🔡',
+    color: NODE_COLORS.data,
+    defaultParams: { format: '%d' },
+    inputs: [{ name: 'Value', type: 'float' }],
+    outputs: [{ name: 'Result', type: 'string' }],
+  },
+  {
+    type: 'data',
+    subType: 'random',
+    label: t('Random number'),
+    description: t('A random whole number between Min and Max'),
+    icon: '🎲',
+    color: NODE_COLORS.data,
+    defaultParams: {},
+    inputs: [
+      { name: 'Min', type: 'int', defaultValue: 0 },
+      { name: 'Max', type: 'int', defaultValue: 100 },
+    ],
+    outputs: [{ name: 'Result', type: 'int' }],
   },
 
   // ============ CUSTOM NODES (Gray) ============

@@ -1770,20 +1770,38 @@
 (defun ui-load-screen-main1-speed ()
   (lv-screen-load-anim ui-screen-main1-speed LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))
 
+(defun ui-load-screen-main1-speed-anim (anim ms)
+  (lv-screen-load-anim ui-screen-main1-speed anim ms 0 nil))
+
 (defun ui-load-screen-main1-charts ()
   (lv-screen-load-anim ui-screen-main1-charts LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))
+
+(defun ui-load-screen-main1-charts-anim (anim ms)
+  (lv-screen-load-anim ui-screen-main1-charts anim ms 0 nil))
 
 (defun ui-load-screen-main1-temperature ()
   (lv-screen-load-anim ui-screen-main1-temperature LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))
 
+(defun ui-load-screen-main1-temperature-anim (anim ms)
+  (lv-screen-load-anim ui-screen-main1-temperature anim ms 0 nil))
+
 (defun ui-load-screen-main2-settings ()
   (lv-screen-load-anim ui-screen-main2-settings LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))
+
+(defun ui-load-screen-main2-settings-anim (anim ms)
+  (lv-screen-load-anim ui-screen-main2-settings anim ms 0 nil))
 
 (defun ui-load-screen-main2-statistics ()
   (lv-screen-load-anim ui-screen-main2-statistics LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))
 
+(defun ui-load-screen-main2-statistics-anim (anim ms)
+  (lv-screen-load-anim ui-screen-main2-statistics anim ms 0 nil))
+
 (defun ui-load-screen-main2-diagnostics ()
   (lv-screen-load-anim ui-screen-main2-diagnostics LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))
+
+(defun ui-load-screen-main2-diagnostics-anim (anim ms)
+  (lv-screen-load-anim ui-screen-main2-diagnostics anim ms 0 nil))
 
 ;; ============================================================
 ;; Main init

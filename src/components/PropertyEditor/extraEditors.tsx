@@ -160,3 +160,134 @@ export function ExtraWidgetEditor({ type, props, onChange }: { type: string; pro
       return null;
   }
 }
+
+/** Additional per-widget properties (modes, rotation, scale, dashes, axes...) shown under the main section. */
+export function MoreWidgetProps({ type, props, onChange }: { type: string; props: Props; onChange: OnChange }): React.ReactElement | null {
+  switch (type) {
+    case 'label':
+      return (
+        <Section title={t('Label options')}>
+          <Select
+            label={t('Long text')}
+            value={props.longMode || 'wrap'}
+            options={[['wrap', t('Wrap')], ['scroll', t('Scroll')], ['scroll_circular', t('Scroll circular')], ['dot', t('Dots')], ['clip', t('Clip')]]}
+            onChange={(v) => onChange('longMode', v)}
+          />
+          <Check label={t('Colour markup (#RRGGBB text#)')} value={props.recolor === true} onChange={(v) => onChange('recolor', v)} />
+        </Section>
+      );
+    case 'slider':
+    case 'bar':
+      return (
+        <Section title={type === 'slider' ? t('Slider mode') : t('Bar mode')}>
+          <Select
+            label={t('Mode')}
+            value={props.mode || 'normal'}
+            options={[['normal', t('Normal')], ['symmetrical', t('Symmetrical')], ['range', t('Range (two values)')]]}
+            onChange={(v) => onChange('mode', v)}
+          />
+          {props.mode === 'range' && (
+            <Row label={t('Start value')}><Num value={props.startValue ?? props.min ?? 0} onChange={(v) => onChange('startValue', Math.round(v))} /></Row>
+          )}
+        </Section>
+      );
+    case 'arc':
+      return (
+        <Section title={t('Arc options')}>
+          <Row label={t('Rotation')}><Num value={props.rotation ?? 0} min={0} max={360} onChange={(v) => onChange('rotation', Math.round(v))} /></Row>
+          <Row label={t('Change rate (deg/s)')}><Num value={props.changeRate ?? 720} min={0} onChange={(v) => onChange('changeRate', Math.max(0, Math.round(v)))} /></Row>
+          <Check label={t('Rounded ends')} value={props.rounded !== false} onChange={(v) => onChange('rounded', v)} />
+        </Section>
+      );
+    case 'img':
+      return (
+        <Section title={t('Image options')}>
+          <Select
+            label={t('Inner align')}
+            value={props.innerAlign || 'stretch'}
+            options={[['stretch', t('Stretch')], ['contain', t('Contain')], ['cover', t('Cover')], ['center', t('Center')], ['tile', t('Tile')], ['top_left', t('Top left')]]}
+            onChange={(v) => onChange('innerAlign', v)}
+          />
+          <Row label={t('Scale X (256 = 100%)')}><Num value={props.scaleX ?? 256} min={0} onChange={(v) => onChange('scaleX', Math.max(0, Math.round(v)))} /></Row>
+          <Row label={t('Scale Y (256 = 100%)')}><Num value={props.scaleY ?? 256} min={0} onChange={(v) => onChange('scaleY', Math.max(0, Math.round(v)))} /></Row>
+          <Row label={t('Pivot X')}><Num value={props.pivotX ?? 0} onChange={(v) => onChange('pivotX', Math.round(v))} /></Row>
+          <Row label={t('Pivot Y')}><Num value={props.pivotY ?? 0} onChange={(v) => onChange('pivotY', Math.round(v))} /></Row>
+        </Section>
+      );
+    case 'line':
+      return (
+        <Section title={t('Line options')}>
+          <Check label={t('Rounded ends')} value={props.rounded !== false} onChange={(v) => onChange('rounded', v)} />
+          <Check label={t('Invert Y')} value={props.yInvert === true} onChange={(v) => onChange('yInvert', v)} />
+          <Row label={t('Dash width')}><Num value={props.dashWidth ?? 0} min={0} onChange={(v) => onChange('dashWidth', Math.max(0, Math.round(v)))} /></Row>
+          <Row label={t('Dash gap')}><Num value={props.dashGap ?? 4} min={0} onChange={(v) => onChange('dashGap', Math.max(0, Math.round(v)))} /></Row>
+        </Section>
+      );
+    case 'switch':
+      return (
+        <Section title={t('Switch options')}>
+          <Select
+            label={t('Orientation')}
+            value={props.orientation || 'auto'}
+            options={[['auto', t('Auto')], ['horizontal', t('Horizontal')], ['vertical', t('Vertical')]]}
+            onChange={(v) => onChange('orientation', v)}
+          />
+        </Section>
+      );
+    case 'textarea':
+      return props.password ? (
+        <Section title={t('Password')}>
+          <Row label={t('Show last char for (ms)')}><Num value={props.passwordShowTime ?? 1500} min={0} onChange={(v) => onChange('passwordShowTime', Math.max(0, Math.round(v)))} /></Row>
+        </Section>
+      ) : null;
+    case 'calendar':
+      return (
+        <Section title={t('Calendar options')}>
+          <Select
+            label={t('Header')}
+            value={props.headerMode || 'none'}
+            options={[['none', t('None')], ['arrow', t('Arrows')], ['dropdown', t('Drop-downs')]]}
+            onChange={(v) => onChange('headerMode', v)}
+          />
+          <Row label={t('Today: year')}><Num value={props.todayYear ?? props.year ?? 2025} onChange={(v) => onChange('todayYear', Math.round(v))} /></Row>
+          <Row label={t('Today: month')}><Num value={props.todayMonth ?? props.month ?? 1} min={1} max={12} onChange={(v) => onChange('todayMonth', Math.max(1, Math.min(12, Math.round(v))))} /></Row>
+          <Row label={t('Today: day')}><Num value={props.todayDay ?? 1} min={1} max={31} onChange={(v) => onChange('todayDay', Math.max(1, Math.min(31, Math.round(v))))} /></Row>
+        </Section>
+      );
+    case 'table':
+      return (
+        <Section title={t('Table options')}>
+          <Lines label={t('Merge cell with the one on its right (row,column per line)')} value={props.mergeRight || []} onChange={(v) => onChange('mergeRight', v.filter((x, i, a) => x.trim() !== '' || i === a.length - 1))} />
+          <Check label={t('Crop long cell text')} value={props.textCrop === true} onChange={(v) => onChange('textCrop', v)} />
+        </Section>
+      );
+    case 'chart': {
+      const series: Array<{ name?: string; axis?: string }> = props.series || [];
+      return (
+        <Section title={t('Chart options')}>
+          <Select
+            label={t('Update mode')}
+            value={props.updateMode || 'shift'}
+            options={[['shift', t('Shift')], ['circular', t('Circular')]]}
+            onChange={(v) => onChange('updateMode', v)}
+          />
+          <Row label={t('Point count')}><Num value={props.pointCount ?? 0} min={0} onChange={(v) => onChange('pointCount', Math.max(0, Math.round(v)))} /></Row>
+          <Row label={t('Horizontal grid lines')}><Num value={props.horDivs ?? 3} min={0} onChange={(v) => onChange('horDivs', Math.max(0, Math.round(v)))} /></Row>
+          <Row label={t('Vertical grid lines')}><Num value={props.verDivs ?? 5} min={0} onChange={(v) => onChange('verDivs', Math.max(0, Math.round(v)))} /></Row>
+          <Row label={t('Secondary Y min')}><Num value={props.y2AxisMin ?? 0} onChange={(v) => onChange('y2AxisMin', Math.round(v))} /></Row>
+          <Row label={t('Secondary Y max')}><Num value={props.y2AxisMax ?? 100} onChange={(v) => onChange('y2AxisMax', Math.round(v))} /></Row>
+          {series.map((sr, i) => (
+            <Check
+              key={i}
+              label={`${sr.name || `${t('Series')} ${i + 1}`}: ${t('secondary axis')}`}
+              value={sr.axis === 'secondary'}
+              onChange={(v) => onChange('series', series.map((o, j) => (j === i ? { ...o, axis: v ? 'secondary' : 'primary' } : o)))}
+            />
+          ))}
+        </Section>
+      );
+    }
+    default:
+      return null;
+  }
+}

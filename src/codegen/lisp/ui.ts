@@ -1,5 +1,6 @@
 // ui/ui.lisp generator: screens, widgets, styles and animations
 
+import { styleSelector } from '../../utils/styleKeys';
 import type { Page, LvglComponent, StyleProps, Animation, Theme } from '../../types';
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LispGenOptions } from './types';
@@ -84,7 +85,7 @@ export function collectUsedCustomFonts(
         const s = c.props.fontSize as number;
         if (s !== (defaultFontSize || 16)) add(defaultFont, s);
       }
-      const states: Array<StyleProps | undefined> = [c.styles.default, c.styles.pressed, c.styles.focused, c.styles.disabled];
+      const states: Array<StyleProps | undefined> = Object.values(c.styles);
       for (const st of states) {
         if (st?.textFont && !isBuiltinFont(st.textFont) && custom.has(st.textFont)) add(st.textFont, st.textFontSize || 16);
       }
@@ -138,12 +139,15 @@ function styleForms(v: string, st: StyleProps, selector: string, ctx: UiContext)
     ['bgOpa', 'bg-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['borderOpa', 'border-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
     ['outlineOpa', 'outline-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['textOpa', 'text-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
     ['textOutlineWidth', 'text-outline-stroke-width', n => n],
+    ['transformWidth', 'transform-width', n => n], ['transformHeight', 'transform-height', n => n],
+    ['bgMainStop', 'bg-main-stop', n => Math.max(0, Math.min(255, Math.round(n)))], ['blurRadius', 'blur-radius', n => Math.max(0, Math.round(n))],
   ];
   for (const [key, fn, conv] of opt) {
     const val = st[key];
     if (typeof val === 'number' && Number.isFinite(val)) set(fn, conv(val));
   }
   if (st.clipCorner === true) set('clip-corner', 't');
+  if (st.borderPost === true) set('border-post', 't');
   if (st.textOutlineWidth && st.textOutlineColor) set('text-outline-stroke-color', lcolor(st.textOutlineColor));
   if (st.padding !== undefined) {
     for (const side of ['top', 'bottom', 'left', 'right']) set(`pad-${side}`, st.padding);
@@ -278,9 +282,11 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
         const m: Record<string, string> = {
           wrap: 'LV_LABEL_LONG_MODE_WRAP', scroll: 'LV_LABEL_LONG_MODE_SCROLL',
           dot: 'LV_LABEL_LONG_MODE_DOTS', clip: 'LV_LABEL_LONG_MODE_CLIP',
+          scroll_circular: 'LV_LABEL_LONG_MODE_SCROLL_CIRCULAR',
         };
         out.push(`(lv-label-set-long-mode ${v} ${m[props.longMode] || 'LV_LABEL_LONG_MODE_WRAP'})`);
       }
+      if (props.recolor === true) out.push(`(lv-label-set-recolor ${v} t)`);
       out.push(...textProps(v, props, ctx));
       break;
     }
@@ -305,6 +311,10 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
     case 'bar': {
       const p = comp.type === 'slider' ? 'slider' : 'bar';
       if (props.min !== undefined || props.max !== undefined) out.push(`(lv-${p}-set-range ${v} ${num(props.min)} ${num(props.max, 100)})`);
+      if (props.mode && props.mode !== 'normal') {
+        out.push(`(lv-${p}-set-mode ${v} LV_${p.toUpperCase()}_MODE_${props.mode === 'range' ? 'RANGE' : 'SYMMETRICAL'})`);
+      }
+      if (props.mode === 'range' && props.startValue !== undefined) out.push(`(lv-${p}-set-start-value ${v} ${num(props.startValue)} LV_ANIM_OFF)`);
       if (props.value !== undefined) out.push(`(lv-${p}-set-value ${v} ${num(props.value)} LV_ANIM_OFF)`);
       if (props.orientation === 'vertical') out.push(`(lv-obj-set-style-transform-rotation ${v} 900 LV_PART_MAIN)`);
       if (props.indicatorColor) {
@@ -320,6 +330,12 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       }
       if (props.min !== undefined || props.max !== undefined) out.push(`(lv-arc-set-range ${v} ${num(props.min)} ${num(props.max, 100)})`);
       if (props.value !== undefined) out.push(`(lv-arc-set-value ${v} ${num(props.value)})`);
+      if (props.rotation) out.push(`(lv-arc-set-rotation ${v} ${Math.round(num(props.rotation))})`);
+      if (props.changeRate !== undefined && num(props.changeRate) !== 720) out.push(`(lv-arc-set-change-rate ${v} ${Math.max(0, Math.round(num(props.changeRate)))})`);
+      if (props.rounded !== undefined) {
+        const r = props.rounded === false ? 'nil' : 't';
+        out.push(`(lv-obj-set-style-arc-rounded ${v} ${r} LV_PART_MAIN)`, `(lv-obj-set-style-arc-rounded ${v} ${r} LV_PART_INDICATOR)`);
+      }
       if (props.hideKnob === true) out.push(`(lv-obj-set-style-bg-opa ${v} LV_OPA_TRANSP LV_PART_KNOB)`);
       if (props.mode) {
         const m: Record<string, string> = { normal: 'LV_ARC_MODE_NORMAL', symmetrical: 'LV_ARC_MODE_SYMMETRICAL', reverse: 'LV_ARC_MODE_REVERSE' };
@@ -335,6 +351,9 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
     }
     case 'switch': {
       if (props.checked) out.push(`(lv-obj-add-state ${v} LV_STATE_CHECKED)`);
+      if (props.orientation === 'horizontal' || props.orientation === 'vertical') {
+        out.push(`(lv-switch-set-orientation ${v} LV_SWITCH_ORIENTATION_${props.orientation.toUpperCase()})`);
+      }
       break;
     }
     case 'textarea': {
@@ -342,6 +361,7 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       if (props.text) out.push(`(lv-textarea-set-text ${v} ${lstr(props.text)})`);
       if (props.maxLength && props.maxLength > 0) out.push(`(lv-textarea-set-max-length ${v} ${num(props.maxLength)})`);
       if (props.password) out.push(`(lv-textarea-set-password-mode ${v} t)`);
+      if (props.password && props.passwordShowTime !== undefined && num(props.passwordShowTime) !== 1500) out.push(`(lv-textarea-set-password-show-time ${v} ${Math.max(0, Math.round(num(props.passwordShowTime)))})`);
       if (props.oneLine) out.push(`(lv-textarea-set-one-line ${v} t)`);
       out.push(...textProps(v, props, ctx));
       break;
@@ -369,7 +389,13 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
         out.push(`(lv-obj-set-style-image-recolor ${v} ${lcolor(ctx.iconColor)} LV_PART_MAIN)`);
         out.push(`(lv-obj-set-style-image-recolor-opa ${v} LV_OPA_COVER LV_PART_MAIN)`);
       }
-      out.push(`(lv-image-set-inner-align ${v} LV_IMAGE_ALIGN_STRETCH)`);
+      const ia: Record<string, string> = {
+        stretch: 'STRETCH', contain: 'CONTAIN', cover: 'COVER', center: 'CENTER', tile: 'TILE', top_left: 'TOP_LEFT', default: 'DEFAULT',
+      };
+      out.push(`(lv-image-set-inner-align ${v} LV_IMAGE_ALIGN_${ia[props.innerAlign] || 'STRETCH'})`);
+      if (props.pivotX !== undefined || props.pivotY !== undefined) out.push(`(lv-image-set-pivot ${v} ${Math.round(num(props.pivotX))} ${Math.round(num(props.pivotY))})`);
+      if (props.scaleX !== undefined && num(props.scaleX) !== 256) out.push(`(lv-image-set-scale-x ${v} ${Math.max(0, Math.round(num(props.scaleX)))})`);
+      if (props.scaleY !== undefined && num(props.scaleY) !== 256) out.push(`(lv-image-set-scale-y ${v} ${Math.max(0, Math.round(num(props.scaleY)))})`);
       if (props.rotation) out.push(`(lv-image-set-rotation ${v} ${Math.round(num(props.rotation) * 10)})`);
       break;
     }
@@ -381,6 +407,12 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       }
       if (props.lineWidth && props.lineWidth !== 2) out.push(`(lv-obj-set-style-line-width ${v} ${num(props.lineWidth)} LV_PART_MAIN)`);
       if (props.lineColor) out.push(`(lv-obj-set-style-line-color ${v} ${lcolor(props.lineColor)} LV_PART_MAIN)`);
+      if (props.yInvert === true) out.push(`(lv-line-set-y-invert ${v} t)`);
+      if (props.rounded === false) out.push(`(lv-obj-set-style-line-rounded ${v} nil LV_PART_MAIN)`);
+      if (num(props.dashWidth) > 0) {
+        out.push(`(lv-obj-set-style-line-dash-width ${v} ${Math.round(num(props.dashWidth))} LV_PART_MAIN)`);
+        out.push(`(lv-obj-set-style-line-dash-gap ${v} ${Math.round(num(props.dashGap, 4))} LV_PART_MAIN)`);
+      }
       break;
     }
     case 'table': {
@@ -390,6 +422,15 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
         props.columnWidths.forEach((w: unknown, i: number) => {
           if (w !== undefined) out.push(`(lv-table-set-column-width ${v} ${i} ${num(w)})`);
         });
+      }
+      if (Array.isArray(props.mergeRight)) {
+        for (const cell of props.mergeRight as string[]) {
+          const m = /^\s*(\d+)\s*,\s*(\d+)\s*$/.exec(String(cell));
+          if (m) out.push(`(lv-table-set-cell-ctrl ${v} ${m[1]} ${m[2]} LV_TABLE_CELL_CTRL_MERGE_RIGHT)`);
+        }
+      }
+      if (props.textCrop === true) {
+        for (let r = 0; r < num(props.rows, 3); r++) for (let c = 0; c < num(props.cols, 3); c++) out.push(`(lv-table-set-cell-ctrl ${v} ${r} ${c} LV_TABLE_CELL_CTRL_TEXT_CROP)`);
       }
       if (Array.isArray(props.cellData)) {
         props.cellData.forEach((row: unknown, r: number) => {
@@ -402,7 +443,10 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       break;
     }
     case 'calendar': {
-      if (props.showToday) out.push(`(lv-calendar-set-today-date ${v} ${num(props.year, 2025)} ${num(props.month, 1)} 1)`);
+      if (props.showToday) out.push(`(lv-calendar-set-today-date ${v} ${num(props.todayYear ?? props.year, 2025)} ${num(props.todayMonth ?? props.month, 1)} ${num(props.todayDay, 1)})`);
+      if (props.year !== undefined || props.month !== undefined) out.push(`(lv-calendar-set-month-shown ${v} ${num(props.year, 2025)} ${num(props.month, 1)})`);
+      if (props.headerMode === 'arrow') out.push(`(lv-calendar-add-header-arrow ${v})`);
+      else if (props.headerMode === 'dropdown') out.push(`(lv-calendar-add-header-dropdown ${v})`);
       if (Array.isArray(props.highlightedDates) && props.highlightedDates.length > 0) {
         out.push(comment('highlighted dates are not exposed by the LVGL bridge'));
       }
@@ -410,30 +454,37 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
     }
     case 'chart': {
       if (props.type) {
-        const m: Record<string, string> = { line: 'LV_CHART_TYPE_LINE', bar: 'LV_CHART_TYPE_BAR', scatter: 'LV_CHART_TYPE_SCATTER' };
+        const m: Record<string, string> = { line: 'LV_CHART_TYPE_LINE', bar: 'LV_CHART_TYPE_BAR', scatter: 'LV_CHART_TYPE_SCATTER', curve: 'LV_CHART_TYPE_CURVE', stacked: 'LV_CHART_TYPE_STACKED' };
         out.push(`(lv-chart-set-type ${v} ${m[props.type] || 'LV_CHART_TYPE_LINE'})`);
       }
       if (props.yAxisMin !== undefined || props.yAxisMax !== undefined) {
         out.push(`(lv-chart-set-axis-range ${v} LV_CHART_AXIS_PRIMARY_Y ${num(props.yAxisMin)} ${num(props.yAxisMax, 100)})`);
       }
-      const series: Array<{ color?: string; data?: number[] }> =
+      if (props.y2AxisMin !== undefined || props.y2AxisMax !== undefined) {
+        out.push(`(lv-chart-set-axis-range ${v} LV_CHART_AXIS_SECONDARY_Y ${num(props.y2AxisMin)} ${num(props.y2AxisMax, 100)})`);
+      }
+      if (props.updateMode === 'circular') out.push(`(lv-chart-set-update-mode ${v} LV_CHART_UPDATE_MODE_CIRCULAR)`);
+      const series: Array<{ color?: string; data?: number[]; axis?: string }> =
         Array.isArray(props.series) && props.series.length > 0
           ? props.series
           : Array.isArray(props.data) && props.data.length > 0
             ? [{ color: props.lineColor, data: props.data }]
             : [];
       if (series.length > 0) {
-        const count = Math.max(...series.map(s => (Array.isArray(s.data) ? s.data.length : 0)), 1);
+        const dataCount = Math.max(...series.map(s => (Array.isArray(s.data) ? s.data.length : 0)), 1);
+        const count = props.pointCount ? Math.max(dataCount, Math.round(num(props.pointCount))) : dataCount;
         out.push(`(lv-chart-set-point-count ${v} ${count})`);
         series.forEach((s, i) => {
           const sv = `${v}${o.namingStyle === 'snake_case' ? '_' : '-'}ser${o.namingStyle === 'snake_case' ? '_' : '-'}${i}`;
-          out.push(`(def ${sv} (lv-chart-add-series ${v} ${lcolor(s.color || '#2196F3')} LV_CHART_AXIS_PRIMARY_Y))`);
+          out.push(`(def ${sv} (lv-chart-add-series ${v} ${lcolor(s.color || '#2196F3')} ${s.axis === 'secondary' ? 'LV_CHART_AXIS_SECONDARY_Y' : 'LV_CHART_AXIS_PRIMARY_Y'}))`);
           if (Array.isArray(s.data) && s.data.length > 0) {
             out.push(`(lv-chart-set-series-values ${v} ${sv} (list ${s.data.map(n => num(n)).join(' ')}))`);
           }
         });
       }
-      if (props.showGrid === false) out.push(`(lv-chart-set-div-line-count ${v} 0 0)`);
+      if (props.horDivs !== undefined || props.verDivs !== undefined) {
+        out.push(`(lv-chart-set-div-line-count ${v} ${Math.max(0, Math.round(num(props.horDivs, 3)))} ${Math.max(0, Math.round(num(props.verDivs, 5)))})`);
+      } else if (props.showGrid === false) out.push(`(lv-chart-set-div-line-count ${v} 0 0)`);
       break;
     }
     case 'spinner': {
@@ -587,6 +638,14 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
     if (f.pressLock) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_PRESS_LOCK)`);
     if (f.eventBubble) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_EVENT_BUBBLE)`);
     if (f.gesturesBubble) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_GESTURE_BUBBLE)`);
+    if (f.clickFocusable === false) out.push(`(lv-obj-remove-flag ${v} LV_OBJ_FLAG_CLICK_FOCUSABLE)`);
+    const extra: Array<[boolean | undefined, string]> = [
+      [f.scrollOne, 'SCROLL_ONE'], [f.scrollChainHor, 'SCROLL_CHAIN_HOR'], [f.scrollChainVer, 'SCROLL_CHAIN_VER'],
+      [f.scrollWithArrow, 'SCROLL_WITH_ARROW'], [f.eventTrickle, 'EVENT_TRICKLE'], [f.stateTrickle, 'STATE_TRICKLE'],
+      [f.advHittest, 'ADV_HITTEST'], [f.floating, 'FLOATING'], [f.ignoreLayout, 'IGNORE_LAYOUT'],
+      [f.overflowVisible, 'OVERFLOW_VISIBLE'], [f.flexInNewTrack, 'FLEX_IN_NEW_TRACK'],
+    ];
+    for (const [on, name] of extra) if (on) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_${name})`);
   }
 
   const sb = comp.styles.default.scrollbarMode;
@@ -606,14 +665,17 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
     out.push(`(lv-obj-set-style-arc-width ${v} ${arc.width} LV_PART_INDICATOR)`);
     out.push(`(lv-obj-set-style-arc-color ${v} ${lcolor(arc.color)} LV_PART_INDICATOR)`);
   }
-  if (comp.styles.pressed) out.push(...styleForms(v, comp.styles.pressed, 'LV_STATE_PRESSED', ctx));
-  if (comp.styles.focused) out.push(...styleForms(v, comp.styles.focused, 'LV_STATE_FOCUSED', ctx));
-  if (comp.styles.disabled) out.push(...styleForms(v, comp.styles.disabled, 'LV_STATE_DISABLED', ctx));
+  for (const [key, st] of Object.entries(comp.styles)) {
+    const sel = styleSelector(key);
+    if (st && sel) out.push(...styleForms(v, st, sel, ctx));
+  }
 
   out.push(...propsForms(comp, v, ctx));
 
   for (const ev of comp.events) {
-    out.push(`(lv-obj-add-event-cb ${v} '${ctx.names.eventHandler(comp, ev)} ${ev.eventType})`);
+    // screen events are only sent to screen objects: register them on the screen the component is on
+    const evTarget = ev.eventType.startsWith('LV_EVENT_SCREEN_') ? ctx.names.screenVar(pageName) : v;
+    out.push(`(lv-obj-add-event-cb ${evTarget} '${ctx.names.eventHandler(comp, ev)} ${ev.eventType})`);
   }
 
   out.push(...animForms(v, comp.animations || [], ctx));
@@ -779,6 +841,8 @@ export function generateUiLisp(pages: Page[], ctx: UiContext, theme?: Theme): st
   for (const page of pages) {
     L.push(`(defun ${ctx.names.loadFn(page.name)} ()`);
     L.push(`${indent(o)}(lv-screen-load-anim ${ctx.names.screenVar(page.name)} LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))`, '');
+    L.push(`(defun ${ctx.names.loadFn(page.name)}${o.namingStyle === 'snake_case' ? '_anim' : '-anim'} (anim ms)`);
+    L.push(`${indent(o)}(lv-screen-load-anim ${ctx.names.screenVar(page.name)} anim ms 0 nil))`, '');
   }
 
   if (o.generateComments) L.push(...banner('Main init'));

@@ -23,6 +23,22 @@ const BUILTIN_ACTIONS: { type: BuiltinActionType; label: string; description: st
   { type: 'disable', label: t('Disable component'), description: t('Disable the specified component') },
   { type: 'setText', label: t('Set text'), description: t('Set the component\'s text content') },
   { type: 'setValue', label: t('Set value'), description: t('Set the component\'s numeric value') },
+  { type: 'setState', label: t('Set state'), description: t('Turn a state (checked, disabled, ...) on, off or toggle it') },
+  { type: 'setFlag', label: t('Set flag'), description: t('Turn an object flag (hidden, clickable, ...) on, off or toggle it') },
+];
+
+const STATE_CHOICES: Array<[string, string]> = [
+  ['checked', t('Checked')], ['disabled', t('Disabled')], ['focused', t('Focused state')], ['pressed', t('Press')],
+  ['hovered', t('Hovered')], ['edited', t('Edited')], ['user_1', 'User 1'], ['user_2', 'User 2'],
+];
+const FLAG_CHOICES: Array<[string, string]> = [
+  ['hidden', t('Hide')], ['clickable', t('Clickable')], ['checkable', t('Checkable')], ['scrollable', t('Scrollable')],
+  ['floating', t('Floating')], ['ignore_layout', t('Ignore layout')], ['event_bubble', t('Event bubble')], ['press_lock', t('Press lock')],
+];
+const SCREEN_ANIMS: Array<[string, string]> = [
+  ['none', t('None')], ['fade', t('Fade')], ['move_left', t('Move left')], ['move_right', t('Move right')],
+  ['move_top', t('Move up')], ['move_bottom', t('Move down')], ['over_left', t('Over left')], ['over_right', t('Over right')],
+  ['over_top', t('Over top')], ['over_bottom', t('Over bottom')],
 ];
 
 const CODE_TEMPLATE = `;; Event handler code (LispBM)
@@ -59,6 +75,8 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
     event?.action?.type || 'navigate'
   );
   const [targetPage, setTargetPage] = useState(event?.action?.targetPage || '');
+  const [animation, setAnimation] = useState(event?.action?.animation || 'none');
+  const [duration, setDuration] = useState<number>(event?.action?.duration ?? 300);
   const [targetComponent, setTargetComponent] = useState(event?.action?.targetComponent || '');
   const [property, setProperty] = useState(event?.action?.property || '');
   const [value, setValue] = useState<string>(
@@ -94,6 +112,13 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
       switch (actionType) {
         case 'navigate':
           action.targetPage = targetPage;
+          if (animation !== 'none') { action.animation = animation; action.duration = duration; }
+          break;
+        case 'setState':
+        case 'setFlag':
+          action.targetComponent = targetComponent;
+          action.property = property;
+          action.value = value || 'on';
           break;
         case 'setProperty':
           action.targetComponent = targetComponent;
@@ -124,7 +149,7 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
     onSave(newEvent);
   }, [
     event, eventType, handlerType, actionType,
-    targetPage, targetComponent, property, value, customCode, onSave
+    targetPage, targetComponent, property, value, customCode, onSave, animation, duration
   ]);
 
   const generateCodePreview = (): string => {
@@ -141,6 +166,12 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
       case 'navigate':
         code += `    ;; Navigate to page: ${targetPage || 'page_name'}\n`;
         code += `    (ui-load-screen-${page})\n`;
+        break;
+      case 'setState':
+        code += `    ;; ${value || 'on'} state ${property || 'checked'}\n`;
+        break;
+      case 'setFlag':
+        code += `    ;; ${value || 'on'} flag ${property || 'hidden'}\n`;
         break;
       case 'setProperty':
         code += `    ;; Set property: ${property || 'property'} = ${value || 'value'}\n`;
@@ -196,6 +227,49 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
                 ))}
               </select>
             </div>
+            <div className="config-row">
+              <label>{t('Animation')}</label>
+              <select value={animation} onChange={(e) => setAnimation(e.target.value)}>
+                {SCREEN_ANIMS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              </select>
+            </div>
+            {animation !== 'none' && (
+              <div className="config-row">
+                <label>{t('Duration (ms)')}</label>
+                <input type="number" min={0} value={duration} onChange={(e) => setDuration(Math.max(0, parseInt(e.target.value) || 0))} />
+              </div>
+            )}
+          </div>
+        );
+
+      case 'setState':
+      case 'setFlag':
+        return (
+          <div className="action-config">
+            <div className="config-row">
+              <label>{t('Target component')}</label>
+              <select value={targetComponent} onChange={(e) => setTargetComponent(e.target.value)}>
+                <option value="">{t('Select component...')}</option>
+                {allComponents.map(comp => (
+                  <option key={comp.id} value={comp.name}>{comp.name} ({comp.type})</option>
+                ))}
+              </select>
+            </div>
+            <div className="config-row">
+              <label>{actionType === 'setState' ? t('State') : t('Flag')}</label>
+              <select value={property} onChange={(e) => setProperty(e.target.value)}>
+                <option value="">{t('Select...')}</option>
+                {(actionType === 'setState' ? STATE_CHOICES : FLAG_CHOICES).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              </select>
+            </div>
+            <div className="config-row">
+              <label>{t('Mode')}</label>
+              <select value={value || 'on'} onChange={(e) => setValue(e.target.value)}>
+                <option value="on">{t('On')}</option>
+                <option value="off">{t('Off')}</option>
+                <option value="toggle">{t('Toggle')}</option>
+              </select>
+            </div>
           </div>
         );
 
@@ -232,6 +306,10 @@ const EventEditDialog: React.FC<EventEditDialogProps> = ({
                 <option value="y">{t('Y coordinate (y)')}</option>
                 <option value="width">{t('Width (width)')}</option>
                 <option value="height">{t('Height (height)')}</option>
+                <option value="text_color">{t('Text color (text_color)')}</option>
+                <option value="bg_opa">{t('Background opacity (bg_opa)')}</option>
+                <option value="translate_x">{t('Translate X (translate_x)')}</option>
+                <option value="translate_y">{t('Translate Y (translate_y)')}</option>
               </select>
             </div>
             <div className="config-row">

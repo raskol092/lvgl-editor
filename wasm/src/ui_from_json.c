@@ -90,6 +90,7 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
             {"marginTop", 4}, {"marginBottom", 5}, {"marginLeft", 6}, {"marginRight", 7},
             {"padRow", 8}, {"padColumn", 9}, {"translateX", 10}, {"translateY", 11}, {"skewX", 12}, {"skewY", 13},
             {"bgOpa", 14}, {"borderOpa", 15}, {"outlineOpa", 16}, {"textOpa", 17}, {"textOutlineWidth", 18},
+            {"transformWidth", 19}, {"transformHeight", 20}, {"bgMainStop", 21}, {"blurRadius", 22},
         };
         for (unsigned k = 0; k < sizeof(extra) / sizeof(extra[0]); k++) {
             cJSON *it2 = cJSON_GetObjectItemCaseSensitive(style, extra[k].key);
@@ -116,9 +117,14 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
                 case 16: lv_obj_set_style_outline_opa(obj, opa, sel); break;
                 case 17: lv_obj_set_style_text_opa(obj, opa, sel); break;
                 case 18: lv_obj_set_style_text_outline_stroke_width(obj, n, sel); break;
+                case 19: lv_obj_set_style_transform_width(obj, n, sel); break;
+                case 20: lv_obj_set_style_transform_height(obj, n, sel); break;
+                case 21: lv_obj_set_style_bg_main_stop(obj, n < 0 ? 0 : n > 255 ? 255 : n, sel); break;
+                case 22: lv_obj_set_style_blur_radius(obj, n, sel); break;
             }
         }
         if (cjson_get_bool(style, "clipCorner", 0)) lv_obj_set_style_clip_corner(obj, true, sel);
+        if (cjson_get_bool(style, "borderPost", 0)) lv_obj_set_style_border_post(obj, true, sel);
         s = cjson_get_string(style, "textOutlineColor");
         if (s) lv_obj_set_style_text_outline_stroke_color(obj, hex_to_color(s), sel);
     }
@@ -188,9 +194,38 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
 static void apply_styles(lv_obj_t *obj, const cJSON *styles) {
     if (!styles) return;
     apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "default"), LV_PART_MAIN | LV_STATE_DEFAULT);
-    apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "pressed"), LV_PART_MAIN | LV_STATE_PRESSED);
-    apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "focused"), LV_PART_MAIN | LV_STATE_FOCUSED);
-    apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "disabled"), LV_PART_MAIN | LV_STATE_DISABLED);
+    /* every other key is a state ("pressed"), a part ("knob") or both ("knob:pressed") */
+    static const struct { const char *name; uint32_t v; } parts[] = {
+        { "indicator", LV_PART_INDICATOR }, { "knob", LV_PART_KNOB }, { "items", LV_PART_ITEMS },
+        { "selected", LV_PART_SELECTED }, { "cursor", LV_PART_CURSOR }, { "scrollbar", LV_PART_SCROLLBAR },
+    };
+    static const struct { const char *name; uint32_t v; } states[] = {
+        { "pressed", LV_STATE_PRESSED }, { "focused", LV_STATE_FOCUSED }, { "disabled", LV_STATE_DISABLED },
+        { "checked", LV_STATE_CHECKED }, { "hovered", LV_STATE_HOVERED }, { "edited", LV_STATE_EDITED },
+        { "scrolled", LV_STATE_SCROLLED },
+    };
+    for (const cJSON *st = styles->child; st; st = st->next) {
+        const char *key = st->string;
+        if (!key || strcmp(key, "default") == 0) continue;
+        char buf[48];
+        strncpy(buf, key, sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = 0;
+        char *colon = strchr(buf, ':');
+        const char *state_name = NULL;
+        if (colon) { *colon = 0; state_name = colon + 1; }
+        uint32_t part = LV_PART_MAIN, state = LV_STATE_DEFAULT;
+        int ok = 0;
+        for (unsigned i = 0; i < sizeof(parts) / sizeof(parts[0]); i++)
+            if (strcmp(buf, parts[i].name) == 0) { part = parts[i].v; ok = 1; }
+        if (!ok) state_name = buf;
+        if (state_name) {
+            int sok = 0;
+            for (unsigned i = 0; i < sizeof(states) / sizeof(states[0]); i++)
+                if (strcmp(state_name, states[i].name) == 0) { state = states[i].v; sok = 1; }
+            if (!sok) continue;
+        } else if (!ok) continue;
+        apply_style_state(obj, st, part | state);
+    }
 }
 
 /* ------------------------------------------------------------------ */
@@ -254,6 +289,15 @@ static lv_obj_t *create_label(lv_obj_t *parent, const cJSON *comp) {
     if (props) {
         const char *text = cjson_get_string(props, "text");
         if (text) lv_label_set_text(lbl, text);
+        const char *lm = cjson_get_string(props, "longMode");
+        if (lm) {
+            if (!strcmp(lm, "scroll")) lv_label_set_long_mode(lbl, LV_LABEL_LONG_MODE_SCROLL);
+            else if (!strcmp(lm, "scroll_circular")) lv_label_set_long_mode(lbl, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
+            else if (!strcmp(lm, "dot")) lv_label_set_long_mode(lbl, LV_LABEL_LONG_MODE_DOTS);
+            else if (!strcmp(lm, "clip")) lv_label_set_long_mode(lbl, LV_LABEL_LONG_MODE_CLIP);
+            else lv_label_set_long_mode(lbl, LV_LABEL_LONG_MODE_WRAP);
+        }
+        if (cjson_get_bool(props, "recolor", 0)) lv_label_set_recolor(lbl, true);
     }
     return lbl;
 }
@@ -266,6 +310,11 @@ static lv_obj_t *create_slider(lv_obj_t *parent, const cJSON *comp) {
         int mx = cjson_get_int(props, "max", 100);
         int val = cjson_get_int(props, "value", 50);
         lv_slider_set_range(slider, mn, mx);
+        const char *md = cjson_get_string(props, "mode");
+        if (md && !strcmp(md, "range")) lv_slider_set_mode(slider, LV_SLIDER_MODE_RANGE);
+        else if (md && !strcmp(md, "symmetrical")) lv_slider_set_mode(slider, LV_SLIDER_MODE_SYMMETRICAL);
+        if (md && !strcmp(md, "range") && cJSON_GetObjectItemCaseSensitive(props, "startValue"))
+            lv_slider_set_start_value(slider, cjson_get_int(props, "startValue", mn), LV_ANIM_OFF);
         lv_slider_set_value(slider, val, LV_ANIM_OFF);
         const char *ic = cjson_get_string(props, "indicatorColor");
         if (ic) {
@@ -285,6 +334,11 @@ static lv_obj_t *create_bar(lv_obj_t *parent, const cJSON *comp) {
         int mx = cjson_get_int(props, "max", 100);
         int val = cjson_get_int(props, "value", 50);
         lv_bar_set_range(bar, mn, mx);
+        const char *md = cjson_get_string(props, "mode");
+        if (md && !strcmp(md, "range")) lv_bar_set_mode(bar, LV_BAR_MODE_RANGE);
+        else if (md && !strcmp(md, "symmetrical")) lv_bar_set_mode(bar, LV_BAR_MODE_SYMMETRICAL);
+        if (md && !strcmp(md, "range") && cJSON_GetObjectItemCaseSensitive(props, "startValue"))
+            lv_bar_set_start_value(bar, cjson_get_int(props, "startValue", mn), LV_ANIM_OFF);
         lv_bar_set_value(bar, val, LV_ANIM_OFF);
         const char *ic = cjson_get_string(props, "indicatorColor");
         if (ic) {
@@ -315,6 +369,13 @@ static lv_obj_t *create_arc(lv_obj_t *parent, const cJSON *comp) {
         if (tc) lv_obj_set_style_arc_color(arc, hex_to_color(tc), LV_PART_MAIN);
         if (ac) lv_obj_set_style_arc_color(arc, hex_to_color(ac), LV_PART_INDICATOR);
         if (cjson_get_bool(props, "hideKnob", 0)) lv_obj_set_style_bg_opa(arc, LV_OPA_TRANSP, LV_PART_KNOB);
+        if (cjson_get_int(props, "rotation", 0)) lv_arc_set_rotation(arc, cjson_get_int(props, "rotation", 0));
+        if (cJSON_GetObjectItemCaseSensitive(props, "changeRate")) lv_arc_set_change_rate(arc, cjson_get_int(props, "changeRate", 720));
+        if (cJSON_GetObjectItemCaseSensitive(props, "rounded")) {
+            bool rd = cjson_get_bool(props, "rounded", 1);
+            lv_obj_set_style_arc_rounded(arc, rd, LV_PART_MAIN);
+            lv_obj_set_style_arc_rounded(arc, rd, LV_PART_INDICATOR);
+        }
     }
     return arc;
 }
@@ -325,6 +386,9 @@ static lv_obj_t *create_switch(lv_obj_t *parent, const cJSON *comp) {
     if (props) {
         int checked = cjson_get_bool(props, "checked", 0);
         if (checked) lv_obj_add_state(sw, LV_STATE_CHECKED);
+        const char *ori = cjson_get_string(props, "orientation");
+        if (ori && !strcmp(ori, "horizontal")) lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_HORIZONTAL);
+        else if (ori && !strcmp(ori, "vertical")) lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_VERTICAL);
     }
     return sw;
 }
@@ -374,6 +438,11 @@ static lv_obj_t *create_textarea(lv_obj_t *parent, const cJSON *comp) {
         if (text && text[0]) lv_textarea_set_text(ta, text);
         const char *ph = cjson_get_string(props, "placeholder");
         if (ph) lv_textarea_set_placeholder_text(ta, ph);
+        if (cjson_get_bool(props, "password", 0)) {
+            lv_textarea_set_password_mode(ta, true);
+            if (cJSON_GetObjectItemCaseSensitive(props, "passwordShowTime"))
+                lv_textarea_set_password_show_time(ta, (uint32_t)cjson_get_int(props, "passwordShowTime", 1500));
+        }
     }
     return ta;
 }
@@ -413,6 +482,20 @@ static lv_obj_t *create_table(lv_obj_t *parent, const cJSON *comp) {
                 ri++;
             }
         }
+        cJSON *mr = cJSON_GetObjectItemCaseSensitive(props, "mergeRight");
+        if (cJSON_IsArray(mr)) {
+            cJSON *m;
+            cJSON_ArrayForEach(m, mr) {
+                int mrow, mcol;
+                if (cJSON_IsString(m) && sscanf(m->valuestring, " %d , %d", &mrow, &mcol) == 2)
+                    lv_table_set_cell_ctrl(tbl, (uint32_t)mrow, (uint32_t)mcol, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+            }
+        }
+        if (cjson_get_bool(props, "textCrop", 0)) {
+            int nr = cjson_get_int(props, "rows", 3), nc = cjson_get_int(props, "cols", 3);
+            for (int r = 0; r < nr; r++)
+                for (int c = 0; c < nc; c++) lv_table_set_cell_ctrl(tbl, (uint32_t)r, (uint32_t)c, LV_TABLE_CELL_CTRL_TEXT_CROP);
+        }
     }
     return tbl;
 }
@@ -420,25 +503,64 @@ static lv_obj_t *create_table(lv_obj_t *parent, const cJSON *comp) {
 static lv_obj_t *create_chart(lv_obj_t *parent, const cJSON *comp) {
     lv_obj_t *chart = lv_chart_create(parent);
     const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
-    if (props) {
-        const char *type_str = cjson_get_string(props, "type");
-        if (type_str && strcmp(type_str, "bar") == 0)
-            lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
-        else
-            lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-
-        cJSON *data = cJSON_GetObjectItemCaseSensitive(props, "data");
-        if (cJSON_IsArray(data)) {
-            int cnt = cJSON_GetArraySize(data);
-            lv_chart_set_point_count(chart, (uint32_t)cnt);
-            lv_chart_series_t *ser = lv_chart_add_series(chart, lv_color_hex(0x2196F3), LV_CHART_AXIS_PRIMARY_Y);
-            cJSON *val;
-            cJSON_ArrayForEach(val, data) {
-                if (cJSON_IsNumber(val))
-                    lv_chart_set_next_value(chart, ser, val->valueint);
-            }
-        }
+    if (!props) return chart;
+    const char *type_str = cjson_get_string(props, "type");
+    lv_chart_type_t ct = LV_CHART_TYPE_LINE;
+    if (type_str) {
+        if (strcmp(type_str, "bar") == 0) ct = LV_CHART_TYPE_BAR;
+        else if (strcmp(type_str, "scatter") == 0) ct = LV_CHART_TYPE_SCATTER;
+        else if (strcmp(type_str, "curve") == 0) ct = LV_CHART_TYPE_CURVE;
+        else if (strcmp(type_str, "stacked") == 0) ct = LV_CHART_TYPE_STACKED;
     }
+    lv_chart_set_type(chart, ct);
+    const cJSON *ymin = cJSON_GetObjectItemCaseSensitive(props, "yAxisMin");
+    const cJSON *ymax = cJSON_GetObjectItemCaseSensitive(props, "yAxisMax");
+    if (cJSON_IsNumber(ymin) || cJSON_IsNumber(ymax))
+        lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, cJSON_IsNumber(ymin) ? ymin->valueint : 0, cJSON_IsNumber(ymax) ? ymax->valueint : 100);
+    const cJSON *y2min = cJSON_GetObjectItemCaseSensitive(props, "y2AxisMin");
+    const cJSON *y2max = cJSON_GetObjectItemCaseSensitive(props, "y2AxisMax");
+    if (cJSON_IsNumber(y2min) || cJSON_IsNumber(y2max))
+        lv_chart_set_axis_range(chart, LV_CHART_AXIS_SECONDARY_Y, cJSON_IsNumber(y2min) ? y2min->valueint : 0, cJSON_IsNumber(y2max) ? y2max->valueint : 100);
+    const char *um = cjson_get_string(props, "updateMode");
+    if (um && strcmp(um, "circular") == 0) lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_CIRCULAR);
+
+    cJSON *series = cJSON_GetObjectItemCaseSensitive(props, "series");
+    cJSON *data = cJSON_GetObjectItemCaseSensitive(props, "data");
+    int count = 1;
+    cJSON *sr;
+    if (cJSON_IsArray(series)) {
+        cJSON_ArrayForEach(sr, series) {
+            cJSON *d = cJSON_GetObjectItemCaseSensitive(sr, "data");
+            if (cJSON_IsArray(d) && cJSON_GetArraySize(d) > count) count = cJSON_GetArraySize(d);
+        }
+    } else if (cJSON_IsArray(data)) {
+        count = cJSON_GetArraySize(data) > 0 ? cJSON_GetArraySize(data) : 1;
+    }
+    const cJSON *pc = cJSON_GetObjectItemCaseSensitive(props, "pointCount");
+    if (cJSON_IsNumber(pc) && pc->valueint > count) count = pc->valueint;
+    lv_chart_set_point_count(chart, (uint32_t)count);
+
+    if (cJSON_IsArray(series)) {
+        cJSON_ArrayForEach(sr, series) {
+            const char *col = cjson_get_string(sr, "color");
+            const char *axis = cjson_get_string(sr, "axis");
+            lv_chart_series_t *ser = lv_chart_add_series(chart, col ? hex_to_color(col) : lv_color_hex(0x2196F3),
+                axis && strcmp(axis, "secondary") == 0 ? LV_CHART_AXIS_SECONDARY_Y : LV_CHART_AXIS_PRIMARY_Y);
+            cJSON *d = cJSON_GetObjectItemCaseSensitive(sr, "data");
+            cJSON *val;
+            if (cJSON_IsArray(d)) cJSON_ArrayForEach(val, d) { if (cJSON_IsNumber(val)) lv_chart_set_next_value(chart, ser, val->valueint); }
+        }
+    } else if (cJSON_IsArray(data)) {
+        lv_chart_series_t *ser = lv_chart_add_series(chart, lv_color_hex(0x2196F3), LV_CHART_AXIS_PRIMARY_Y);
+        cJSON *val;
+        cJSON_ArrayForEach(val, data) { if (cJSON_IsNumber(val)) lv_chart_set_next_value(chart, ser, val->valueint); }
+    }
+    const cJSON *hd = cJSON_GetObjectItemCaseSensitive(props, "horDivs");
+    const cJSON *vd = cJSON_GetObjectItemCaseSensitive(props, "verDivs");
+    if (cJSON_IsNumber(hd) || cJSON_IsNumber(vd))
+        lv_chart_set_div_line_count(chart, cJSON_IsNumber(hd) ? hd->valueint : 3, cJSON_IsNumber(vd) ? vd->valueint : 5);
+    else if (cJSON_IsFalse(cJSON_GetObjectItemCaseSensitive(props, "showGrid")))
+        lv_chart_set_div_line_count(chart, 0, 0);
     return chart;
 }
 
@@ -448,8 +570,11 @@ static lv_obj_t *create_calendar(lv_obj_t *parent, const cJSON *comp) {
     if (props) {
         int year = cjson_get_int(props, "year", 2026);
         int month = cjson_get_int(props, "month", 1);
-        lv_calendar_set_today_date(cal, (uint32_t)year, (uint32_t)month, 1);
-        lv_calendar_set_showed_date(cal, (uint32_t)year, (uint32_t)month);
+        lv_calendar_set_today_date(cal, (uint32_t)cjson_get_int(props, "todayYear", year), (uint32_t)cjson_get_int(props, "todayMonth", month), (uint32_t)cjson_get_int(props, "todayDay", 1));
+        lv_calendar_set_month_shown(cal, (uint32_t)year, (uint32_t)month);
+        const char *hm = cjson_get_string(props, "headerMode");
+        if (hm && strcmp(hm, "arrow") == 0) lv_calendar_add_header_arrow(cal);
+        else if (hm && strcmp(hm, "dropdown") == 0) lv_calendar_add_header_dropdown(cal);
     }
     return cal;
 }
@@ -696,27 +821,39 @@ static lv_obj_t *create_spinner(lv_obj_t *parent, const cJSON *comp) {
 
 static lv_obj_t *create_line(lv_obj_t *parent, const cJSON *comp) {
     lv_obj_t *line = lv_line_create(parent);
-    /* Default horizontal line */
-    static lv_point_precise_t line_points[2];
+    /* the points must outlive the object: one slot per line, as the preview only shows one screen at a time */
+    static lv_point_precise_t pool[64][64];
+    static int pool_used = 0;
+    lv_point_precise_t *pt = pool[pool_used % 64];
+    pool_used++;
     const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
     int w = cjson_get_int(comp, "width", 100);
-    line_points[0].x = 0; line_points[0].y = 0;
-    line_points[1].x = w; line_points[1].y = 0;
-
+    pt[0].x = 0; pt[0].y = 0;
+    pt[1].x = w; pt[1].y = 0;
+    uint32_t n = 2;
     if (props) {
         cJSON *pts = cJSON_GetObjectItemCaseSensitive(props, "points");
         if (cJSON_IsArray(pts) && cJSON_GetArraySize(pts) >= 2) {
-            cJSON *p0 = cJSON_GetArrayItem(pts, 0);
-            cJSON *p1 = cJSON_GetArrayItem(pts, 1);
-            if (cJSON_IsArray(p0) && cJSON_IsArray(p1)) {
-                line_points[0].x = cJSON_GetArrayItem(p0, 0)->valueint;
-                line_points[0].y = cJSON_GetArrayItem(p0, 1)->valueint;
-                line_points[1].x = cJSON_GetArrayItem(p1, 0)->valueint;
-                line_points[1].y = cJSON_GetArrayItem(p1, 1)->valueint;
+            n = 0;
+            cJSON *p;
+            cJSON_ArrayForEach(p, pts) {
+                if (n >= 64 || !cJSON_IsArray(p)) break;
+                cJSON *x = cJSON_GetArrayItem(p, 0), *y = cJSON_GetArrayItem(p, 1);
+                pt[n].x = cJSON_IsNumber(x) ? x->valueint : 0;
+                pt[n].y = cJSON_IsNumber(y) ? y->valueint : 0;
+                n++;
             }
+            if (n < 2) { n = 2; pt[0].x = 0; pt[0].y = 0; pt[1].x = w; pt[1].y = 0; }
+        }
+        if (cjson_get_bool(props, "yInvert", 0)) lv_line_set_y_invert(line, true);
+        if (!cjson_get_bool(props, "rounded", 1)) lv_obj_set_style_line_rounded(line, false, LV_PART_MAIN);
+        int dw = cjson_get_int(props, "dashWidth", 0);
+        if (dw > 0) {
+            lv_obj_set_style_line_dash_width(line, dw, LV_PART_MAIN);
+            lv_obj_set_style_line_dash_gap(line, cjson_get_int(props, "dashGap", 4), LV_PART_MAIN);
         }
     }
-    lv_line_set_points(line, line_points, 2);
+    lv_line_set_points(line, pt, n);
     return line;
 }
 
@@ -798,7 +935,23 @@ static lv_obj_t *create_img(lv_obj_t *parent, const cJSON *comp) {
             }
         }
     }
-    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_STRETCH);
+    lv_image_align_t ia = LV_IMAGE_ALIGN_STRETCH;
+    const char *ias = props ? cjson_get_string(props, "innerAlign") : NULL;
+    if (ias) {
+        if (!strcmp(ias, "contain")) ia = LV_IMAGE_ALIGN_CONTAIN;
+        else if (!strcmp(ias, "cover")) ia = LV_IMAGE_ALIGN_COVER;
+        else if (!strcmp(ias, "center")) ia = LV_IMAGE_ALIGN_CENTER;
+        else if (!strcmp(ias, "tile")) ia = LV_IMAGE_ALIGN_TILE;
+        else if (!strcmp(ias, "top_left")) ia = LV_IMAGE_ALIGN_TOP_LEFT;
+        else if (!strcmp(ias, "default")) ia = LV_IMAGE_ALIGN_DEFAULT;
+    }
+    lv_image_set_inner_align(img, ia);
+    if (props) {
+        if (cJSON_GetObjectItemCaseSensitive(props, "pivotX") || cJSON_GetObjectItemCaseSensitive(props, "pivotY"))
+            lv_image_set_pivot(img, cjson_get_int(props, "pivotX", 0), cjson_get_int(props, "pivotY", 0));
+        if (cJSON_GetObjectItemCaseSensitive(props, "scaleX")) lv_image_set_scale_x(img, (uint32_t)cjson_get_int(props, "scaleX", 256));
+        if (cJSON_GetObjectItemCaseSensitive(props, "scaleY")) lv_image_set_scale_y(img, (uint32_t)cjson_get_int(props, "scaleY", 256));
+    }
     return img;
 }
 
@@ -958,6 +1111,15 @@ void ui_from_json(const char *json_str) {
             if (cjson_get_bool(flags, "hidden", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
             if (!cjson_get_bool(flags, "clickable", 1)) lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
             if (!cjson_get_bool(flags, "scrollable", 1)) lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+            if (cjson_get_bool(flags, "checkable", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+            if (cjson_get_bool(flags, "disabled", 0)) lv_obj_add_state(obj, LV_STATE_DISABLED);
+            if (cjson_get_bool(flags, "scrollOne", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
+            if (cjson_get_bool(flags, "scrollChainHor", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            if (cjson_get_bool(flags, "scrollChainVer", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            if (cjson_get_bool(flags, "floating", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLOATING);
+            if (cjson_get_bool(flags, "ignoreLayout", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT);
+            if (cjson_get_bool(flags, "overflowVisible", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+            if (cjson_get_bool(flags, "flexInNewTrack", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
         }
 
         /* Register in id map */

@@ -149,6 +149,10 @@ function renderParamsPreview(node: LogicNode): React.ReactNode {
       return <span className="param-preview">{t('Calculation:')} {params.operator}</span>;
     case 'string_op':
       return <span className="param-preview">{t('Operation:')} {params.operation}</span>;
+    case 'math_func':
+      return <span className="param-preview">{t('Function:')} {params.func}</span>;
+    case 'to_string':
+      return <span className="param-preview">{t('Format:')} {params.format}</span>;
     case 'delay':
       return <span className="param-preview">{t('Delay:')} {params.duration}ms</span>;
     case 'show_hide':

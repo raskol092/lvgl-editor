@@ -17,6 +17,13 @@ function getAllEvents(pages: Page[]) {
   return out;
 }
 
+const SCREEN_ANIM: Record<string, string> = {
+  fade: 'LV_SCREEN_LOAD_ANIM_FADE_IN', move_left: 'LV_SCREEN_LOAD_ANIM_MOVE_LEFT', move_right: 'LV_SCREEN_LOAD_ANIM_MOVE_RIGHT',
+  move_top: 'LV_SCREEN_LOAD_ANIM_MOVE_TOP', move_bottom: 'LV_SCREEN_LOAD_ANIM_MOVE_BOTTOM',
+  over_left: 'LV_SCREEN_LOAD_ANIM_OVER_LEFT', over_right: 'LV_SCREEN_LOAD_ANIM_OVER_RIGHT',
+  over_top: 'LV_SCREEN_LOAD_ANIM_OVER_TOP', over_bottom: 'LV_SCREEN_LOAD_ANIM_OVER_BOTTOM',
+};
+
 const num = (x: unknown, d = 0) => (Number.isFinite(Number(x)) ? Number(x) : d);
 
 /** Forms for a built-in action; `page` is the page of the component that owns the event. */
@@ -29,7 +36,9 @@ function actionForms(action: BuiltinAction, page: string, names: NameResolver, o
     case 'navigate': {
       if (action.targetPage && names.hasScreen(action.targetPage)) {
         note(`Navigate to: ${action.targetPage}`);
-        out.push(`(${names.loadFn(action.targetPage)})`);
+        const anim = action.animation ? SCREEN_ANIM[action.animation] : undefined;
+        if (anim) out.push(`(${names.loadFn(action.targetPage)}${options.namingStyle === 'snake_case' ? '_anim' : '-anim'} ${anim} ${Math.max(0, Math.round(num(action.duration, 300)))})`);
+        else out.push(`(${names.loadFn(action.targetPage)})`);
       }
       break;
     }
@@ -43,6 +52,10 @@ function actionForms(action: BuiltinAction, page: string, names: NameResolver, o
         case 'border_width': out.push(`(lv-obj-set-style-border-width ${target} ${num(v)} LV_PART_MAIN)`); break;
         case 'radius': out.push(`(lv-obj-set-style-radius ${target} ${num(v)} LV_PART_MAIN)`); break;
         case 'opa': out.push(`(lv-obj-set-style-opa ${target} ${num(v, 255)} LV_PART_MAIN)`); break;
+        case 'text_color': out.push(`(lv-obj-set-style-text-color ${target} ${lcolor(String(v || '#000000'))} LV_PART_MAIN)`); break;
+        case 'bg_opa': out.push(`(lv-obj-set-style-bg-opa ${target} ${Math.max(0, Math.min(255, num(v, 255)))} LV_PART_MAIN)`); break;
+        case 'translate_x': out.push(`(lv-obj-set-style-translate-x ${target} ${num(v)} LV_PART_MAIN)`); break;
+        case 'translate_y': out.push(`(lv-obj-set-style-translate-y ${target} ${num(v)} LV_PART_MAIN)`); break;
         case 'x': out.push(`(lv-obj-set-x ${target} ${num(v)})`); break;
         case 'y': out.push(`(lv-obj-set-y ${target} ${num(v)})`); break;
         case 'width': out.push(`(lv-obj-set-width ${target} ${num(v, 100)})`); break;
@@ -73,6 +86,24 @@ function actionForms(action: BuiltinAction, page: string, names: NameResolver, o
       else if (type === 'checkbox') out.push(`(lv-checkbox-set-text ${target} ${text})`);
       else if (type === 'dropdown') out.push(comment('dropdown caption cannot be changed through the LVGL bridge'));
       else out.push(`(lv-label-set-text ${target} ${text})`);
+      break;
+    }
+    case 'setState': {
+      if (!target || !action.property) break;
+      const st = `LV_STATE_${String(action.property).toUpperCase()}`;
+      note(`${action.value || 'on'} state: ${action.property}`);
+      if (action.value === 'off') out.push(`(lv-obj-remove-state ${target} ${st})`);
+      else if (action.value === 'toggle') out.push(`(lv-obj-set-state ${target} ${st} (not (lv-obj-has-state ${target} ${st})))`);
+      else out.push(`(lv-obj-add-state ${target} ${st})`);
+      break;
+    }
+    case 'setFlag': {
+      if (!target || !action.property) break;
+      const fl = `LV_OBJ_FLAG_${String(action.property).toUpperCase()}`;
+      note(`${action.value || 'on'} flag: ${action.property}`);
+      if (action.value === 'off') out.push(`(lv-obj-remove-flag ${target} ${fl})`);
+      else if (action.value === 'toggle') out.push(`(if (lv-obj-has-flag ${target} ${fl}) (lv-obj-remove-flag ${target} ${fl}) (lv-obj-add-flag ${target} ${fl}))`);
+      else out.push(`(lv-obj-add-flag ${target} ${fl})`);
       break;
     }
     case 'setValue': {

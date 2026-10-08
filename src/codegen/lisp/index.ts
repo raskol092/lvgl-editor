@@ -39,7 +39,7 @@ export function generateCode(
     'main.lisp': generateMainLisp(pages, opts, imageResources, fontResources, defaultFont, defaultFontSize),
     'ui/ui.lisp': generateUiLisp(pages, ctx, theme),
     'ui/ui_events.lisp': generateEventsLisp(pages, names, opts),
-    'ui/ui_logic.lisp': generateLogicLisp(logicGraphs, names, opts),
+    'ui/ui_logic.lisp': generateLogicLisp(logicGraphs, names, opts, pages),
   };
 }
 

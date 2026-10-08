@@ -1,3 +1,5 @@
+import { useLogicEditorStore } from '../LogicEditor/logicEditorStore';
+import { applyBindingsToPreview } from '../../utils/bindings';
 import type { Page, CanvasState, LvglComponent, Theme } from '../../types';
 import { isDarkTheme } from '../../utils/isDarkTheme';
 import { isIconImage } from '../../utils/iconRecolor';
@@ -47,11 +49,7 @@ interface WasmComponent {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: Record<string, any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pressed?: Record<string, any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    focused?: Record<string, any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    disabled?: Record<string, any>;
+    [stateOrPart: string]: Record<string, any>;
   };
 }
 
@@ -137,17 +135,19 @@ function flattenTree(
       if (comp.alignOffsetX) wc.alignOffsetX = comp.alignOffsetX;
       if (comp.alignOffsetY) wc.alignOffsetY = comp.alignOffsetY;
     }
-    if (comp.flags) {
-      const flags: Record<string, boolean> = {};
-      for (const [k, v] of Object.entries(comp.flags)) {
-        if (v !== undefined) flags[k] = v;
-      }
-      if (Object.keys(flags).length > 0) wc.flags = flags;
+    const flags: Record<string, boolean> = {};
+    for (const [k, v] of Object.entries(comp.flags || {})) {
+      if (v !== undefined) flags[k] = v;
     }
+    if (comp.bindings?.length) {
+      const vars = useLogicEditorStore.getState().graphs.flatMap(g => g.variables);
+      applyBindingsToPreview(comp.type, comp.bindings, vars, wc.props, flags);
+    }
+    if (Object.keys(flags).length > 0) wc.flags = flags;
 
-    if (comp.styles.pressed) wc.styles.pressed = { ...comp.styles.pressed };
-    if (comp.styles.focused) wc.styles.focused = { ...comp.styles.focused };
-    if (comp.styles.disabled) wc.styles.disabled = { ...comp.styles.disabled };
+    for (const [key, st] of Object.entries(comp.styles)) {
+      if (key !== 'default' && st) wc.styles[key] = { ...st };
+    }
 
     result.push(wc);
 

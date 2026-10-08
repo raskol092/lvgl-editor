@@ -127,6 +127,12 @@ export interface StyleProps {
   outlineOpa?: number;
   textOpa?: number;
   clipCorner?: boolean;
+  // More transforms and effects
+  transformWidth?: number;
+  transformHeight?: number;
+  bgMainStop?: number; // 0-255
+  borderPost?: boolean;
+  blurRadius?: number;
   // Text outline
   textOutlineWidth?: number;
   textOutlineColor?: string;
@@ -146,7 +152,29 @@ export type LvglEventType =
   | 'LV_EVENT_FOCUSED'
   | 'LV_EVENT_DEFOCUSED'
   | 'LV_EVENT_READY'
-  | 'LV_EVENT_CANCEL';
+  | 'LV_EVENT_CANCEL'
+  | 'LV_EVENT_PRESSING'
+  | 'LV_EVENT_PRESS_LOST'
+  | 'LV_EVENT_SHORT_CLICKED'
+  | 'LV_EVENT_SINGLE_CLICKED'
+  | 'LV_EVENT_DOUBLE_CLICKED'
+  | 'LV_EVENT_TRIPLE_CLICKED'
+  | 'LV_EVENT_LONG_PRESSED_REPEAT'
+  | 'LV_EVENT_GESTURE'
+  | 'LV_EVENT_SCROLL_BEGIN'
+  | 'LV_EVENT_SCROLL'
+  | 'LV_EVENT_SCROLL_END'
+  | 'LV_EVENT_KEY'
+  | 'LV_EVENT_INSERT'
+  | 'LV_EVENT_REFRESH'
+  | 'LV_EVENT_STATE_CHANGED'
+  | 'LV_EVENT_LEAVE'
+  | 'LV_EVENT_HOVER_OVER'
+  | 'LV_EVENT_HOVER_LEAVE'
+  | 'LV_EVENT_SCREEN_LOAD_START'
+  | 'LV_EVENT_SCREEN_LOADED'
+  | 'LV_EVENT_SCREEN_UNLOAD_START'
+  | 'LV_EVENT_SCREEN_UNLOADED';
 
 // Built-in Action Types
 export type BuiltinActionType = 
@@ -157,12 +185,16 @@ export type BuiltinActionType =
   | 'enable'
   | 'disable'
   | 'setText'
-  | 'setValue';
+  | 'setValue'
+  | 'setState'
+  | 'setFlag';
 
 // Built-in Action Configuration
 export interface BuiltinAction {
   type: BuiltinActionType;
   targetPage?: string;      // For navigate
+  animation?: string;       // For navigate: screen-load animation (none, fade, move_left, ...)
+  duration?: number;        // For navigate: animation time in ms
   targetComponent?: string; // For setProperty, show, hide, enable, disable, setText, setValue
   property?: string;        // For setProperty
   value?: string | number | boolean;  // For setProperty, setText, setValue
@@ -202,6 +234,28 @@ export interface LvglFlags {
   gesturesBubble?: boolean;
   hidden?: boolean;
   disabled?: boolean;
+  clickFocusable?: boolean;
+  scrollOne?: boolean;
+  scrollChainHor?: boolean;
+  scrollChainVer?: boolean;
+  scrollWithArrow?: boolean;
+  eventTrickle?: boolean;
+  stateTrickle?: boolean;
+  advHittest?: boolean;
+  floating?: boolean;
+  ignoreLayout?: boolean;
+  overflowVisible?: boolean;
+  flexInNewTrack?: boolean;
+}
+
+/** Keeps a component property in sync with a logic variable (checked every 50 ms on the board) */
+export interface ComponentBinding {
+  id: string;
+  kind: 'text' | 'value' | 'hidden' | 'disabled' | 'checked';
+  variable: string;       // name of a logic variable
+  format?: string;        // text: printf format, e.g. "%.1f km/h" (empty = the value as it is)
+  op?: '' | '==' | '!=' | '>' | '<' | '>=' | '<='; // flag kinds: comparison (empty = value is non-zero)
+  compare?: number;
 }
 
 export interface LvglComponent {
@@ -220,8 +274,15 @@ export interface LvglComponent {
     pressed?: StyleProps;
     focused?: StyleProps;
     disabled?: StyleProps;
+    checked?: StyleProps;
+    hovered?: StyleProps;
+    edited?: StyleProps;
+    scrolled?: StyleProps;
+    // "<part>" / "<part>:<state>" keys, e.g. knob, knob:pressed (see utils/styleKeys)
+    [partKey: string]: StyleProps | undefined;
   };
   events: EventBinding[];
+  bindings?: ComponentBinding[];
   animations: Animation[];
   parentId: string | null;
   // Phase 2: Lock and visibility

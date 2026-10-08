@@ -9,7 +9,9 @@ import { useProjectStore } from '../../store/projectStore';
 import type { LvglComponent, StyleProps, LvglAlign, LvglFlags } from '../../types';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import { t } from '../../i18n';
-import { ExtraWidgetEditor } from './extraEditors';
+import BindingsEditor from './BindingsEditor';
+import { PARTS_BY_TYPE } from '../../utils/styleKeys';
+import { ExtraWidgetEditor, MoreWidgetProps } from './extraEditors';
 import ToolIcon from '../icons/ToolIcon';
 import './PropertyEditor.css';
 
@@ -90,7 +92,7 @@ const STYLE_SECTION_VISIBILITY: Record<string, Set<string>> = {
 };
 
 // Flags that only apply to container-like components
-const SCROLL_FLAGS = new Set(['scrollable', 'scrollElastic', 'scrollMomentum', 'scrollOnFocus']);
+const SCROLL_FLAGS = new Set(['scrollable', 'scrollElastic', 'scrollMomentum', 'scrollOnFocus', 'scrollOne', 'scrollChainHor', 'scrollChainVer', 'scrollWithArrow']);
 const CONTAINER_TYPES = new Set(['obj', 'tabview', 'tileview', 'win']);
 
 // Helper to check if a style section should be visible for a component type
@@ -183,18 +185,27 @@ const ToggleSwitch: React.FC<{
   </div>
 );
 
-type StyleState = 'default' | 'pressed' | 'focused' | 'disabled';
+type StyleState = 'default' | 'pressed' | 'focused' | 'disabled' | 'checked' | 'hovered' | 'edited' | 'scrolled';
 
 const STYLE_STATES: { key: StyleState; label: string }[] = [
   { key: 'default', label: t('Default') },
   { key: 'pressed', label: t('Press') },
   { key: 'focused', label: t('Focused state') },
   { key: 'disabled', label: t('Disabled') },
+  { key: 'checked', label: t('Checked') },
+  { key: 'hovered', label: t('Hovered') },
+  { key: 'edited', label: t('Edited') },
+  { key: 'scrolled', label: t('Scrolled') },
 ];
+
+const PART_LABELS: Record<string, string> = {
+  indicator: t('Indicator'), knob: t('Knob'), items: t('Items'), selected: t('Selected'), cursor: t('Cursor'), scrollbar: t('Scrollbar'),
+};
 
 const PropertyEditor: React.FC = () => {
   const { selection, getComponentById, updateComponent } = useEditorStore();
-  const [activeStyleState, setActiveStyleState] = useState<StyleState>('default');
+  const [activeState, setActiveStyleState] = useState<StyleState>('default');
+  const [activePartRaw, setActivePart] = useState<string>('main');
   const [paddingLinked, setPaddingLinked] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [radiusLinked, setRadiusLinked] = useState(true);
@@ -211,9 +222,14 @@ const PropertyEditor: React.FC = () => {
 
   const parentLayout = parentComponent?.props?.layout as string | undefined;
 
+  // part of the widget being styled (main or e.g. knob) and the key of the style in component.styles
+  const availableParts = component ? (PARTS_BY_TYPE[component.type] || []) : [];
+  const activePart = availableParts.includes(activePartRaw) ? activePartRaw : 'main';
+  const activeStyleState: string = activePart === 'main' ? activeState : activeState === 'default' ? activePart : `${activePart}:${activeState}`;
+
   // Get the current style object for the active state
   const currentStyles: StyleProps = component
-    ? (component.styles[activeStyleState] || component.styles.default)
+    ? (component.styles[activeStyleState] || (activePart === 'main' ? component.styles.default : {}))
     : {};
 
   // Whether the active state has its own overrides
@@ -230,7 +246,7 @@ const PropertyEditor: React.FC = () => {
   const handleStyleChange = useCallback(
     (styleKey: keyof StyleProps, value: StyleProps[keyof StyleProps]) => {
       if (!selectedId || !component) return;
-      const baseStyles = component.styles[activeStyleState] || { ...component.styles.default };
+      const baseStyles = component.styles[activeStyleState] || (activePart === 'main' ? { ...component.styles.default } : {});
       updateComponent(selectedId, {
         styles: {
           ...component.styles,
@@ -453,24 +469,41 @@ const PropertyEditor: React.FC = () => {
         <div className="property-section">
           <div className="section-header">{t('Style')}</div>
           
+          {/* Part of the widget (knob, indicator, ...) */}
+          {availableParts.length > 0 && (
+            <div className="style-state-switcher">
+              {['main', ...availableParts].map((part) => (
+                <button
+                  key={part}
+                  className={`style-state-btn ${activePart === part ? 'active' : ''}`}
+                  onClick={() => setActivePart(part)}
+                >
+                  {part === 'main' ? t('Main') : PART_LABELS[part] || part}
+                </button>
+              ))}
+            </div>
+          )}
           {/* Style state switcher */}
           <div className="style-state-switcher">
-            {STYLE_STATES.map(({ key, label }) => (
-              <button
-                key={key}
-                className={`style-state-btn ${activeStyleState === key ? 'active' : ''} ${key !== 'default' && component.styles[key] ? 'has-override' : ''}`}
-                onClick={() => setActiveStyleState(key)}
-              >
-                {label}
-              </button>
-            ))}
+            {STYLE_STATES.map(({ key, label }) => {
+              const k = activePart === 'main' ? key : key === 'default' ? activePart : `${activePart}:${key}`;
+              return (
+                <button
+                  key={key}
+                  className={`style-state-btn ${activeState === key ? 'active' : ''} ${(key !== 'default' || activePart !== 'main') && component.styles[k] ? 'has-override' : ''}`}
+                  onClick={() => setActiveStyleState(key)}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
           
           {activeStyleState !== 'default' && (
             <div className="style-state-info">
               {hasStateOverride ? (
                 <button className="clear-override-btn" onClick={handleClearStateOverride}>
-                  {t('Clear')}{STYLE_STATES.find(s => s.key === activeStyleState)?.label}{t('State styles')}
+                  {t('Clear')}{activePart === 'main' ? '' : `${PART_LABELS[activePart] || activePart} / `}{STYLE_STATES.find(s => s.key === activeState)?.label}{t('State styles')}
                 </button>
               ) : (
                 <span className="inherit-hint">{t('Inherits the default style; editing creates an independent style')}</span>
@@ -757,6 +790,7 @@ const PropertyEditor: React.FC = () => {
               ['padRow', 'Row gap'], ['padColumn', 'Column gap'],
               ['translateX', 'Translate X'], ['translateY', 'Translate Y'], ['skewX', 'Skew X'], ['skewY', 'Skew Y'],
               ['textOutlineWidth', 'Text outline width'],
+              ['transformWidth', 'Grow width by'], ['transformHeight', 'Grow height by'], ['bgMainStop', 'Gradient start (0-255)'], ['blurRadius', 'Blur radius'],
             ] as Array<[string, string]>).map(([k, label]) => (
               <div className="property-row" key={k}>
                 <label>{t(label)}</label>
@@ -782,6 +816,10 @@ const PropertyEditor: React.FC = () => {
                 <span className="range-value">{(currentStyles as Record<string, number | undefined>)[k] ?? 255}</span>
               </div>
             ))}
+            <div className="property-row">
+              <label>{t('Border above content')}</label>
+              <input type="checkbox" checked={currentStyles.borderPost === true} onChange={(e) => handleStyleChange('borderPost' as never, e.target.checked as never)} />
+            </div>
             <div className="property-row">
               <label>{t('Clip corner')}</label>
               <input type="checkbox" checked={currentStyles.clipCorner === true} onChange={(e) => handleStyleChange('clipCorner' as never, e.target.checked as never)} />
@@ -1037,6 +1075,7 @@ const PropertyEditor: React.FC = () => {
 
         {/* Component-specific props */}
         {renderComponentProps(component, handlePropsChange, handleBatchPropsChange)}
+        <BindingsEditor component={component} onChange={(bindings) => handlePropertyChange('bindings', bindings)} />
 
         {/* Flex/Grid child properties */}
         {parentLayout === 'flex' && (
@@ -1180,6 +1219,10 @@ function renderFlagsSection(
         { key: 'scrollElastic', label: t('Elastic scroll') },
         { key: 'scrollMomentum', label: t('Momentum scroll') },
         { key: 'scrollOnFocus', label: t('Scroll on focus') },
+        { key: 'scrollOne', label: t('Scroll one item') },
+        { key: 'scrollChainHor', label: t('Chain horizontal scroll') },
+        { key: 'scrollChainVer', label: t('Chain vertical scroll') },
+        { key: 'scrollWithArrow', label: t('Scroll with arrow keys') },
       ],
     },
     {
@@ -1190,6 +1233,13 @@ function renderFlagsSection(
         { key: 'pressLock', label: t('Press lock') },
         { key: 'eventBubble', label: t('Event bubble') },
         { key: 'gesturesBubble', label: t('Gesture bubble') },
+        { key: 'eventTrickle', label: t('Event trickle') },
+        { key: 'stateTrickle', label: t('State trickle') },
+        { key: 'advHittest', label: t('Advanced hit test') },
+        { key: 'floating', label: t('Floating') },
+        { key: 'ignoreLayout', label: t('Ignore layout') },
+        { key: 'overflowVisible', label: t('Overflow visible') },
+        { key: 'flexInNewTrack', label: t('Flex: start new track') },
       ],
     },
   ];
@@ -1575,7 +1625,7 @@ function ContainerLayoutEditor({
 }
 
 // Render component-specific properties
-function renderComponentProps(
+function renderComponentPropsBase(
   component: LvglComponent,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (key: string, value: any) => void,
@@ -2185,6 +2235,21 @@ function renderComponentProps(
   }
 }
 
+function renderComponentProps(
+  component: LvglComponent,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onChange: (key: string, value: any) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onBatchChange?: (updates: Record<string, any>) => void
+): React.ReactNode {
+  return (
+    <>
+      {renderComponentPropsBase(component, onChange, onBatchChange)}
+      <MoreWidgetProps type={component.type} props={component.props} onChange={onChange} />
+    </>
+  );
+}
+
 // Image props editor with resource picker
 function ImagePropsEditor({
   props,
@@ -2599,6 +2664,8 @@ function ChartSeriesEditor({
           <option value="line">{t('Line chart')}</option>
           <option value="bar">{t('Bar chart')}</option>
           <option value="scatter">{t('Scatter chart')}</option>
+          <option value="curve">{t('Curve chart')}</option>
+          <option value="stacked">{t('Stacked bar chart')}</option>
         </select>
       </div>
 

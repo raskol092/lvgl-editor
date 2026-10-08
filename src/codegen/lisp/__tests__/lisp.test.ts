@@ -369,7 +369,7 @@ describe('extra widgets', () => {
   })
 
   it('emits advanced common styles', () => {
-    const c = createComponent('obj', { id: 'o', name: 'box', styles: { default: { minWidth: 50, marginTop: 4, padRow: 3, translateX: 7, skewX: 2, bgOpa: 128, clipCorner: true } } as never })
+    const c = createComponent('obj', { id: 'o', name: 'box', styles: { default: { minWidth: 50, marginTop: 4, padRow: 3, translateX: 7, skewX: 2, bgOpa: 128, clipCorner: true, transformWidth: 6, bgMainStop: 40, borderPost: true, blurRadius: 5 } } as never })
     const pages = [createPage({ components: [c] } as never)]
     const src = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
     expect(src).toContain('(lv-obj-set-style-min-width ui-box 50 LV_PART_MAIN)')
@@ -378,5 +378,115 @@ describe('extra widgets', () => {
     expect(src).toContain('(lv-obj-set-style-translate-x ui-box 7 LV_PART_MAIN)')
     expect(src).toContain('(lv-obj-set-style-transform-skew-x ui-box 20 LV_PART_MAIN)')
     expect(src).toContain('(lv-obj-set-style-bg-opa ui-box 128 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-transform-width ui-box 6 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-bg-main-stop ui-box 40 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-blur-radius ui-box 5 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-border-post ui-box t LV_PART_MAIN)')
+  })
+
+  it('emits per-widget extra properties', () => {
+    const mk = (type: string, name: string, props: Record<string, unknown>) => createComponent(type, { id: name, name, props } as never)
+    const pages = [createPage({ components: [
+      mk('slider', 's', { mode: 'range', startValue: 20, value: 70 }),
+      mk('bar', 'b', { mode: 'symmetrical', min: -50, max: 50, value: 10 }),
+      mk('arc', 'a', { rotation: 90, changeRate: 300, rounded: false }),
+      mk('img', 'i', { innerAlign: 'cover', scaleX: 128, scaleY: 512, pivotX: 5, pivotY: 6 }),
+      mk('line', 'l', { points: [[0, 0], [10, 10], [20, 0]], yInvert: true, rounded: false, dashWidth: 6, dashGap: 3 }),
+      mk('label', 't', { text: 'x', longMode: 'scroll_circular', recolor: true }),
+      mk('switch', 'w', { orientation: 'vertical' }),
+      mk('textarea', 'x', { password: true, passwordShowTime: 500 }),
+      mk('chart', 'c', { type: 'stacked', updateMode: 'circular', horDivs: 4, verDivs: 2, y2AxisMin: 0, y2AxisMax: 500, pointCount: 20, series: [{ data: [1, 2], color: '#112233', axis: 'secondary' }] }),
+    ] } as never)]
+    const src = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    for (const frag of [
+      '(lv-slider-set-mode ui-s LV_SLIDER_MODE_RANGE)', '(lv-slider-set-start-value ui-s 20 LV_ANIM_OFF)',
+      '(lv-bar-set-mode ui-b LV_BAR_MODE_SYMMETRICAL)',
+      '(lv-arc-set-rotation ui-a 90)', '(lv-arc-set-change-rate ui-a 300)', '(lv-obj-set-style-arc-rounded ui-a nil LV_PART_MAIN)',
+      'LV_IMAGE_ALIGN_COVER', '(lv-image-set-scale-x ui-i 128)', '(lv-image-set-scale-y ui-i 512)', '(lv-image-set-pivot ui-i 5 6)',
+      '(lv-line-set-y-invert ui-l t)', '(lv-obj-set-style-line-rounded ui-l nil LV_PART_MAIN)', '(lv-obj-set-style-line-dash-width ui-l 6 LV_PART_MAIN)',
+      '(lv-label-set-long-mode ui-t LV_LABEL_LONG_MODE_SCROLL_CIRCULAR)', '(lv-label-set-recolor ui-t t)',
+      '(lv-switch-set-orientation ui-w LV_SWITCH_ORIENTATION_VERTICAL)', '(lv-textarea-set-password-show-time ui-x 500)',
+      'LV_CHART_TYPE_STACKED', '(lv-chart-set-update-mode ui-c LV_CHART_UPDATE_MODE_CIRCULAR)', '(lv-chart-set-div-line-count ui-c 4 2)',
+      '(lv-chart-set-axis-range ui-c LV_CHART_AXIS_SECONDARY_Y 0 500)', 'LV_CHART_AXIS_SECONDARY_Y))', '(lv-chart-set-point-count ui-c 20)',
+    ]) expect(src, frag).toContain(frag)
+  })
+
+  it('emits states, flags, parts, new events and animated navigation', () => {
+    const target = createComponent('obj', { id: 't', name: 'panel' } as never)
+    const sl = createComponent('slider', {
+      id: 's', name: 'vol',
+      styles: { default: {}, knob: { bgColor: '#FF0000' }, 'knob:pressed': { bgColor: '#00FF00' }, checked: { bgColor: '#0000FF' } },
+      flags: { floating: true, ignoreLayout: true, scrollChainHor: true },
+      events: [
+        createEvent({ id: 'a', eventType: 'LV_EVENT_DOUBLE_CLICKED', action: createBuiltinAction({ type: 'setState', targetComponent: 'panel', property: 'checked', value: 'toggle' }) }),
+        createEvent({ id: 'b', eventType: 'LV_EVENT_SCREEN_LOADED', action: createBuiltinAction({ type: 'setFlag', targetComponent: 'panel', property: 'hidden', value: 'toggle' }) }),
+        createEvent({ id: 'c', action: createBuiltinAction({ type: 'navigate', targetPage: 'two', animation: 'move_left', duration: 250 }) }),
+      ],
+    } as never)
+    const pages = [createPage({ name: 'one', components: [target, sl] } as never), createPage({ name: 'two', components: [] } as never)]
+    const files = generateCode(pages, undefined, [], undefined, [], [], '', 14)
+    const ui = files['ui/ui.lisp']
+    const ev = files['ui/ui_events.lisp']
+    expect(ui).toContain('LV_PART_KNOB)')
+    expect(ui).toContain('(bitwise-or LV_PART_KNOB LV_STATE_PRESSED)')
+    expect(ui).toContain('LV_STATE_CHECKED)')
+    expect(ui).toContain('(lv-obj-add-flag ui-vol LV_OBJ_FLAG_FLOATING)')
+    expect(ui).toContain('(lv-obj-add-flag ui-vol LV_OBJ_FLAG_IGNORE_LAYOUT)')
+    expect(ui).toContain('LV_EVENT_DOUBLE_CLICKED)')
+    expect(ui).toMatch(/\(lv-obj-add-event-cb ui-screen-one '\S+ LV_EVENT_SCREEN_LOADED\)/)
+    expect(ev).toContain('(lv-obj-set-state ui-panel LV_STATE_CHECKED (not (lv-obj-has-state ui-panel LV_STATE_CHECKED)))')
+    expect(ev).toContain('(if (lv-obj-has-flag ui-panel LV_OBJ_FLAG_HIDDEN)')
+    expect(ev).toContain('-anim LV_SCREEN_LOAD_ANIM_MOVE_LEFT 250)')
+    expect(ui).toContain('-anim (anim ms)')
+    expectValid(files)
+  })
+
+  it('generates the new logic nodes', () => {
+    const lbl = createComponent('label', { id: 'l', name: 'out' } as never)
+    const pages = [createPage({ components: [lbl] } as never)]
+    const port = (id: string, name: string, type: string, def?: unknown) => createLogicPort({ id, name, type, defaultValue: def } as never)
+    const mapN = createLogicNode('map_range', { id: 'm', inputs: [port('a', 'Value', 'float', 5), port('b', 'In min', 'float', 0), port('c', 'In max', 'float', 10), port('d', 'Out min', 'float', 0), port('e', 'Out max', 'float', 100)], outputs: [port('mo', 'Result', 'float')] })
+    const str = createLogicNode('to_string', { id: 's', params: { format: '%.1f' }, inputs: [port('sv', 'Value', 'float')], outputs: [port('so', 'Result', 'string')] })
+    const setT = createLogicNode('set_text', { id: 't', params: { targetComponent: 'l' }, inputs: [exec('ti'), port('tt', 'Text', 'string')], outputs: [exec('to', 'Done')] })
+    const loop = createLogicNode('for_loop', { id: 'f', params: { count: 3 }, inputs: [exec('fi'), port('fc', 'Count', 'int', 3)], outputs: [port('fb', 'Body', 'execution'), port('fd', 'Done', 'execution'), port('fx', 'Index', 'int')] })
+    const trig = createLogicNode('timer_trigger', { id: 'g', outputs: [exec('go')] })
+    const conn = (a: string, ao: string, b: string, bi: string, type = 'data') => createLogicConnection({ sourceNode: a, sourceOutput: ao, targetNode: b, targetInput: bi, type } as never)
+    const g = createLogicGraph({ id: 'g1', name: 'calc', nodes: [trig, loop, mapN, str, setT], connections: [
+      conn('g', 'go', 'f', 'fi', 'execution'), conn('f', 'fb', 't', 'ti', 'execution'),
+      conn('m', 'mo', 's', 'sv'), conn('s', 'so', 't', 'tt'),
+    ] })
+    const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+    expect(src).toContain('(looprange loop-i 0 3')
+    expect(src).toContain('(str-from-n')
+    expect(src).toContain('"%.1f"')
+    expect(src).toContain('(if (= 10.0 0.0) 1 (- 10.0 0.0))')
+    expectValid({ 'ui_logic.lisp': src })
+  })
+
+  it('generates bindings of components to variables', () => {
+    const lbl = createComponent('label', { id: 'l', name: 'speed', bindings: [{ id: 'b1', kind: 'text', variable: 'kmh', format: '%d km/h' }, { id: 'b2', kind: 'hidden', variable: 'kmh', op: '<', compare: 1 }] } as never)
+    const bar = createComponent('bar', { id: 'b', name: 'level', bindings: [{ id: 'b3', kind: 'value', variable: 'kmh' }] } as never)
+    const pages = [createPage({ components: [lbl, bar] } as never)]
+    const g = createLogicGraph({ id: 'g1', name: 'x', nodes: [], connections: [], variables: [createLogicVariable({ id: 'v1', name: 'kmh', type: 'int', defaultValue: 5 } as never)] } as never)
+    const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+    expect(src).toContain("(def ui-bind-0 'unset)")
+    expect(src).toContain('(defun ui-bindings-update ()')
+    expect(src).toContain('(lv-label-set-text ui-speed (str-from-n bv "%d km/h"))')
+    expect(src).toContain('(lv-obj-add-flag ui-speed LV_OBJ_FLAG_HIDDEN)')
+    expect(src).toContain('(lv-bar-set-value ui-level bv LV_ANIM_ON)')
+    expect(src).toContain('(ui-bindings-update)')
+    expectValid({ 'ui_logic.lisp': src })
+  })
+
+  it('emits calendar header / shown month and table cell merge', () => {
+    const cal = createComponent('calendar', { id: 'c', name: 'cal', props: { year: 2026, month: 3, showToday: true, todayDay: 15, headerMode: 'arrow' } } as never)
+    const tbl = createComponent('table', { id: 't', name: 'grid', props: { rows: 2, cols: 3, mergeRight: ['0,0', ' 1 , 1 '], textCrop: true } } as never)
+    const src = generateCode([createPage({ components: [cal, tbl] } as never)], undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    expect(src).toContain('(lv-calendar-set-today-date ui-cal 2026 3 15)')
+    expect(src).toContain('(lv-calendar-set-month-shown ui-cal 2026 3)')
+    expect(src).toContain('(lv-calendar-add-header-arrow ui-cal)')
+    expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 0 0 LV_TABLE_CELL_CTRL_MERGE_RIGHT)')
+    expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 1 1 LV_TABLE_CELL_CTRL_MERGE_RIGHT)')
+    expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 1 2 LV_TABLE_CELL_CTRL_TEXT_CROP)')
   })
 })
