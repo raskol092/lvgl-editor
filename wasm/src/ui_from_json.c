@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <emscripten.h>
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -258,6 +259,139 @@ static lv_obj_t *id_map_find(const char *id) {
         if (strcmp(id_map[i].id, id) == 0) return id_map[i].obj;
     }
     return NULL;
+}
+
+
+/* ------------------------------------------------------------------ */
+/*  Interactive preview: events go to the editor (JS), which runs the   */
+/*  actions and calls back into the pv_* functions below                */
+/* ------------------------------------------------------------------ */
+
+static const struct { const char *name; lv_event_code_t code; } ev_names[] = {
+    {"LV_EVENT_CLICKED", LV_EVENT_CLICKED}, {"LV_EVENT_PRESSED", LV_EVENT_PRESSED}, {"LV_EVENT_RELEASED", LV_EVENT_RELEASED},
+    {"LV_EVENT_LONG_PRESSED", LV_EVENT_LONG_PRESSED}, {"LV_EVENT_VALUE_CHANGED", LV_EVENT_VALUE_CHANGED},
+    {"LV_EVENT_FOCUSED", LV_EVENT_FOCUSED}, {"LV_EVENT_DEFOCUSED", LV_EVENT_DEFOCUSED}, {"LV_EVENT_READY", LV_EVENT_READY},
+    {"LV_EVENT_CANCEL", LV_EVENT_CANCEL}, {"LV_EVENT_PRESSING", LV_EVENT_PRESSING}, {"LV_EVENT_PRESS_LOST", LV_EVENT_PRESS_LOST},
+    {"LV_EVENT_SHORT_CLICKED", LV_EVENT_SHORT_CLICKED}, {"LV_EVENT_SINGLE_CLICKED", LV_EVENT_SINGLE_CLICKED},
+    {"LV_EVENT_DOUBLE_CLICKED", LV_EVENT_DOUBLE_CLICKED}, {"LV_EVENT_TRIPLE_CLICKED", LV_EVENT_TRIPLE_CLICKED},
+    {"LV_EVENT_LONG_PRESSED_REPEAT", LV_EVENT_LONG_PRESSED_REPEAT}, {"LV_EVENT_GESTURE", LV_EVENT_GESTURE},
+    {"LV_EVENT_SCROLL_BEGIN", LV_EVENT_SCROLL_BEGIN}, {"LV_EVENT_SCROLL", LV_EVENT_SCROLL}, {"LV_EVENT_SCROLL_END", LV_EVENT_SCROLL_END},
+    {"LV_EVENT_KEY", LV_EVENT_KEY}, {"LV_EVENT_INSERT", LV_EVENT_INSERT}, {"LV_EVENT_REFRESH", LV_EVENT_REFRESH},
+    {"LV_EVENT_STATE_CHANGED", LV_EVENT_STATE_CHANGED}, {"LV_EVENT_LEAVE", LV_EVENT_LEAVE},
+    {"LV_EVENT_HOVER_OVER", LV_EVENT_HOVER_OVER}, {"LV_EVENT_HOVER_LEAVE", LV_EVENT_HOVER_LEAVE},
+};
+
+EM_JS(void, pv_post_event, (const char *id, const char *name), {
+    var msg = { type: 'lvgl-event', id: UTF8ToString(id), name: UTF8ToString(name) };
+    (window.parent || window).postMessage(msg, '*');
+});
+
+static void pv_event_cb(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    for (unsigned i = 0; i < sizeof(ev_names) / sizeof(ev_names[0]); i++)
+        if (ev_names[i].code == code) { pv_post_event((const char *)lv_event_get_user_data(e), ev_names[i].name); return; }
+}
+
+static void register_listeners(lv_obj_t *obj, const char *id, const cJSON *listen) {
+    if (!cJSON_IsArray(listen)) return;
+    const cJSON *n;
+    cJSON_ArrayForEach(n, listen) {
+        if (!cJSON_IsString(n)) continue;
+        for (unsigned i = 0; i < sizeof(ev_names) / sizeof(ev_names[0]); i++)
+            if (strcmp(ev_names[i].name, n->valuestring) == 0) lv_obj_add_event_cb(obj, pv_event_cb, ev_names[i].code, (void *)id);
+    }
+}
+
+static int mode_apply(int mode, int cur) { return mode == 2 ? !cur : mode != 0; }
+
+EMSCRIPTEN_KEEPALIVE
+void pv_set_flag(const char *id, const char *flag, int mode) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o || !flag) return;
+    static const struct { const char *n; lv_obj_flag_t f; } fl[] = {
+        {"hidden", LV_OBJ_FLAG_HIDDEN}, {"clickable", LV_OBJ_FLAG_CLICKABLE}, {"checkable", LV_OBJ_FLAG_CHECKABLE},
+        {"scrollable", LV_OBJ_FLAG_SCROLLABLE}, {"floating", LV_OBJ_FLAG_FLOATING}, {"ignore_layout", LV_OBJ_FLAG_IGNORE_LAYOUT},
+        {"event_bubble", LV_OBJ_FLAG_EVENT_BUBBLE}, {"press_lock", LV_OBJ_FLAG_PRESS_LOCK},
+    };
+    for (unsigned i = 0; i < sizeof(fl) / sizeof(fl[0]); i++)
+        if (strcmp(fl[i].n, flag) == 0) {
+            if (mode_apply(mode, lv_obj_has_flag(o, fl[i].f))) lv_obj_add_flag(o, fl[i].f); else lv_obj_remove_flag(o, fl[i].f);
+        }
+}
+
+EMSCRIPTEN_KEEPALIVE
+void pv_set_state(const char *id, const char *state, int mode) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o || !state) return;
+    static const struct { const char *n; lv_state_t s; } st[] = {
+        {"checked", LV_STATE_CHECKED}, {"disabled", LV_STATE_DISABLED}, {"focused", LV_STATE_FOCUSED}, {"pressed", LV_STATE_PRESSED},
+        {"hovered", LV_STATE_HOVERED}, {"edited", LV_STATE_EDITED}, {"user_1", LV_STATE_USER_1}, {"user_2", LV_STATE_USER_2},
+    };
+    for (unsigned i = 0; i < sizeof(st) / sizeof(st[0]); i++)
+        if (strcmp(st[i].n, state) == 0) lv_obj_set_state(o, st[i].s, mode_apply(mode, lv_obj_has_state(o, st[i].s)));
+}
+
+EMSCRIPTEN_KEEPALIVE
+void pv_set_text(const char *id, const char *text) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o || !text) return;
+    if (lv_obj_check_type(o, &lv_textarea_class)) lv_textarea_set_text(o, text);
+    else if (lv_obj_check_type(o, &lv_checkbox_class)) lv_checkbox_set_text(o, text);
+    else if (lv_obj_check_type(o, &lv_button_class)) { lv_obj_t *c = lv_obj_get_child(o, 0); if (c) lv_label_set_text(c, text); }
+    else if (lv_obj_check_type(o, &lv_label_class)) lv_label_set_text(o, text);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void pv_set_value(const char *id, int v) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o) return;
+    if (lv_obj_check_type(o, &lv_bar_class) || lv_obj_check_type(o, &lv_slider_class)) lv_bar_set_value(o, v, LV_ANIM_ON);
+    else if (lv_obj_check_type(o, &lv_arc_class)) lv_arc_set_value(o, v);
+    else if (lv_obj_check_type(o, &lv_roller_class)) lv_roller_set_selected(o, (uint32_t)v, LV_ANIM_ON);
+    else if (lv_obj_check_type(o, &lv_spinbox_class)) lv_spinbox_set_value(o, v);
+    else if (lv_obj_check_type(o, &lv_dropdown_class)) lv_dropdown_set_selected(o, (uint32_t)v);
+    else if (lv_obj_check_type(o, &lv_led_class)) lv_led_set_brightness(o, (uint8_t)(v < 0 ? 0 : v > 255 ? 255 : v));
+    else if (lv_obj_check_type(o, &lv_switch_class) || lv_obj_check_type(o, &lv_checkbox_class)) lv_obj_set_state(o, LV_STATE_CHECKED, v != 0);
+}
+
+/* current value of a widget (slider, bar, arc, roller, spinbox, dropdown, switch, checkbox) */
+EMSCRIPTEN_KEEPALIVE
+int pv_get_value(const char *id) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o) return 0;
+    if (lv_obj_check_type(o, &lv_slider_class)) return lv_slider_get_value(o);
+    if (lv_obj_check_type(o, &lv_bar_class)) return lv_bar_get_value(o);
+    if (lv_obj_check_type(o, &lv_arc_class)) return lv_arc_get_value(o);
+    if (lv_obj_check_type(o, &lv_roller_class)) return (int)lv_roller_get_selected(o);
+    if (lv_obj_check_type(o, &lv_spinbox_class)) return lv_spinbox_get_value(o);
+    if (lv_obj_check_type(o, &lv_dropdown_class)) return (int)lv_dropdown_get_selected(o);
+    return lv_obj_has_state(o, LV_STATE_CHECKED) ? 1 : 0;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int pv_has_state(const char *id, int checked_state) {
+    lv_obj_t *o = id_map_find(id);
+    (void)checked_state;
+    return o && lv_obj_has_state(o, LV_STATE_CHECKED);
+}
+
+/* style keys of the editor JSON ("bgColor", "textColor", ...) applied to the main part */
+EMSCRIPTEN_KEEPALIVE
+void pv_set_style(const char *id, const char *json) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o || !json) return;
+    cJSON *st = cJSON_Parse(json);
+    if (st) { apply_style_state(o, st, LV_PART_MAIN); cJSON_Delete(st); }
+}
+
+EMSCRIPTEN_KEEPALIVE
+void pv_set_geom(const char *id, const char *key, int v) {
+    lv_obj_t *o = id_map_find(id);
+    if (!o || !key) return;
+    if (strcmp(key, "x") == 0) lv_obj_set_x(o, v);
+    else if (strcmp(key, "y") == 0) lv_obj_set_y(o, v);
+    else if (strcmp(key, "width") == 0) lv_obj_set_width(o, v);
+    else if (strcmp(key, "height") == 0) lv_obj_set_height(o, v);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1124,6 +1258,7 @@ void ui_from_json(const char *json_str) {
 
         /* Register in id map */
         if (id) id_map_add(id, obj);
+        if (id) register_listeners(obj, id_map[id_map_count - 1].id, cJSON_GetObjectItemCaseSensitive(comp, "listen"));
     }
 
     /* keyboards are bound to their text area once every widget exists */

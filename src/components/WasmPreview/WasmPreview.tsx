@@ -7,6 +7,8 @@ import { encodeImagesForWasm } from './imageData';
 import { useResourceStore } from '../../resources/resourceStore';
 import type { LvglComponent } from '../../types';
 import { editorStateToJson } from './editorStateToJson';
+import { createPreviewRuntime } from './previewRuntime';
+import { useLogicEditorStore } from '../LogicEditor/logicEditorStore';
 import { t } from '../../i18n';
 import './WasmPreview.css';
 
@@ -18,7 +20,27 @@ const WasmPreviewInner: React.FC = () => {
   const [status, setStatus] = useState<Status>('loading');
 
   const pages = useEditorStore((s) => s.pages);
-  const currentPageId = useEditorStore((s) => s.currentPageId);
+  const editorPageId = useEditorStore((s) => s.currentPageId);
+  // the preview has its own current page: buttons navigate here without moving the editor
+  const [previewPageId, setPreviewPageId] = useState<string | null>(null);
+  const currentPageId = previewPageId && pages.some((p) => p.id === previewPageId) ? previewPageId : editorPageId;
+  useEffect(() => { setPreviewPageId(null); }, [editorPageId]);
+  const pagesRef = useRef(pages);
+  pagesRef.current = pages;
+  const pageIdRef = useRef(currentPageId);
+  pageIdRef.current = currentPageId;
+  const runtimeRef = useRef<ReturnType<typeof createPreviewRuntime> | null>(null);
+  if (!runtimeRef.current) {
+    runtimeRef.current = createPreviewRuntime({
+      getWasm: () => (iframeRef.current?.contentWindow as unknown as { Module?: { ccall: never } } | null)?.Module as never ?? null,
+      getPage: () => pagesRef.current.find((p) => p.id === pageIdRef.current),
+      getGraphs: () => useLogicEditorStore.getState().graphs,
+      navigate: (name) => {
+        const target = pagesRef.current.find((p) => p.name === name);
+        if (target) setPreviewPageId(target.id);
+      },
+    });
+  }
   const canvas = useEditorStore((s) => s.canvas);
   const theme = useThemeStore((s) => s.currentTheme);
 
@@ -37,6 +59,8 @@ const WasmPreviewInner: React.FC = () => {
     encodeImagesForWasm(resources).then((images) => {
       const json = editorStateToJson(pages, currentPageId, canvas, theme, images);
       iframe.contentWindow?.postMessage({ type: 'load-ui', json }, '*');
+      // the UI is built synchronously by the runtime: start timers / graphs once it exists
+      window.setTimeout(() => runtimeRef.current?.start(), 60);
     });
   }, [pages, currentPageId, canvas, theme, status]);
 
@@ -45,10 +69,12 @@ const WasmPreviewInner: React.FC = () => {
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'lvgl-ready') {
         setStatus('ready');
+      } else if (e.data?.type === 'lvgl-event') {
+        runtimeRef.current?.handleEvent(String(e.data.id), String(e.data.name));
       }
     };
     window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
+    return () => { window.removeEventListener('message', handler); runtimeRef.current?.stop(); };
   }, []);
 
   // Debounced sync on state change

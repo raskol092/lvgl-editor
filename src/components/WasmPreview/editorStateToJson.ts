@@ -43,6 +43,7 @@ interface WasmComponent {
   alignOffsetX?: number;
   alignOffsetY?: number;
   flags?: Record<string, boolean>;
+  listen?: string[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: Record<string, any>;
   styles: {
@@ -144,6 +145,15 @@ function flattenTree(
       applyBindingsToPreview(comp.type, comp.bindings, vars, wc.props, flags);
     }
     if (Object.keys(flags).length > 0) wc.flags = flags;
+
+    // events the editor wants to hear about (its own events + event triggers of logic graphs)
+    const listen = new Set<string>(comp.events.map(e => e.eventType));
+    for (const g of useLogicEditorStore.getState().graphs) {
+      for (const n of g.nodes) {
+        if (n.subType === 'event_trigger' && (n.params?.targetComponent === comp.name || n.params?.targetComponent === comp.id)) listen.add(n.params.eventType || 'LV_EVENT_CLICKED');
+      }
+    }
+    if (listen.size > 0) wc.listen = [...listen];
 
     for (const [key, st] of Object.entries(comp.styles)) {
       if (key !== 'default' && st) wc.styles[key] = { ...st };

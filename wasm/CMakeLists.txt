@@ -48,7 +48,7 @@ target_link_options(lvgl_wasm PRIVATE
     -sUSE_SDL=2
     -sALLOW_MEMORY_GROWTH=1
     -sINITIAL_MEMORY=33554432
-    "-sEXPORTED_FUNCTIONS=[\"_main\",\"_load_ui_json\",\"_set_screen_size\",\"_malloc\",\"_free\"]"
+    "-sEXPORTED_FUNCTIONS=[\"_main\",\"_load_ui_json\",\"_set_screen_size\",\"_malloc\",\"_free\",\"_pv_set_flag\",\"_pv_set_state\",\"_pv_set_text\",\"_pv_set_value\",\"_pv_get_value\",\"_pv_has_state\",\"_pv_set_style\",\"_pv_set_geom\"]"
     "-sEXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\",\"stringToUTF8\",\"lengthBytesUTF8\"]"
     -sASYNCIFY
     --shell-file=${CMAKE_SOURCE_DIR}/shell.html

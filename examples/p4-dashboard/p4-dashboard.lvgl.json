@@ -3529,39 +3529,116 @@
           ]
         },
         {
-          "id": "g1c",
-          "type": "custom",
-          "subType": "c_code_block",
-          "label": "Lisp code block",
+          "id": "g1g",
+          "type": "data",
+          "subType": "get_property",
+          "label": "Get property",
           "position": {
-            "x": 360,
+            "x": 60,
+            "y": 220
+          },
+          "params": {
+            "targetComponent": "slider-61",
+            "property": "value"
+          },
+          "inputs": [],
+          "outputs": [
+            {
+              "name": "Value",
+              "type": "any",
+              "id": "g1g-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g1n",
+          "type": "data",
+          "subType": "to_string",
+          "label": "Number to text",
+          "position": {
+            "x": 300,
+            "y": 220
+          },
+          "params": {
+            "format": "%d"
+          },
+          "inputs": [
+            {
+              "name": "Value",
+              "type": "float",
+              "id": "g1n-in-0"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Result",
+              "type": "string",
+              "id": "g1n-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g1j",
+          "type": "data",
+          "subType": "string_op",
+          "label": "String operation",
+          "position": {
+            "x": 540,
+            "y": 220
+          },
+          "params": {
+            "operation": "concat"
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "type": "string",
+              "id": "g1j-in-0"
+            },
+            {
+              "name": "B",
+              "type": "string",
+              "id": "g1j-in-1",
+              "defaultValue": " km/h"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Result",
+              "type": "string",
+              "id": "g1j-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g1s",
+          "type": "action",
+          "subType": "set_text",
+          "label": "Set text",
+          "position": {
+            "x": 780,
             "y": 80
           },
           "params": {
-            "code": "(lv-label-set-text ui-max-speed-label (str-merge (str-from-n (lv-slider-get-value ui-max-speed-slider)) \" km/h\"))"
+            "targetComponent": "label-60"
           },
           "inputs": [
             {
               "name": "Exec",
               "type": "execution",
-              "id": "g1c-in-0"
+              "id": "g1s-in-0"
             },
             {
-              "name": "Input1",
-              "type": "any",
-              "id": "g1c-in-1"
+              "name": "Text",
+              "type": "string",
+              "id": "g1s-in-1"
             }
           ],
           "outputs": [
             {
               "name": "Done",
               "type": "execution",
-              "id": "g1c-out-0"
-            },
-            {
-              "name": "Output1",
-              "type": "any",
-              "id": "g1c-out-1"
+              "id": "g1s-out-0"
             }
           ]
         }
@@ -3571,9 +3648,33 @@
           "id": "c-128",
           "sourceNode": "g1t",
           "sourceOutput": "g1t-out-0",
-          "targetNode": "g1c",
-          "targetInput": "g1c-in-0",
+          "targetNode": "g1s",
+          "targetInput": "g1s-in-0",
           "type": "execution"
+        },
+        {
+          "id": "c-129",
+          "sourceNode": "g1g",
+          "sourceOutput": "g1g-out-0",
+          "targetNode": "g1n",
+          "targetInput": "g1n-in-0",
+          "type": "data"
+        },
+        {
+          "id": "c-130",
+          "sourceNode": "g1n",
+          "sourceOutput": "g1n-out-0",
+          "targetNode": "g1j",
+          "targetInput": "g1j-in-0",
+          "type": "data"
+        },
+        {
+          "id": "c-131",
+          "sourceNode": "g1j",
+          "sourceOutput": "g1j-out-0",
+          "targetNode": "g1s",
+          "targetInput": "g1s-in-1",
+          "type": "data"
         }
       ],
       "variables": []
@@ -3640,7 +3741,7 @@
       ],
       "connections": [
         {
-          "id": "c-129",
+          "id": "c-132",
           "sourceNode": "g2g",
           "sourceOutput": "g2g-out-0",
           "targetNode": "g2s",
@@ -3689,54 +3790,274 @@
           ]
         },
         {
-          "id": "g3c",
-          "type": "custom",
-          "subType": "c_code_block",
-          "label": "Lisp code block",
+          "id": "g3r1",
+          "type": "data",
+          "subType": "var_read",
+          "label": "Read variable",
           "position": {
-            "x": 360,
+            "x": 60,
+            "y": 260
+          },
+          "params": {
+            "variableId": "var-uptime",
+            "variableName": "uptime"
+          },
+          "inputs": [],
+          "outputs": [
+            {
+              "name": "Value",
+              "type": "any",
+              "id": "g3r1-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g3a",
+          "type": "data",
+          "subType": "math_op",
+          "label": "Math operation",
+          "position": {
+            "x": 300,
+            "y": 260
+          },
+          "params": {
+            "operator": "+"
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "type": "int",
+              "id": "g3a-in-0"
+            },
+            {
+              "name": "B",
+              "type": "int",
+              "id": "g3a-in-1",
+              "defaultValue": 1
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Result",
+              "type": "int",
+              "id": "g3a-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g3w",
+          "type": "data",
+          "subType": "var_write",
+          "label": "Write variable",
+          "position": {
+            "x": 540,
             "y": 80
           },
           "params": {
-            "code": "(lv-label-set-text ui-uptime-label (str-merge (str-from-n (to-i (secs-since 0))) \" s\"))"
+            "variableId": "var-uptime",
+            "variableName": "uptime"
           },
           "inputs": [
             {
               "name": "Exec",
               "type": "execution",
-              "id": "g3c-in-0"
+              "id": "g3w-in-0"
             },
             {
-              "name": "Input1",
+              "name": "Value",
               "type": "any",
-              "id": "g3c-in-1"
+              "id": "g3w-in-1"
             }
           ],
           "outputs": [
             {
               "name": "Done",
               "type": "execution",
-              "id": "g3c-out-0"
+              "id": "g3w-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g3r2",
+          "type": "data",
+          "subType": "var_read",
+          "label": "Read variable",
+          "position": {
+            "x": 540,
+            "y": 300
+          },
+          "params": {
+            "variableId": "var-uptime",
+            "variableName": "uptime"
+          },
+          "inputs": [],
+          "outputs": [
+            {
+              "name": "Value",
+              "type": "any",
+              "id": "g3r2-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g3n",
+          "type": "data",
+          "subType": "to_string",
+          "label": "Number to text",
+          "position": {
+            "x": 780,
+            "y": 300
+          },
+          "params": {
+            "format": "%d"
+          },
+          "inputs": [
+            {
+              "name": "Value",
+              "type": "float",
+              "id": "g3n-in-0"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Result",
+              "type": "string",
+              "id": "g3n-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g3j",
+          "type": "data",
+          "subType": "string_op",
+          "label": "String operation",
+          "position": {
+            "x": 1020,
+            "y": 300
+          },
+          "params": {
+            "operation": "concat"
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "type": "string",
+              "id": "g3j-in-0"
             },
             {
-              "name": "Output1",
-              "type": "any",
-              "id": "g3c-out-1"
+              "name": "B",
+              "type": "string",
+              "id": "g3j-in-1",
+              "defaultValue": " s"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Result",
+              "type": "string",
+              "id": "g3j-out-0"
+            }
+          ]
+        },
+        {
+          "id": "g3s",
+          "type": "action",
+          "subType": "set_text",
+          "label": "Set text",
+          "position": {
+            "x": 1260,
+            "y": 80
+          },
+          "params": {
+            "targetComponent": "label-103"
+          },
+          "inputs": [
+            {
+              "name": "Exec",
+              "type": "execution",
+              "id": "g3s-in-0"
+            },
+            {
+              "name": "Text",
+              "type": "string",
+              "id": "g3s-in-1"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "Done",
+              "type": "execution",
+              "id": "g3s-out-0"
             }
           ]
         }
       ],
       "connections": [
         {
-          "id": "c-130",
+          "id": "c-133",
           "sourceNode": "g3t",
           "sourceOutput": "g3t-out-0",
-          "targetNode": "g3c",
-          "targetInput": "g3c-in-0",
+          "targetNode": "g3w",
+          "targetInput": "g3w-in-0",
           "type": "execution"
+        },
+        {
+          "id": "c-134",
+          "sourceNode": "g3r1",
+          "sourceOutput": "g3r1-out-0",
+          "targetNode": "g3a",
+          "targetInput": "g3a-in-0",
+          "type": "data"
+        },
+        {
+          "id": "c-135",
+          "sourceNode": "g3a",
+          "sourceOutput": "g3a-out-0",
+          "targetNode": "g3w",
+          "targetInput": "g3w-in-1",
+          "type": "data"
+        },
+        {
+          "id": "c-136",
+          "sourceNode": "g3w",
+          "sourceOutput": "g3w-out-0",
+          "targetNode": "g3s",
+          "targetInput": "g3s-in-0",
+          "type": "execution"
+        },
+        {
+          "id": "c-137",
+          "sourceNode": "g3r2",
+          "sourceOutput": "g3r2-out-0",
+          "targetNode": "g3n",
+          "targetInput": "g3n-in-0",
+          "type": "data"
+        },
+        {
+          "id": "c-138",
+          "sourceNode": "g3n",
+          "sourceOutput": "g3n-out-0",
+          "targetNode": "g3j",
+          "targetInput": "g3j-in-0",
+          "type": "data"
+        },
+        {
+          "id": "c-139",
+          "sourceNode": "g3j",
+          "sourceOutput": "g3j-out-0",
+          "targetNode": "g3s",
+          "targetInput": "g3s-in-1",
+          "type": "data"
         }
       ],
-      "variables": []
+      "variables": [
+        {
+          "id": "var-uptime",
+          "name": "uptime",
+          "type": "int",
+          "defaultValue": 0
+        }
+      ]
     },
     {
       "id": "graph-sd-blink",
@@ -3807,7 +4128,7 @@
       ],
       "connections": [
         {
-          "id": "c-131",
+          "id": "c-140",
           "sourceNode": "g4t",
           "sourceOutput": "g4t-out-0",
           "targetNode": "g4h",
