@@ -58,7 +58,7 @@ const WasmPreviewInner: React.FC = () => {
     const resources = useResourceStore.getState().images.filter((i) => used.has(i.id) || used.has(i.name) || used.has(i.cArrayName));
     encodeImagesForWasm(resources).then((images) => {
       const json = editorStateToJson(pages, currentPageId, canvas, theme, images);
-      iframe.contentWindow?.postMessage({ type: 'load-ui', json }, '*');
+      iframe.contentWindow?.postMessage({ type: 'load-ui', json }, window.location.origin);
       // the UI is built synchronously by the runtime: start timers / graphs once it exists
       window.setTimeout(() => runtimeRef.current?.start(), 60);
     });
@@ -67,6 +67,8 @@ const WasmPreviewInner: React.FC = () => {
   // Listen for lvgl-ready from iframe
   useEffect(() => {
     const handler = (e: MessageEvent) => {
+      // only the preview iframe of this page may talk to the editor
+      if (e.source !== iframeRef.current?.contentWindow || e.origin !== window.location.origin) return;
       if (e.data?.type === 'lvgl-ready') {
         setStatus('ready');
       } else if (e.data?.type === 'lvgl-event') {

@@ -867,12 +867,8 @@ const Canvas: React.FC = () => {
   const renderGrid = () => {
     if (!canvas.showGrid) return null;
 
-    const gridSize = canvas.gridSize;
-    const pattern = `
-      <pattern id="grid" width="${gridSize}" height="${gridSize}" patternUnits="userSpaceOnUse">
-        <path d="M ${gridSize} 0 L 0 0 0 ${gridSize}" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
-      </pattern>
-    `;
+    // a project file can carry any value here: only a plain positive number reaches the SVG
+    const gridSize = Math.max(2, Math.min(200, Number(canvas.gridSize) || 10));
 
     return (
       <svg
@@ -881,7 +877,11 @@ const Canvas: React.FC = () => {
         height={canvas.height}
         style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
       >
-        <defs dangerouslySetInnerHTML={{ __html: pattern }} />
+        <defs>
+          <pattern id="grid" width={gridSize} height={gridSize} patternUnits="userSpaceOnUse">
+            <path d={`M ${gridSize} 0 L 0 0 0 ${gridSize}`} fill="none" stroke="#e0e0e0" strokeWidth={0.5} />
+          </pattern>
+        </defs>
         <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
     );

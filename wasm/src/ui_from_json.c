@@ -233,7 +233,7 @@ static void apply_styles(lv_obj_t *obj, const cJSON *styles) {
 /*  ID map – so children can find their parent by id string            */
 /* ------------------------------------------------------------------ */
 
-#define MAX_COMPONENTS 256
+#define MAX_COMPONENTS 1024
 
 typedef struct {
     char id[64];
@@ -245,12 +245,13 @@ static int id_map_count = 0;
 
 static void id_map_reset(void) { id_map_count = 0; }
 
-static void id_map_add(const char *id, lv_obj_t *obj) {
-    if (id_map_count >= MAX_COMPONENTS) return;
+/* returns the stored id (stable until the next load) or NULL when the table is full */
+static const char *id_map_add(const char *id, lv_obj_t *obj) {
+    if (id_map_count >= MAX_COMPONENTS) return NULL;
     strncpy(id_map[id_map_count].id, id, 63);
     id_map[id_map_count].id[63] = '\0';
     id_map[id_map_count].obj = obj;
-    id_map_count++;
+    return id_map[id_map_count++].id;
 }
 
 static lv_obj_t *id_map_find(const char *id) {
@@ -992,7 +993,7 @@ static lv_obj_t *create_line(lv_obj_t *parent, const cJSON *comp) {
 }
 
 /* ---- raw images sent by the editor: {"images": {"<id>": {"w":..,"h":..,"data":"<base64 BGRA>"}}} ---- */
-#define MAX_IMAGES 32
+#define MAX_IMAGES 128
 typedef struct {
     char id[64];
     lv_image_dsc_t dsc;
@@ -1257,8 +1258,8 @@ void ui_from_json(const char *json_str) {
         }
 
         /* Register in id map */
-        if (id) id_map_add(id, obj);
-        if (id) register_listeners(obj, id_map[id_map_count - 1].id, cJSON_GetObjectItemCaseSensitive(comp, "listen"));
+        const char *stored_id = id ? id_map_add(id, obj) : NULL;
+        if (stored_id) register_listeners(obj, stored_id, cJSON_GetObjectItemCaseSensitive(comp, "listen"));
     }
 
     /* keyboards are bound to their text area once every widget exists */

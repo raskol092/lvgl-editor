@@ -61,6 +61,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ onClose, onCreate }
       colorFormat,
       fontLarge,
       defaultFont,
+      useBuiltinSymbols: true,
       memSize,
     };
     onCreate(projectName, display, lvglConfig);
