@@ -6,7 +6,7 @@
 ;; ============================================================
 ;; Logic variables
 ;; ============================================================
-;; No variables defined
+(def var-uptime 0)
 
 ;; ============================================================
 ;; Logic functions
@@ -15,7 +15,7 @@
 (defun logic-max-speed-caption ()
   (progn
     ;; Event: LV_EVENT_VALUE_CHANGED on slider-61
-    (lv-label-set-text ui-max-speed-label (str-merge (str-from-n (lv-slider-get-value ui-max-speed-slider)) " km/h"))
+    (lv-label-set-text ui-max-speed-label (str-merge (str-from-n (lv-slider-get-value ui-max-speed-slider) "%d") " km/h"))
     nil))
 
 ;; Logic: Max speed bar follows the slider
@@ -28,7 +28,8 @@
 (defun logic-uptime-counter ()
   (progn
     ;; Timer: repeat, 1000ms
-    (lv-label-set-text ui-uptime-label (str-merge (str-from-n (to-i (secs-since 0))) " s"))
+    (setq var-uptime (+ var-uptime 1))
+    (lv-label-set-text ui-uptime-label (str-merge (str-from-n var-uptime "%d") " s"))
     nil))
 
 ;; Logic: SD card LED blinks

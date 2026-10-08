@@ -174,23 +174,41 @@ const wire = (a: Node, an: string, b: Node, bn: string, type: 'execution' | 'dat
   ({ id: uid('c'), sourceNode: a.id, sourceOutput: out(a, an), targetNode: b.id, targetInput: inp(b, bn), type });
 const byName = (n: string) => screens.flatMap(s => s.comps.flatMap(c => [c, ...c.children])).find(c => c.name === n)!.id;
 const graphs = [] as import('../../src/components/LogicEditor/types').LogicGraph[];
-const graph = (id: string, name: string, nodes: Node[], connections: ReturnType<typeof wire>[]) =>
-  graphs.push({ id, name, description: '', nodes, connections, variables: [] } as never);
+const graph = (id: string, name: string, nodes: Node[], connections: ReturnType<typeof wire>[], variables: unknown[] = []) =>
+  graphs.push({ id, name, description: '', nodes, connections, variables } as never);
+const withDefault = (n: Node, input: string, value: unknown) => { n.inputs.find(p => p.name === input)!.defaultValue = value as never; return n; };
 
-{ // slider -> "45 km/h" caption (event trigger + Lisp code block)
+{ // slider -> "45 km/h" caption: event trigger, Get value -> Number to text -> join with " km/h" -> Set text
   const t = node('event_trigger', 'g1t', 60, 80, { eventType: 'LV_EVENT_VALUE_CHANGED', targetComponent: byName('max_speed_slider') });
-  const c = node('c_code_block', 'g1c', 360, 80, { code: '(lv-label-set-text ui-max-speed-label (str-merge (str-from-n (lv-slider-get-value ui-max-speed-slider)) " km/h"))' });
-  graph('graph-max-label', 'Max speed caption', [t, c], [wire(t, 'Exec', c, 'Exec')]);
+  const g = node('get_property', 'g1g', 60, 220, { targetComponent: byName('max_speed_slider'), property: 'value' });
+  const n = node('to_string', 'g1n', 300, 220, { format: '%d' });
+  const j = withDefault(node('string_op', 'g1j', 540, 220, { operation: 'concat' }), 'B', ' km/h');
+  const s = node('set_text', 'g1s', 780, 80, { targetComponent: byName('max_speed_label') });
+  graph('graph-max-label', 'Max speed caption', [t, g, n, j, s], [
+    wire(t, 'Exec', s, 'Exec'), wire(g, 'Value', n, 'Value', 'data'), wire(n, 'Result', j, 'A', 'data'), wire(j, 'Result', s, 'Text', 'data'),
+  ]);
 }
 { // slider value -> progress bar, no trigger: the graph runs live
   const g = node('get_property', 'g2g', 60, 80, { targetComponent: byName('max_speed_slider'), property: 'value' });
   const s = node('set_value', 'g2s', 380, 80, { targetComponent: byName('max_speed_bar') });
   graph('graph-max-bar', 'Max speed bar follows the slider', [g, s], [wire(g, 'Value', s, 'Number', 'data')]);
 }
-{ // uptime counter, every second
+{ // uptime counter, every second: seconds = seconds + 1, label = seconds + " s"
+  const v = { id: 'var-uptime', name: 'uptime', type: 'int', defaultValue: 0 };
   const t = node('timer_trigger', 'g3t', 60, 80, { mode: 'repeat', duration: 1000 });
-  const c = node('c_code_block', 'g3c', 360, 80, { code: '(lv-label-set-text ui-uptime-label (str-merge (str-from-n (to-i (secs-since 0))) " s"))' });
-  graph('graph-uptime', 'Uptime counter', [t, c], [wire(t, 'Exec', c, 'Exec')]);
+  const r1 = node('var_read', 'g3r1', 60, 260, { variableName: 'uptime', variableId: v.id });
+  const add = withDefault(node('math_op', 'g3a', 300, 260, { operator: '+' }), 'B', 1);
+  add.inputs.forEach(i => { i.type = 'int'; });
+  add.outputs.forEach(o => { o.type = 'int'; });
+  const w = node('var_write', 'g3w', 540, 80, { variableName: 'uptime', variableId: v.id });
+  const r2 = node('var_read', 'g3r2', 540, 300, { variableName: 'uptime', variableId: v.id });
+  const n = node('to_string', 'g3n', 780, 300, { format: '%d' });
+  const j = withDefault(node('string_op', 'g3j', 1020, 300, { operation: 'concat' }), 'B', ' s');
+  const s = node('set_text', 'g3s', 1260, 80, { targetComponent: byName('uptime_label') });
+  graph('graph-uptime', 'Uptime counter', [t, r1, add, w, r2, n, j, s], [
+    wire(t, 'Exec', w, 'Exec'), wire(r1, 'Value', add, 'A', 'data'), wire(add, 'Result', w, 'Value', 'data'), wire(w, 'Done', s, 'Exec'),
+    wire(r2, 'Value', n, 'Value', 'data'), wire(n, 'Result', j, 'A', 'data'), wire(j, 'Result', s, 'Text', 'data'),
+  ], [v]);
 }
 { // the failing SD card LED blinks
   const t = node('timer_trigger', 'g4t', 60, 80, { mode: 'repeat', duration: 500 });
