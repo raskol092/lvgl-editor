@@ -9,6 +9,7 @@ import { useProjectStore } from '../../store/projectStore';
 import type { LvglComponent, StyleProps, LvglAlign, LvglFlags } from '../../types';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import { t } from '../../i18n';
+import { ExtraWidgetEditor } from './extraEditors';
 import ToolIcon from '../icons/ToolIcon';
 import './PropertyEditor.css';
 
@@ -2141,7 +2142,7 @@ function renderComponentProps(
       return <ContainerLayoutEditor props={props} onChange={onChange} />;
 
     default:
-      return null;
+      return <ExtraWidgetEditor type={type} props={props} onChange={onChange} />;
   }
 }
 

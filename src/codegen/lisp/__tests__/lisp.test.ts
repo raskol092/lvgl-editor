@@ -326,3 +326,45 @@ describe('led', () => {
     expect(out).toContain('(lv-led-set-brightness ui-dim-led 120)')
   })
 })
+
+describe('extra widgets', () => {
+  it('generates roller, spinbox, keyboard, list, msgbox and scale (with needle)', () => {
+    const ta = createComponent('textarea', { id: 'ta', name: 'input' })
+    const comps = [
+      createComponent('roller', { id: 'r', name: 'pick', props: { options: ['A', 'B', 'C'], selected: 2, visibleRows: 4, mode: 'infinite' } }),
+      createComponent('spinbox', { id: 's', name: 'count', props: { value: 5, min: 0, max: 20, step: 5, digitCount: 3, decimalPos: 1, rollover: true } }),
+      ta,
+      createComponent('keyboard', { id: 'k', name: 'kb', props: { mode: 'number', textarea: 'input' } }),
+      createComponent('list', { id: 'l', name: 'menu', props: { items: ['One', 'Two'] } }),
+      createComponent('msgbox', { id: 'm', name: 'dlg', props: { title: 'T', text: 'Body', buttons: ['OK'], showClose: true } }),
+      createComponent('scale', { id: 'c', name: 'gauge', props: { mode: 'round_inner', min: 0, max: 200, totalTicks: 21, majorEvery: 5, showLabels: true, angleRange: 240, rotation: 150, needle: true, needleValue: 80, needleLength: 70, needleWidth: 4, needleColor: '#ff0000' } }),
+    ]
+    const src = generateCode([createPage({ components: comps } as never)], undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    expect(src).toContain('(lv-roller-set-options ui-pick "A\\nB\\nC" LV_ROLLER_MODE_INFINITE)')
+    expect(src).toContain('(lv-roller-set-visible-row-count ui-pick 4)')
+    expect(src).toContain('(lv-roller-set-selected ui-pick 2 LV_ANIM_OFF)')
+    expect(src).toContain('(lv-spinbox-set-digit-format ui-count 3 1)')
+    expect(src).toContain('(lv-spinbox-set-step ui-count 5)')
+    expect(src).toContain('(lv-spinbox-set-rollover ui-count t)')
+    expect(src).toContain('(lv-keyboard-set-mode ui-kb LV_KEYBOARD_MODE_NUMBER)')
+    expect(src).toContain('(lv-keyboard-set-textarea ui-kb ui-input)')
+    expect(src).toContain('(lv-list-add-button ui-menu nil "One")')
+    expect(src).toContain('(lv-msgbox-add-footer-button ui-dlg "OK")')
+    expect(src).toContain('(lv-msgbox-add-close-button ui-dlg)')
+    expect(src).toContain('(lv-scale-set-mode ui-gauge LV_SCALE_MODE_ROUND_INNER)')
+    expect(src).toContain('(lv-scale-set-angle-range ui-gauge 240)')
+    expect(src).toContain('(lv-scale-set-line-needle-value ui-gauge ui-gauge-needle 70 80)')
+  })
+
+  it('logic reads and writes roller / spinbox / scale', () => {
+    const roller = createComponent('roller', { id: 'r', name: 'pick' })
+    const sb = createComponent('spinbox', { id: 's', name: 'count' })
+    const sc = createComponent('scale', { id: 'c', name: 'gauge', props: { needle: true, needleLength: 55 } })
+    const pages = [createPage({ components: [roller, sb, sc] } as never)]
+    const get = createLogicNode('get_property', { id: 'g', params: { targetComponent: 'r', property: 'value' }, outputs: [createLogicPort({ id: 'go', name: 'Value', type: 'any' })] })
+    const set = createLogicNode('set_value', { id: 'v', params: { targetComponent: 'c' }, inputs: [createLogicPort({ id: 'vi', name: 'Exec', type: 'execution' }), createLogicPort({ id: 'vn', name: 'Number', type: 'int', defaultValue: 0 })], outputs: [createLogicPort({ id: 'vo', name: 'Done', type: 'execution' })] })
+    const g = createLogicGraph({ id: 'g1', name: 'gauge', nodes: [get, set], connections: [createLogicConnection({ sourceNode: 'g', sourceOutput: 'go', targetNode: 'v', targetInput: 'vn', type: 'data' })] })
+    const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+    expect(src).toContain('(lv-scale-set-line-needle-value ui-gauge ui-gauge-needle 55 (lv-roller-get-selected ui-pick))')
+  })
+})

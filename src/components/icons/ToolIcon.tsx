@@ -4,7 +4,7 @@ import {
   Loader, Table, Calendar, AppWindow, LayoutDashboard, Files, ListFilter, AlignLeft, ToggleRight,
   RectangleHorizontal, Activity, Zap, Timer, GitBranch, GitFork, Scale, Link2, SlidersHorizontal,
   Navigation, Eye, Hash, SquareFunction, Hourglass, BookOpen, PenLine, Calculator, CaseSensitive,
-  Lightbulb, Search, CodeXml, Clapperboard, Database, Code, Package, FolderOpen, Monitor, Square,
+  Lightbulb, ChevronsUpDown, Plus, Keyboard, List, MessageSquare, Gauge, Search, CodeXml, Clapperboard, Database, Code, Package, FolderOpen, Monitor, Square,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const ICONS: Record<string, LucideIcon> = {
   btn: MousePointerClick, label: Type, img: ImageIcon, line: Activity, textarea: AlignLeft,
   dropdown: ListFilter, checkbox: CheckSquare, switch: ToggleRight, slider: Sliders,
   obj: Box, container: Box, panel: Box, tabview: Files, tileview: LayoutDashboard,
-  win: AppWindow, window: AppWindow, led: Lightbulb, bar: RectangleHorizontal, arc: CircleDashed,
+  win: AppWindow, window: AppWindow, led: Lightbulb, roller: ChevronsUpDown, spinbox: Plus, keyboard: Keyboard, list: List, msgbox: MessageSquare, scale: Gauge, bar: RectangleHorizontal, arc: CircleDashed,
   spinner: Loader, chart: BarChart3, table: Table, calendar: Calendar,
   // widget categories
   'cat:basic': Package, 'cat:input': PenLine, 'cat:container': FolderOpen, 'cat:display': Monitor,

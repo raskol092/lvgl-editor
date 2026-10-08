@@ -124,6 +124,8 @@ function expression(node: LogicNode, c: Ctx): string {
             case 'bar': return `(lv-bar-get-value ${t})`;
             case 'arc': return `(lv-arc-get-value ${t})`;
             case 'dropdown': return `(lv-dropdown-get-selected ${t})`;
+            case 'roller': return `(lv-roller-get-selected ${t})`;
+            case 'spinbox': return `(lv-spinbox-get-value ${t})`;
             case 'switch':
             case 'checkbox': return `(if (lv-obj-has-state ${t} LV_STATE_CHECKED) 1 0)`;
             default: return `(lv-slider-get-value ${t})`;
@@ -139,6 +141,13 @@ function expression(node: LogicNode, c: Ctx): string {
     default:
       return '0';
   }
+}
+
+/** Moves the needle of a scale (the needle line is created with the scale when its "Needle" option is on). */
+function scaleNeedle(c: Ctx, p: Record<string, unknown>, target: string, value: string): string {
+  const comp = c.names.compByName(String(p.targetComponent || ''), c.pageHint);
+  const len = Number(comp?.props.needleLength) || 60;
+  return `(lv-scale-set-line-needle-value ${target} ${sym(c.options, target, 'needle')} ${len} ${value})`;
 }
 
 function ledType(c: Ctx, p: Record<string, unknown>): boolean {
@@ -240,6 +249,9 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
         value: (() => {
           switch (c.names.compByName(p.targetComponent || '', c.pageHint)?.type) {
             case 'led': return `(lv-led-set-brightness ${target} ${val})`;
+            case 'roller': return `(lv-roller-set-selected ${target} ${val} LV_ANIM_ON)`;
+            case 'spinbox': return `(lv-spinbox-set-value ${target} ${val})`;
+            case 'scale': return scaleNeedle(c, p, target, val);
             case 'bar': return `(lv-bar-set-value ${target} ${val} LV_ANIM_ON)`;
             case 'arc': return `(lv-arc-set-value ${target} ${val})`;
             default: return `(lv-slider-set-value ${target} ${val} LV_ANIM_ON)`;
@@ -294,6 +306,9 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
       const type = c.names.compByName(p.targetComponent || '', c.pageHint)?.type ?? p.componentType ?? 'slider';
       switch (type) {
         case 'led': return [`(lv-led-set-brightness ${target} ${value})`];
+        case 'roller': return [`(lv-roller-set-selected ${target} ${value} LV_ANIM_ON)`];
+        case 'spinbox': return [`(lv-spinbox-set-value ${target} ${value})`];
+        case 'scale': return [scaleNeedle(c, p, target, value)];
         case 'bar': return [`(lv-bar-set-value ${target} ${value} LV_ANIM_ON)`];
         case 'arc': return [`(lv-arc-set-value ${target} ${value})`];
         case 'dropdown': return [`(lv-dropdown-set-selected ${target} ${value})`];

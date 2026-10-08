@@ -526,6 +526,129 @@ static lv_obj_t *create_led(lv_obj_t *parent, const cJSON *comp) {
     return led;
 }
 
+/* ---- widgets of the extra set: roller, spinbox, keyboard, list, message box, scale (same calls as the generated Lisp) ---- */
+static void join_strings(const cJSON *arr, char *buf, size_t cap) {
+    buf[0] = '\0';
+    int first = 1;
+    const cJSON *it;
+    cJSON_ArrayForEach(it, arr) {
+        if (!cJSON_IsString(it)) continue;
+        if (!first) strncat(buf, "\n", cap - strlen(buf) - 1);
+        strncat(buf, it->valuestring, cap - strlen(buf) - 1);
+        first = 0;
+    }
+}
+
+static lv_obj_t *create_roller(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *r = lv_roller_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    if (props) {
+        char buf[1024];
+        join_strings(cJSON_GetObjectItemCaseSensitive(props, "options"), buf, sizeof(buf));
+        const char *mode = cjson_get_string(props, "mode");
+        lv_roller_set_options(r, buf, (mode && strcmp(mode, "infinite") == 0) ? LV_ROLLER_MODE_INFINITE : LV_ROLLER_MODE_NORMAL);
+        int rows = cjson_get_int(props, "visibleRows", 3);
+        if (rows > 0) lv_roller_set_visible_row_count(r, (uint32_t)rows);
+        int sel = cjson_get_int(props, "selected", 0);
+        if (sel > 0) lv_roller_set_selected(r, (uint32_t)sel, LV_ANIM_OFF);
+    }
+    return r;
+}
+
+static lv_obj_t *create_spinbox(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *sb = lv_spinbox_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    if (props) {
+        lv_spinbox_set_range(sb, cjson_get_int(props, "min", 0), cjson_get_int(props, "max", 100));
+        int digits = cjson_get_int(props, "digitCount", 4);
+        int dec = cjson_get_int(props, "decimalPos", 0);
+        lv_spinbox_set_digit_format(sb, (uint32_t)(digits < 1 ? 1 : digits), (uint32_t)(dec < 0 ? 0 : dec));
+        int step = cjson_get_int(props, "step", 1);
+        lv_spinbox_set_step(sb, (uint32_t)(step < 1 ? 1 : step));
+        lv_spinbox_set_rollover(sb, cjson_get_bool(props, "rollover", 0));
+        lv_spinbox_set_value(sb, cjson_get_int(props, "value", 0));
+    }
+    return sb;
+}
+
+static lv_obj_t *create_keyboard(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *kb = lv_keyboard_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    if (props) {
+        const char *m = cjson_get_string(props, "mode");
+        lv_keyboard_mode_t mode = LV_KEYBOARD_MODE_TEXT_LOWER;
+        if (m && strcmp(m, "text_upper") == 0) mode = LV_KEYBOARD_MODE_TEXT_UPPER;
+        else if (m && strcmp(m, "special") == 0) mode = LV_KEYBOARD_MODE_SPECIAL;
+        else if (m && strcmp(m, "number") == 0) mode = LV_KEYBOARD_MODE_NUMBER;
+        lv_keyboard_set_mode(kb, mode);
+    }
+    return kb;
+}
+
+static lv_obj_t *create_list(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *list = lv_list_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    const cJSON *items = props ? cJSON_GetObjectItemCaseSensitive(props, "items") : NULL;
+    const cJSON *it;
+    cJSON_ArrayForEach(it, items) {
+        if (cJSON_IsString(it)) lv_list_add_button(list, NULL, it->valuestring);
+    }
+    return list;
+}
+
+static lv_obj_t *create_msgbox(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *mb = lv_msgbox_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    if (props) {
+        const char *title = cjson_get_string(props, "title");
+        const char *text = cjson_get_string(props, "text");
+        if (title && title[0]) lv_msgbox_add_title(mb, title);
+        if (text && text[0]) lv_msgbox_add_text(mb, text);
+        const cJSON *buttons = cJSON_GetObjectItemCaseSensitive(props, "buttons");
+        const cJSON *b;
+        cJSON_ArrayForEach(b, buttons) {
+            if (cJSON_IsString(b)) lv_msgbox_add_footer_button(mb, b->valuestring);
+        }
+        if (cjson_get_bool(props, "showClose", 1)) lv_msgbox_add_close_button(mb);
+    }
+    return mb;
+}
+
+static lv_obj_t *create_scale(lv_obj_t *parent, const cJSON *comp) {
+    lv_obj_t *sc = lv_scale_create(parent);
+    const cJSON *props = cJSON_GetObjectItemCaseSensitive(comp, "props");
+    if (!props) return sc;
+    const char *m = cjson_get_string(props, "mode");
+    lv_scale_mode_t mode = LV_SCALE_MODE_HORIZONTAL_BOTTOM;
+    if (m) {
+        if (strcmp(m, "horizontal_top") == 0) mode = LV_SCALE_MODE_HORIZONTAL_TOP;
+        else if (strcmp(m, "vertical_left") == 0) mode = LV_SCALE_MODE_VERTICAL_LEFT;
+        else if (strcmp(m, "vertical_right") == 0) mode = LV_SCALE_MODE_VERTICAL_RIGHT;
+        else if (strcmp(m, "round_inner") == 0) mode = LV_SCALE_MODE_ROUND_INNER;
+        else if (strcmp(m, "round_outer") == 0) mode = LV_SCALE_MODE_ROUND_OUTER;
+    }
+    lv_scale_set_mode(sc, mode);
+    lv_scale_set_range(sc, cjson_get_int(props, "min", 0), cjson_get_int(props, "max", 100));
+    int ticks = cjson_get_int(props, "totalTicks", 11);
+    lv_scale_set_total_tick_count(sc, (uint32_t)(ticks < 2 ? 2 : ticks));
+    int every = cjson_get_int(props, "majorEvery", 5);
+    lv_scale_set_major_tick_every(sc, (uint32_t)(every < 1 ? 1 : every));
+    lv_scale_set_label_show(sc, cjson_get_bool(props, "showLabels", 1));
+    if (m && strncmp(m, "round", 5) == 0) {
+        lv_scale_set_angle_range(sc, (uint32_t)cjson_get_int(props, "angleRange", 270));
+        lv_scale_set_rotation(sc, cjson_get_int(props, "rotation", 135));
+    }
+    if (cjson_get_bool(props, "needle", 0)) {
+        lv_obj_t *needle = lv_line_create(sc);
+        const char *nc = cjson_get_string(props, "needleColor");
+        lv_obj_set_style_line_width(needle, cjson_get_int(props, "needleWidth", 3), LV_PART_MAIN);
+        lv_obj_set_style_line_color(needle, hex_to_color(nc ? nc : "#EF4444"), LV_PART_MAIN);
+        lv_obj_set_style_line_rounded(needle, true, LV_PART_MAIN);
+        lv_scale_set_line_needle_value(sc, needle, cjson_get_int(props, "needleLength", 60), cjson_get_int(props, "needleValue", 0));
+    }
+    return sc;
+}
+
 static lv_obj_t *create_spinner(lv_obj_t *parent, const cJSON *comp) {
     (void)comp;
     return lv_spinner_create(parent);
@@ -671,6 +794,12 @@ static const type_entry_t type_table[] = {
     { "win",       create_win },
     { "spinner",   create_spinner },
     { "led",       create_led },
+    { "roller",    create_roller },
+    { "spinbox",   create_spinbox },
+    { "keyboard",  create_keyboard },
+    { "list",      create_list },
+    { "msgbox",    create_msgbox },
+    { "scale",     create_scale },
     { "line",      create_line },
     { "img",       create_img },
     { NULL, NULL }
@@ -762,6 +891,7 @@ void ui_from_json(const char *json_str) {
         else if (wm && strcmp(wm, "percent") == 0) w = lv_pct(w);
         if (hm && strcmp(hm, "content") == 0) h = LV_SIZE_CONTENT;
         else if (hm && strcmp(hm, "percent") == 0) h = lv_pct(h);
+        if (strcmp(type, "keyboard") == 0 || strcmp(type, "msgbox") == 0) lv_obj_set_align(obj, LV_ALIGN_TOP_LEFT);
         lv_obj_set_pos(obj, x, y);
         lv_obj_set_size(obj, w, h);
 
@@ -792,6 +922,17 @@ void ui_from_json(const char *json_str) {
 
         /* Register in id map */
         if (id) id_map_add(id, obj);
+    }
+
+    /* keyboards are bound to their text area once every widget exists */
+    cJSON_ArrayForEach(comp, components) {
+        const char *type = cjson_get_string(comp, "type");
+        if (!type || strcmp(type, "keyboard") != 0) continue;
+        cJSON *kp = cJSON_GetObjectItemCaseSensitive(comp, "props");
+        const char *ta_id = kp ? cjson_get_string(kp, "textareaId") : NULL;
+        lv_obj_t *kb = id_map_find(cjson_get_string(comp, "id"));
+        lv_obj_t *ta = id_map_find(ta_id);
+        if (kb && ta) lv_keyboard_set_textarea(kb, ta);
     }
 
     cJSON_Delete(root);

@@ -22,7 +22,7 @@ const VARIABLE_TYPES: { type: VariableType; label: string; icon: string; default
 /** The property a screen element exposes to the logic by default */
 function mainProperty(type: string): string {
   switch (type) {
-    case 'slider': case 'bar': case 'arc': case 'dropdown': return 'value';
+    case 'slider': case 'bar': case 'arc': case 'dropdown': case 'roller': case 'spinbox': case 'scale': return 'value';
     case 'switch': case 'checkbox': case 'led': return 'checked';
     case 'label': case 'btn': case 'textarea': return 'text';
     default: return 'visible';
@@ -31,7 +31,7 @@ function mainProperty(type: string): string {
 
 /** Widgets the user (or the board) changes: their value can be read. Display widgets (bar, label, chart...) only receive values. */
 function canReadValue(type: string): boolean {
-  return ['slider', 'arc', 'switch', 'checkbox', 'dropdown', 'textarea'].includes(type);
+  return ['slider', 'arc', 'switch', 'checkbox', 'dropdown', 'textarea', 'roller', 'spinbox'].includes(type);
 }
 
 const PROPERTY_LABEL: Record<string, string> = { value: 'Value', checked: 'Checked state', text: 'Text', visible: 'Visibility' };

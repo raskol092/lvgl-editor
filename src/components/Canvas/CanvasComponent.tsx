@@ -6,6 +6,7 @@ import { useEditorStore } from '../../store/editorStore';
 import { useAppStore } from '../../store/appStore';
 import { useResourceStore } from '../../resources/resourceStore';
 import { useThemeStore } from '../../store/themeStore';
+import { renderExtraWidget } from './extraWidgets';
 import { t } from '../../i18n';
 import './CanvasComponent.css';
 
@@ -933,7 +934,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         );
       
       default:
-        return <div>{type}</div>;
+        return renderExtraWidget({ component, th, fontSize: Number(props.fontSize) || defaultFontSize, tint, muted, textColor: defaultStyle.textColor || th.text }) ?? <div>{type}</div>;
     }
   };
 

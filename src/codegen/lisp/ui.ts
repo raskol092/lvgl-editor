@@ -4,6 +4,7 @@ import type { Page, LvglComponent, StyleProps, Animation, Theme } from '../../ty
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LispGenOptions } from './types';
 import type { NameResolver } from './names';
+import { EXTRA_CREATE_FN, extraPropsForms } from './extraWidgets';
 import { isDarkTheme } from '../../utils/isDarkTheme';
 import { getArcStyle, isArcLike } from '../../utils/arcStyle';
 import { sym, lstr, lcolor, lopa, indent, comment, banner, userCode, shift, symbolText } from './sexp';
@@ -508,6 +509,7 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
     }
   }
 
+  out.push(...extraPropsForms(comp, v, o, ctx.names));
   if (props.flexGrow !== undefined && props.flexGrow > 0) out.push(`(lv-obj-set-flex-grow ${v} ${num(props.flexGrow)})`);
   return out;
 }
@@ -536,7 +538,9 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
   const out: string[] = [];
   if (o.generateComments) out.push(comment(`Create ${comp.type}: ${comp.name}`));
 
-  out.push(`(def ${v} (${CREATE_FN[comp.type] || 'lv-obj-create'} ${parent}))`);
+  out.push(`(def ${v} (${CREATE_FN[comp.type] || EXTRA_CREATE_FN[comp.type] || 'lv-obj-create'} ${parent}))`);
+  // keyboard and message box come centred / bottom-aligned from LVGL: pin them to the top left like every other widget
+  if (comp.type === 'keyboard' || comp.type === 'msgbox') out.push(`(lv-obj-set-align ${v} LV_ALIGN_TOP_LEFT)`);
   out.push(`(lv-obj-set-pos ${v} ${Math.round(comp.x)} ${Math.round(comp.y)})`);
 
   const w = comp.widthMode === 'content' ? 'LV_SIZE_CONTENT' : comp.widthMode === 'percent' ? `(lv-pct ${comp.width})` : String(Math.round(comp.width));

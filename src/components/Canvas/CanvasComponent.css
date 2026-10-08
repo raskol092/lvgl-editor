@@ -182,3 +182,5 @@
 
 /* the slider knob is larger than the track and sticks out of the object, like in LVGL */
 .canvas-component:has(> .lvgl-slider) { overflow: visible; }
+
+.canvas-component:has(> .lvgl-scale) { overflow: visible; }
