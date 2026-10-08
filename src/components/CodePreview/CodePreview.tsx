@@ -8,6 +8,8 @@ import { useResourceStore } from '../../resources/resourceStore';
 import { useAppStore } from '../../store/appStore';
 import { useProjectStore } from '../../store/projectStore';
 import { generateCode, getGeneratedFileNames, convertAssets } from '../../codegen/lisp';
+import { validateLinks } from '../../codegen/lisp/validate';
+import { useExportIssuesStore } from '../ExportIssues/exportIssuesStore';
 import type { LispGenOptions, LispFileName } from '../../codegen/lisp';
 import { useZipExport } from '../../hooks/useZipExport';
 import { toast } from '../Toast';
@@ -77,6 +79,8 @@ const CodePreview: React.FC = () => {
   };
 
   const handleDownload = () => {
+    const issues = validateLinks(pages, logicGraphs);
+    if (issues.length > 0) { useExportIssuesStore.getState().show(issues); return; }
     const blob = new Blob([currentCode], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
