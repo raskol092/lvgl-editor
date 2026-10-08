@@ -21,6 +21,9 @@ export interface UiContext {
   iconColor?: string;
 }
 
+/** Built-in Montserrat sizes available on the P4 board */
+const BUILTIN_SIZES = [14, 16, 20, 24, 32, 48];
+
 const isBuiltinFont = (name: string) => /^montserrat_\d+$/.test(name);
 
 // ---------------------------------------------------------------- resources
@@ -229,6 +232,12 @@ function textProps(v: string, props: Record<string, any>, ctx: UiContext): strin
   } else if (props.fontSize !== undefined && ctx.defaultFont && !isBuiltinFont(ctx.defaultFont)) {
     const s = props.fontSize as number;
     if (s !== (ctx.defaultFontSize || 16)) set('text-font', fontSym(ctx.defaultFont, s, ctx.options));
+  } else if (props.fontSize !== undefined && Number.isFinite(Number(props.fontSize))) {
+    // built-in Montserrat: the nearest size the board has (the P4 firmware ships 14 16 20 24 32 48)
+    const want = Number(props.fontSize);
+    const size = BUILTIN_SIZES.reduce((a, b) => (Math.abs(b - want) < Math.abs(a - want) ? b : a));
+    const def = /^montserrat_(\d+)$/.exec(ctx.defaultFont || '');
+    if (size !== (def ? Number(def[1]) : 14)) set('text-font', `font-montserrat-${size}`);
   }
   if (props.textAlign) {
     const al: Record<string, string> = { left: 'LV_TEXT_ALIGN_LEFT', center: 'LV_TEXT_ALIGN_CENTER', right: 'LV_TEXT_ALIGN_RIGHT' };
@@ -272,6 +281,11 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       if (props.min !== undefined || props.max !== undefined) out.push(`(lv-${p}-set-range ${v} ${num(props.min)} ${num(props.max, 100)})`);
       if (props.value !== undefined) out.push(`(lv-${p}-set-value ${v} ${num(props.value)} LV_ANIM_OFF)`);
       if (props.orientation === 'vertical') out.push(`(lv-obj-set-style-transform-rotation ${v} 900 LV_PART_MAIN)`);
+      if (props.indicatorColor) {
+        out.push(`(lv-obj-set-style-bg-color ${v} ${lcolor(props.indicatorColor)} LV_PART_INDICATOR)`);
+        out.push(`(lv-obj-set-style-bg-opa ${v} LV_OPA_COVER LV_PART_INDICATOR)`);
+        if (comp.type === 'slider') out.push(`(lv-obj-set-style-bg-color ${v} ${lcolor(props.indicatorColor)} LV_PART_KNOB)`);
+      }
       break;
     }
     case 'arc': {
@@ -280,6 +294,7 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       }
       if (props.min !== undefined || props.max !== undefined) out.push(`(lv-arc-set-range ${v} ${num(props.min)} ${num(props.max, 100)})`);
       if (props.value !== undefined) out.push(`(lv-arc-set-value ${v} ${num(props.value)})`);
+      if (props.hideKnob === true) out.push(`(lv-obj-set-style-bg-opa ${v} LV_OPA_TRANSP LV_PART_KNOB)`);
       if (props.mode) {
         const m: Record<string, string> = { normal: 'LV_ARC_MODE_NORMAL', symmetrical: 'LV_ARC_MODE_SYMMETRICAL', reverse: 'LV_ARC_MODE_REVERSE' };
         out.push(`(lv-arc-set-mode ${v} ${m[props.mode] || 'LV_ARC_MODE_NORMAL'})`);

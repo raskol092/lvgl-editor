@@ -1792,6 +1792,13 @@ function renderComponentProps(
             />
           </div>
           <div className="property-row">
+            <label>{t('Indicator color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={props.indicatorColor || '#2196F3'} onChange={(e) => onChange('indicatorColor', e.target.value)} />
+              <input type="text" value={props.indicatorColor || ''} placeholder={t('Theme')} onChange={(e) => onChange('indicatorColor', e.target.value)} className="color-text" />
+            </div>
+          </div>
+          <div className="property-row">
             <label>{t('Direction')}</label>
             <select
               value={props.orientation || 'horizontal'}
@@ -1858,6 +1865,13 @@ function renderComponentProps(
                 max={props.max ?? 100}
                 onChange={(e) => onChange('value', parseInt(e.target.value) || 0)}
               />
+            </div>
+          </div>
+          <div className="property-row">
+            <label>{t('Indicator color')}</label>
+            <div className="color-input-wrapper">
+              <input type="color" value={props.indicatorColor || '#2196F3'} onChange={(e) => onChange('indicatorColor', e.target.value)} />
+              <input type="text" value={props.indicatorColor || ''} placeholder={t('Theme')} onChange={(e) => onChange('indicatorColor', e.target.value)} className="color-text" />
             </div>
           </div>
           <div className="property-row">
@@ -1955,6 +1969,10 @@ function renderComponentProps(
               <input type="color" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} />
               <input type="text" value={arcStyle.track} onChange={(e) => onChange('arcTrackColor', e.target.value)} className="color-text" />
             </div>
+          <div className="property-row">
+            <label>{t('Show knob')}</label>
+            <input type="checkbox" checked={props.hideKnob !== true} onChange={(e) => onChange('hideKnob', !e.target.checked)} />
+          </div>
           </div>
           <div className="property-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
             <label>{t('Start angle:')} {props.startAngle || 135}°</label>

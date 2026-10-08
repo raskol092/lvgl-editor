@@ -527,7 +527,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             <div style={{
               width: `${sPct}%`,
               height: '100%',
-              backgroundColor: th.primary,
+              backgroundColor: props.indicatorColor || th.primary,
               borderRadius: defaultStyle.borderRadius ?? 9999,
             }} />
             <div style={{
@@ -538,7 +538,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               height: knob,
               transform: 'translateY(-50%)',
               borderRadius: '50%',
-              backgroundColor: th.primary,
+              backgroundColor: props.indicatorColor || th.primary,
             }} />
           </div>
         );
@@ -668,7 +668,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             <div style={{
               width: `${barPercent}%`,
               height: '100%',
-              backgroundColor: th.primary,
+              backgroundColor: props.indicatorColor || th.primary,
               borderRadius: defaultStyle.borderRadius,
               transition: 'width 0.15s',
             }} />
@@ -708,7 +708,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
               <path d={arcPath(total)} fill="none" stroke={arc.track} strokeWidth={stroke} strokeLinecap="round" />
               {frac > 0 && <path d={arcPath(total * frac)} fill="none" stroke={arc.color} strokeWidth={stroke} strokeLinecap="round" />}
-              <circle cx={kx} cy={ky} r={stroke * 0.7} fill={arc.color} />
+              {props.hideKnob !== true && <circle cx={kx} cy={ky} r={stroke * 0.7} fill={arc.color} />}
             </svg>
           </div>
         );

@@ -300,3 +300,15 @@ describe('screen element values in logic', () => {
     expect(src).toContain('(lv-obj-add-state ui-agree LV_STATE_CHECKED)')
   })
 })
+
+describe('built-in font sizes', () => {
+  it('uses the nearest built-in Montserrat size for a label font size', () => {
+    const a = createComponent('label', { id: 'a', name: 'big', props: { text: 'x', fontSize: 48 } })
+    const b = createComponent('label', { id: 'b', name: 'small', props: { text: 'y', fontSize: 14 } })
+    const c = createComponent('label', { id: 'c', name: 'odd', props: { text: 'z', fontSize: 28 } })
+    const out = generateCode([createPage({ components: [a, b, c] } as never)], undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    expect(out).toContain('(lv-obj-set-style-text-font ui-big font-montserrat-48 LV_PART_MAIN)')
+    expect(out).not.toContain('ui-small font-montserrat')
+    expect(out).toContain('(lv-obj-set-style-text-font ui-odd font-montserrat-24 LV_PART_MAIN)')
+  })
+})

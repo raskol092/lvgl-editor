@@ -227,6 +227,12 @@ static lv_obj_t *create_slider(lv_obj_t *parent, const cJSON *comp) {
         int val = cjson_get_int(props, "value", 50);
         lv_slider_set_range(slider, mn, mx);
         lv_slider_set_value(slider, val, LV_ANIM_OFF);
+        const char *ic = cjson_get_string(props, "indicatorColor");
+        if (ic) {
+            lv_obj_set_style_bg_color(slider, hex_to_color(ic), LV_PART_INDICATOR);
+            lv_obj_set_style_bg_opa(slider, LV_OPA_COVER, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(slider, hex_to_color(ic), LV_PART_KNOB);
+        }
     }
     return slider;
 }
@@ -240,6 +246,11 @@ static lv_obj_t *create_bar(lv_obj_t *parent, const cJSON *comp) {
         int val = cjson_get_int(props, "value", 50);
         lv_bar_set_range(bar, mn, mx);
         lv_bar_set_value(bar, val, LV_ANIM_OFF);
+        const char *ic = cjson_get_string(props, "indicatorColor");
+        if (ic) {
+            lv_obj_set_style_bg_color(bar, hex_to_color(ic), LV_PART_INDICATOR);
+            lv_obj_set_style_bg_opa(bar, LV_OPA_COVER, LV_PART_INDICATOR);
+        }
     }
     return bar;
 }
@@ -253,6 +264,17 @@ static lv_obj_t *create_arc(lv_obj_t *parent, const cJSON *comp) {
         int val = cjson_get_int(props, "value", 75);
         lv_arc_set_range(arc, mn, mx);
         lv_arc_set_value(arc, val);
+        /* same as the generated Lisp: angles, widths and colors of the track and the indicator */
+        if (cJSON_GetObjectItemCaseSensitive(props, "startAngle") || cJSON_GetObjectItemCaseSensitive(props, "endAngle"))
+            lv_arc_set_bg_angles(arc, (lv_value_precise_t)cjson_get_int(props, "startAngle", 135), (lv_value_precise_t)cjson_get_int(props, "endAngle", 45));
+        int aw = cjson_get_int(props, "arcWidth", 12);
+        const char *ac = cjson_get_string(props, "arcColor");
+        const char *tc = cjson_get_string(props, "arcTrackColor");
+        lv_obj_set_style_arc_width(arc, aw, LV_PART_MAIN);
+        lv_obj_set_style_arc_width(arc, aw, LV_PART_INDICATOR);
+        if (tc) lv_obj_set_style_arc_color(arc, hex_to_color(tc), LV_PART_MAIN);
+        if (ac) lv_obj_set_style_arc_color(arc, hex_to_color(ac), LV_PART_INDICATOR);
+        if (cjson_get_bool(props, "hideKnob", 0)) lv_obj_set_style_bg_opa(arc, LV_OPA_TRANSP, LV_PART_KNOB);
     }
     return arc;
 }
@@ -728,6 +750,19 @@ void ui_from_json(const char *json_str) {
         /* Apply styles */
         cJSON *styles = cJSON_GetObjectItemCaseSensitive(comp, "styles");
         apply_styles(obj, styles);
+
+        /* font size: the nearest built-in Montserrat the board has (14 16 20 24 32 48), like the generated Lisp */
+        cJSON *cprops = cJSON_GetObjectItemCaseSensitive(comp, "props");
+        cJSON *fs = cprops ? cJSON_GetObjectItemCaseSensitive(cprops, "fontSize") : NULL;
+        if (cJSON_IsNumber(fs)) {
+            static const int sizes[] = {14, 16, 20, 24, 32, 48};
+            static const lv_font_t *fonts[] = {&lv_font_montserrat_14, &lv_font_montserrat_16, &lv_font_montserrat_20,
+                                               &lv_font_montserrat_24, &lv_font_montserrat_32, &lv_font_montserrat_48};
+            int best = 0;
+            for (int k = 1; k < 6; k++)
+                if (abs(sizes[k] - fs->valueint) < abs(sizes[best] - fs->valueint)) best = k;
+            lv_obj_set_style_text_font(obj, fonts[best], LV_PART_MAIN);
+        }
 
         /* Flags */
         cJSON *flags = cJSON_GetObjectItemCaseSensitive(comp, "flags");
