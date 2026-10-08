@@ -115,10 +115,12 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
                 case 15: lv_obj_set_style_border_opa(obj, opa, sel); break;
                 case 16: lv_obj_set_style_outline_opa(obj, opa, sel); break;
                 case 17: lv_obj_set_style_text_opa(obj, opa, sel); break;
-                case 18: break; /* text outline: not in LVGL 9.2 (preview only) */
+                case 18: lv_obj_set_style_text_outline_stroke_width(obj, n, sel); break;
             }
         }
         if (cjson_get_bool(style, "clipCorner", 0)) lv_obj_set_style_clip_corner(obj, true, sel);
+        s = cjson_get_string(style, "textOutlineColor");
+        if (s) lv_obj_set_style_text_outline_stroke_color(obj, hex_to_color(s), sel);
     }
 
     /* image recolor (library icons follow the theme text color) */

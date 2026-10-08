@@ -106,20 +106,20 @@ function List({ component, th, fontSize, textColor }: Ctx) {
   );
 }
 
-function Msgbox({ component, th, fontSize, textColor, tint }: Ctx) {
+function Msgbox({ component, th, fontSize, textColor }: Ctx) {
   const p = component.props;
   const buttons = optionList(p.buttons, []);
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', color: textColor, fontSize, padding: 12, boxSizing: 'border-box', gap: 8 }}>
-      <div style={{ display: 'flex', alignItems: 'center', fontWeight: 600 }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', color: textColor, fontSize, boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px', background: 'rgba(128,128,128,0.22)', borderRadius: '10px 10px 0 0' }}>
         <span style={{ flex: 1 }}>{p.title || ''}</span>
-        {p.showClose !== false && <span style={{ width: 28, height: 24, borderRadius: 6, background: th.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</span>}
+        {p.showClose !== false && <span style={{ width: 44, height: 22, borderRadius: 11, background: th.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</span>}
       </div>
-      <div style={{ flex: 1, overflow: 'hidden' }}>{p.text || ''}</div>
+      <div style={{ flex: 1, overflow: 'hidden', padding: '10px 12px 0' }}>{p.text || ''}</div>
       {buttons.length > 0 && (
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', padding: '8px 12px 12px' }}>
           {buttons.map((b, i) => (
-            <span key={i} style={{ padding: '6px 14px', borderRadius: 6, background: tint, border: `1px solid ${th.border}` }}>{b}</span>
+            <span key={i} style={{ padding: '4px 16px', borderRadius: 14, background: th.primary, color: '#fff' }}>{b}</span>
           ))}
         </div>
       )}
