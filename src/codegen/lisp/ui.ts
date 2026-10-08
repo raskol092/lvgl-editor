@@ -1,5 +1,6 @@
 // ui/ui.lisp generator: screens, widgets, styles and animations
 
+import { styleSelector } from '../../utils/styleKeys';
 import type { Page, LvglComponent, StyleProps, Animation, Theme } from '../../types';
 import type { ImageResource, FontResource } from '../../resources/types';
 import type { LispGenOptions } from './types';
@@ -84,7 +85,7 @@ export function collectUsedCustomFonts(
         const s = c.props.fontSize as number;
         if (s !== (defaultFontSize || 16)) add(defaultFont, s);
       }
-      const states: Array<StyleProps | undefined> = [c.styles.default, c.styles.pressed, c.styles.focused, c.styles.disabled];
+      const states: Array<StyleProps | undefined> = Object.values(c.styles);
       for (const st of states) {
         if (st?.textFont && !isBuiltinFont(st.textFont) && custom.has(st.textFont)) add(st.textFont, st.textFontSize || 16);
       }
@@ -622,6 +623,14 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
     if (f.pressLock) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_PRESS_LOCK)`);
     if (f.eventBubble) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_EVENT_BUBBLE)`);
     if (f.gesturesBubble) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_GESTURE_BUBBLE)`);
+    if (f.clickFocusable === false) out.push(`(lv-obj-remove-flag ${v} LV_OBJ_FLAG_CLICK_FOCUSABLE)`);
+    const extra: Array<[boolean | undefined, string]> = [
+      [f.scrollOne, 'SCROLL_ONE'], [f.scrollChainHor, 'SCROLL_CHAIN_HOR'], [f.scrollChainVer, 'SCROLL_CHAIN_VER'],
+      [f.scrollWithArrow, 'SCROLL_WITH_ARROW'], [f.eventTrickle, 'EVENT_TRICKLE'], [f.stateTrickle, 'STATE_TRICKLE'],
+      [f.advHittest, 'ADV_HITTEST'], [f.floating, 'FLOATING'], [f.ignoreLayout, 'IGNORE_LAYOUT'],
+      [f.overflowVisible, 'OVERFLOW_VISIBLE'], [f.flexInNewTrack, 'FLEX_IN_NEW_TRACK'],
+    ];
+    for (const [on, name] of extra) if (on) out.push(`(lv-obj-add-flag ${v} LV_OBJ_FLAG_${name})`);
   }
 
   const sb = comp.styles.default.scrollbarMode;
@@ -641,14 +650,17 @@ function componentForms(comp: LvglComponent, parent: string, pageName: string, c
     out.push(`(lv-obj-set-style-arc-width ${v} ${arc.width} LV_PART_INDICATOR)`);
     out.push(`(lv-obj-set-style-arc-color ${v} ${lcolor(arc.color)} LV_PART_INDICATOR)`);
   }
-  if (comp.styles.pressed) out.push(...styleForms(v, comp.styles.pressed, 'LV_STATE_PRESSED', ctx));
-  if (comp.styles.focused) out.push(...styleForms(v, comp.styles.focused, 'LV_STATE_FOCUSED', ctx));
-  if (comp.styles.disabled) out.push(...styleForms(v, comp.styles.disabled, 'LV_STATE_DISABLED', ctx));
+  for (const [key, st] of Object.entries(comp.styles)) {
+    const sel = styleSelector(key);
+    if (st && sel) out.push(...styleForms(v, st, sel, ctx));
+  }
 
   out.push(...propsForms(comp, v, ctx));
 
   for (const ev of comp.events) {
-    out.push(`(lv-obj-add-event-cb ${v} '${ctx.names.eventHandler(comp, ev)} ${ev.eventType})`);
+    // screen events are only sent to screen objects: register them on the screen the component is on
+    const evTarget = ev.eventType.startsWith('LV_EVENT_SCREEN_') ? ctx.names.screenVar(pageName) : v;
+    out.push(`(lv-obj-add-event-cb ${evTarget} '${ctx.names.eventHandler(comp, ev)} ${ev.eventType})`);
   }
 
   out.push(...animForms(v, comp.animations || [], ctx));
@@ -814,6 +826,8 @@ export function generateUiLisp(pages: Page[], ctx: UiContext, theme?: Theme): st
   for (const page of pages) {
     L.push(`(defun ${ctx.names.loadFn(page.name)} ()`);
     L.push(`${indent(o)}(lv-screen-load-anim ${ctx.names.screenVar(page.name)} LV_SCREEN_LOAD_ANIM_FADE_ON 300 0 nil))`, '');
+    L.push(`(defun ${ctx.names.loadFn(page.name)}${o.namingStyle === 'snake_case' ? '_anim' : '-anim'} (anim ms)`);
+    L.push(`${indent(o)}(lv-screen-load-anim ${ctx.names.screenVar(page.name)} anim ms 0 nil))`, '');
   }
 
   if (o.generateComments) L.push(...banner('Main init'));

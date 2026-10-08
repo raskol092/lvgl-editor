@@ -1,3 +1,4 @@
+import { cloneStyles } from '../utils/styleKeys';
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import type {
@@ -283,12 +284,7 @@ function cloneComponents(components: LvglComponent[]): LvglComponent[] {
   return components.map(comp => ({
     ...comp,
     props: { ...comp.props },
-    styles: {
-      default: { ...comp.styles.default },
-      pressed: comp.styles.pressed ? { ...comp.styles.pressed } : undefined,
-      focused: comp.styles.focused ? { ...comp.styles.focused } : undefined,
-      disabled: comp.styles.disabled ? { ...comp.styles.disabled } : undefined,
-    },
+    styles: cloneStyles(comp.styles),
     events: comp.events.map(e => ({ ...e, action: e.action ? { ...e.action } : undefined })),
     animations: (comp.animations || []).map(a => ({ ...a })),
     children: cloneComponents(comp.children),

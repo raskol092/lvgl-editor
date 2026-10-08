@@ -47,11 +47,7 @@ interface WasmComponent {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: Record<string, any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pressed?: Record<string, any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    focused?: Record<string, any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    disabled?: Record<string, any>;
+    [stateOrPart: string]: Record<string, any>;
   };
 }
 
@@ -145,9 +141,9 @@ function flattenTree(
       if (Object.keys(flags).length > 0) wc.flags = flags;
     }
 
-    if (comp.styles.pressed) wc.styles.pressed = { ...comp.styles.pressed };
-    if (comp.styles.focused) wc.styles.focused = { ...comp.styles.focused };
-    if (comp.styles.disabled) wc.styles.disabled = { ...comp.styles.disabled };
+    for (const [key, st] of Object.entries(comp.styles)) {
+      if (key !== 'default' && st) wc.styles[key] = { ...st };
+    }
 
     result.push(wc);
 

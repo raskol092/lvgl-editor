@@ -406,4 +406,34 @@ describe('extra widgets', () => {
       '(lv-chart-set-axis-range ui-c LV_CHART_AXIS_SECONDARY_Y 0 500)', 'LV_CHART_AXIS_SECONDARY_Y))', '(lv-chart-set-point-count ui-c 20)',
     ]) expect(src, frag).toContain(frag)
   })
+
+  it('emits states, flags, parts, new events and animated navigation', () => {
+    const target = createComponent('obj', { id: 't', name: 'panel' } as never)
+    const sl = createComponent('slider', {
+      id: 's', name: 'vol',
+      styles: { default: {}, knob: { bgColor: '#FF0000' }, 'knob:pressed': { bgColor: '#00FF00' }, checked: { bgColor: '#0000FF' } },
+      flags: { floating: true, ignoreLayout: true, scrollChainHor: true },
+      events: [
+        createEvent({ id: 'a', eventType: 'LV_EVENT_DOUBLE_CLICKED', action: createBuiltinAction({ type: 'setState', targetComponent: 'panel', property: 'checked', value: 'toggle' }) }),
+        createEvent({ id: 'b', eventType: 'LV_EVENT_SCREEN_LOADED', action: createBuiltinAction({ type: 'setFlag', targetComponent: 'panel', property: 'hidden', value: 'toggle' }) }),
+        createEvent({ id: 'c', action: createBuiltinAction({ type: 'navigate', targetPage: 'two', animation: 'move_left', duration: 250 }) }),
+      ],
+    } as never)
+    const pages = [createPage({ name: 'one', components: [target, sl] } as never), createPage({ name: 'two', components: [] } as never)]
+    const files = generateCode(pages, undefined, [], undefined, [], [], '', 14)
+    const ui = files['ui/ui.lisp']
+    const ev = files['ui/ui_events.lisp']
+    expect(ui).toContain('LV_PART_KNOB)')
+    expect(ui).toContain('(bitwise-or LV_PART_KNOB LV_STATE_PRESSED)')
+    expect(ui).toContain('LV_STATE_CHECKED)')
+    expect(ui).toContain('(lv-obj-add-flag ui-vol LV_OBJ_FLAG_FLOATING)')
+    expect(ui).toContain('(lv-obj-add-flag ui-vol LV_OBJ_FLAG_IGNORE_LAYOUT)')
+    expect(ui).toContain('LV_EVENT_DOUBLE_CLICKED)')
+    expect(ui).toMatch(/\(lv-obj-add-event-cb ui-screen-one '\S+ LV_EVENT_SCREEN_LOADED\)/)
+    expect(ev).toContain('(lv-obj-set-state ui-panel LV_STATE_CHECKED (not (lv-obj-has-state ui-panel LV_STATE_CHECKED)))')
+    expect(ev).toContain('(if (lv-obj-has-flag ui-panel LV_OBJ_FLAG_HIDDEN)')
+    expect(ev).toContain('-anim LV_SCREEN_LOAD_ANIM_MOVE_LEFT 250)')
+    expect(ui).toContain('-anim (anim ms)')
+    expectValid(files)
+  })
 })

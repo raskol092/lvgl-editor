@@ -188,9 +188,38 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
 static void apply_styles(lv_obj_t *obj, const cJSON *styles) {
     if (!styles) return;
     apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "default"), LV_PART_MAIN | LV_STATE_DEFAULT);
-    apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "pressed"), LV_PART_MAIN | LV_STATE_PRESSED);
-    apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "focused"), LV_PART_MAIN | LV_STATE_FOCUSED);
-    apply_style_state(obj, cJSON_GetObjectItemCaseSensitive(styles, "disabled"), LV_PART_MAIN | LV_STATE_DISABLED);
+    /* every other key is a state ("pressed"), a part ("knob") or both ("knob:pressed") */
+    static const struct { const char *name; uint32_t v; } parts[] = {
+        { "indicator", LV_PART_INDICATOR }, { "knob", LV_PART_KNOB }, { "items", LV_PART_ITEMS },
+        { "selected", LV_PART_SELECTED }, { "cursor", LV_PART_CURSOR }, { "scrollbar", LV_PART_SCROLLBAR },
+    };
+    static const struct { const char *name; uint32_t v; } states[] = {
+        { "pressed", LV_STATE_PRESSED }, { "focused", LV_STATE_FOCUSED }, { "disabled", LV_STATE_DISABLED },
+        { "checked", LV_STATE_CHECKED }, { "hovered", LV_STATE_HOVERED }, { "edited", LV_STATE_EDITED },
+        { "scrolled", LV_STATE_SCROLLED },
+    };
+    for (const cJSON *st = styles->child; st; st = st->next) {
+        const char *key = st->string;
+        if (!key || strcmp(key, "default") == 0) continue;
+        char buf[48];
+        strncpy(buf, key, sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = 0;
+        char *colon = strchr(buf, ':');
+        const char *state_name = NULL;
+        if (colon) { *colon = 0; state_name = colon + 1; }
+        uint32_t part = LV_PART_MAIN, state = LV_STATE_DEFAULT;
+        int ok = 0;
+        for (unsigned i = 0; i < sizeof(parts) / sizeof(parts[0]); i++)
+            if (strcmp(buf, parts[i].name) == 0) { part = parts[i].v; ok = 1; }
+        if (!ok) state_name = buf;
+        if (state_name) {
+            int sok = 0;
+            for (unsigned i = 0; i < sizeof(states) / sizeof(states[0]); i++)
+                if (strcmp(state_name, states[i].name) == 0) { state = states[i].v; sok = 1; }
+            if (!sok) continue;
+        } else if (!ok) continue;
+        apply_style_state(obj, st, part | state);
+    }
 }
 
 /* ------------------------------------------------------------------ */
@@ -1059,6 +1088,15 @@ void ui_from_json(const char *json_str) {
             if (cjson_get_bool(flags, "hidden", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
             if (!cjson_get_bool(flags, "clickable", 1)) lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
             if (!cjson_get_bool(flags, "scrollable", 1)) lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+            if (cjson_get_bool(flags, "checkable", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+            if (cjson_get_bool(flags, "disabled", 0)) lv_obj_add_state(obj, LV_STATE_DISABLED);
+            if (cjson_get_bool(flags, "scrollOne", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
+            if (cjson_get_bool(flags, "scrollChainHor", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            if (cjson_get_bool(flags, "scrollChainVer", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            if (cjson_get_bool(flags, "floating", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLOATING);
+            if (cjson_get_bool(flags, "ignoreLayout", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT);
+            if (cjson_get_bool(flags, "overflowVisible", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+            if (cjson_get_bool(flags, "flexInNewTrack", 0)) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
         }
 
         /* Register in id map */

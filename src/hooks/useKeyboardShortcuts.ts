@@ -1,3 +1,4 @@
+import { cloneStyles } from '../utils/styleKeys';
 import { useEffect, useCallback } from 'react';
 import { useEditorStore } from '../store/editorStore';
 import type { LvglComponent } from '../types';
@@ -18,12 +19,7 @@ function cloneComponentWithNewIds(comp: LvglComponent, parentId: string | null =
     name: `${comp.name}_copy`,
     parentId,
     props: { ...comp.props },
-    styles: {
-      default: { ...comp.styles.default },
-      pressed: comp.styles.pressed ? { ...comp.styles.pressed } : undefined,
-      focused: comp.styles.focused ? { ...comp.styles.focused } : undefined,
-      disabled: comp.styles.disabled ? { ...comp.styles.disabled } : undefined,
-    },
+    styles: cloneStyles(comp.styles),
     events: comp.events.map(e => ({ ...e, id: uuidv4() })),
     children: comp.children.map(child => cloneComponentWithNewIds(child, newId)),
   };

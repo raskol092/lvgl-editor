@@ -537,18 +537,20 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         const startKnob = props.mode === 'range';
         const sStartPct = sMax > sMin ? Math.max(0, Math.min(100, (Number(props.startValue ?? sMin) - sMin) / (sMax - sMin) * 100)) : 0;
         const knob = component.height * 1.3;
+        const indColor = component.styles.indicator?.bgColor || props.indicatorColor || th.primary;
+        const knobColor = component.styles.knob?.bgColor || props.indicatorColor || th.primary;
         return (
           <div className="lvgl-slider" style={{ width: '100%', height: '100%', position: 'relative' }}>
             <div style={{
               marginLeft: `${sLeft}%`,
               width: `${sWidth}%`,
               height: '100%',
-              backgroundColor: props.indicatorColor || th.primary,
+              backgroundColor: indColor,
               borderRadius: defaultStyle.borderRadius ?? 9999,
             }} />
             {startKnob && <div style={{
               position: 'absolute', top: '50%', left: `calc(${sStartPct}% - ${knob / 2}px)`, width: knob, height: knob,
-              transform: 'translateY(-50%)', borderRadius: '50%', backgroundColor: props.indicatorColor || th.primary,
+              transform: 'translateY(-50%)', borderRadius: '50%', backgroundColor: knobColor,
             }} />}
             <div style={{
               position: 'absolute',
@@ -558,7 +560,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               height: knob,
               transform: 'translateY(-50%)',
               borderRadius: '50%',
-              backgroundColor: props.indicatorColor || th.primary,
+              backgroundColor: knobColor,
             }} />
           </div>
         );
@@ -708,7 +710,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
               marginLeft: `${bLeft}%`,
               width: `${bWidth}%`,
               height: '100%',
-              backgroundColor: props.indicatorColor || th.primary,
+              backgroundColor: component.styles.indicator?.bgColor || props.indicatorColor || th.primary,
               borderRadius: defaultStyle.borderRadius,
               transition: 'width 0.15s',
             }} />
@@ -748,7 +750,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
               <path d={arcPath(total)} fill="none" stroke={arc.track} strokeWidth={stroke} strokeLinecap={props.rounded === false ? 'butt' : 'round'} />
               {frac > 0 && <path d={arcPath(total * frac)} fill="none" stroke={arc.color} strokeWidth={stroke} strokeLinecap={props.rounded === false ? 'butt' : 'round'} />}
-              {props.hideKnob !== true && <circle cx={kx} cy={ky} r={stroke * 0.7} fill={arc.color} />}
+              {props.hideKnob !== true && <circle cx={kx} cy={ky} r={stroke * 0.7} fill={component.styles.knob?.bgColor || arc.color} />}
             </svg>
           </div>
         );
