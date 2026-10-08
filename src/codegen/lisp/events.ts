@@ -29,7 +29,7 @@ const num = (x: unknown, d = 0) => (Number.isFinite(Number(x)) ? Number(x) : d);
 /** Forms for a built-in action; `page` is the page of the component that owns the event. */
 function actionForms(action: BuiltinAction, page: string, names: NameResolver, options: LispGenOptions): string[] {
   const out: string[] = [];
-  const target = action.targetComponent ? names.varByName(action.targetComponent, page) : '';
+  const target = action.targetComponent && names.compByName(action.targetComponent, page) ? names.varByName(action.targetComponent, page) : '';
   const note = (text: string) => { if (options.generateComments) out.push(comment(text)); };
 
   switch (action.type) {

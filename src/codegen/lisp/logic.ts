@@ -138,6 +138,7 @@ function expression(node: LogicNode, c: Ctx): string {
       return a;
     }
     case 'get_property': {
+      if (!c.names.compByName(p.targetComponent || '', c.pageHint)) return '0'; // the component was deleted
       const t = c.names.varByName(p.targetComponent || 'obj', c.pageHint);
       switch (p.property || 'x') {
         case 'x': return `(lv-obj-get-x ${t})`;
@@ -216,6 +217,11 @@ function nodeForms(node: LogicNode, c: Ctx): string[] {
   const g = c.graph;
   const gen = c.options.generateComments;
   const t = () => c.names.varByName(p.targetComponent || 'obj', c.pageHint);
+
+  // a node whose component was deleted would reference an unbound variable on the board: skip it
+  if (['set_property', 'set_text', 'set_value', 'show_hide'].includes(node.subType) && !c.names.compByName(p.targetComponent || '', c.pageHint)) {
+    return [comment(`${node.label || node.subType}: component "${p.targetComponent || ''}" does not exist (deleted?) - node skipped`)];
+  }
 
   switch (node.subType) {
     case 'event_trigger':
@@ -458,7 +464,7 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
   const init: string[] = [];
   for (const g of eventGraphs) {
     for (const t of g.nodes.filter(n => n.subType === 'event_trigger')) {
-      if (!t.params.targetComponent) continue;
+      if (!t.params.targetComponent || !names.compByName(t.params.targetComponent)) continue;
       const target = names.varByName(t.params.targetComponent);
       init.push(`(lv-obj-add-event-cb ${target} '${graphFn(g, o)}-on-event ${t.params.eventType || 'LV_EVENT_CLICKED'})`);
     }
