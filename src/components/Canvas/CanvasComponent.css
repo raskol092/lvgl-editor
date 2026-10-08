@@ -5,18 +5,12 @@
   overflow: hidden;
 }
 
-.canvas-component:hover {
-  z-index: 10;
-}
-
 .canvas-component.hovered:not(.selected) {
   box-shadow: 0 0 0 1px #2196F3;
 }
 
-.canvas-component.selected {
-  z-index: 20;
-}
-
+/* No z-index bump on hover/selection: the content of a container is drawn as later siblings, a raised container would cover it.
+   The selection frame and handles have their own z-index. */
 /* Selection overlay */
 .selection-overlay {
   position: absolute;
@@ -27,6 +21,7 @@
   border: 2px solid #3b82f6;
   pointer-events: none;
   box-sizing: content-box;
+  z-index: 30;
 }
 
 /* Resize handles */
@@ -39,6 +34,7 @@
   border-radius: 1px;
   pointer-events: auto;
   box-sizing: border-box;
+  z-index: 31;
 }
 
 .resize-handle.top-left {
