@@ -367,4 +367,16 @@ describe('extra widgets', () => {
     const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
     expect(src).toContain('(lv-scale-set-line-needle-value ui-gauge ui-gauge-needle 55 (lv-roller-get-selected ui-pick))')
   })
+
+  it('emits advanced common styles', () => {
+    const c = createComponent('obj', { id: 'o', name: 'box', styles: { default: { minWidth: 50, marginTop: 4, padRow: 3, translateX: 7, skewX: 2, bgOpa: 128, clipCorner: true } } as never })
+    const pages = [createPage({ components: [c] } as never)]
+    const src = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    expect(src).toContain('(lv-obj-set-style-min-width ui-box 50 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-margin-top ui-box 4 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-pad-row ui-box 3 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-translate-x ui-box 7 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-transform-skew-x ui-box 20 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-bg-opa ui-box 128 LV_PART_MAIN)')
+  })
 })

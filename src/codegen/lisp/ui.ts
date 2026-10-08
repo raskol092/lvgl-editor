@@ -128,6 +128,23 @@ function styleForms(v: string, st: StyleProps, selector: string, ctx: UiContext)
     set('image-recolor-opa', 'LV_OPA_COVER');
   }
   if (st.opacity !== undefined && st.opacity < 1) set('opa', lopa(st.opacity));
+  // size limits, margins, gaps, offsets, per-part opacity (all optional)
+  const opt: Array<[keyof StyleProps, string, (n: number) => number]> = [
+    ['minWidth', 'min-width', n => n], ['maxWidth', 'max-width', n => n], ['minHeight', 'min-height', n => n], ['maxHeight', 'max-height', n => n],
+    ['marginTop', 'margin-top', n => n], ['marginBottom', 'margin-bottom', n => n], ['marginLeft', 'margin-left', n => n], ['marginRight', 'margin-right', n => n],
+    ['padRow', 'pad-row', n => n], ['padColumn', 'pad-column', n => n],
+    ['translateX', 'translate-x', n => n], ['translateY', 'translate-y', n => n],
+    ['skewX', 'transform-skew-x', n => Math.round(n * 10)], ['skewY', 'transform-skew-y', n => Math.round(n * 10)],
+    ['bgOpa', 'bg-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['borderOpa', 'border-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
+    ['outlineOpa', 'outline-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['textOpa', 'text-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
+    ['textOutlineWidth', 'text-outline-stroke-width', n => n],
+  ];
+  for (const [key, fn, conv] of opt) {
+    const val = st[key];
+    if (typeof val === 'number' && Number.isFinite(val)) set(fn, conv(val));
+  }
+  if (st.clipCorner === true) set('clip-corner', 't');
+  if (st.textOutlineWidth && st.textOutlineColor) set('text-outline-stroke-color', lcolor(st.textOutlineColor));
   if (st.padding !== undefined) {
     for (const side of ['top', 'bottom', 'left', 'right']) set(`pad-${side}`, st.padding);
   }

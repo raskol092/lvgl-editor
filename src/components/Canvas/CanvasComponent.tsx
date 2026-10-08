@@ -362,6 +362,14 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
     mixBlendMode: buildMixBlendMode(),
     // Text decoration
     textDecoration: buildTextDecoration(),
+    // Size limits, margins and per-part opacity
+    minWidth: defaultStyle.minWidth, maxWidth: defaultStyle.maxWidth, minHeight: defaultStyle.minHeight, maxHeight: defaultStyle.maxHeight,
+    ...(defaultStyle.marginTop !== undefined ? { marginTop: defaultStyle.marginTop } : {}),
+    ...(defaultStyle.marginBottom !== undefined ? { marginBottom: defaultStyle.marginBottom } : {}),
+    ...(defaultStyle.marginLeft !== undefined ? { marginLeft: defaultStyle.marginLeft } : {}),
+    ...(defaultStyle.marginRight !== undefined ? { marginRight: defaultStyle.marginRight } : {}),
+    ...(defaultStyle.clipCorner ? { overflow: 'hidden' } : {}),
+    ...(defaultStyle.textOpa !== undefined && defaultStyle.textColor ? { color: `color-mix(in srgb, ${defaultStyle.textColor} ${Math.round((defaultStyle.textOpa / 255) * 100)}%, transparent)` } : {}),
     // Flex child properties when inside a flex container
     ...(parentLayout === 'flex' ? {
       flexGrow: component.props.flexGrow ?? undefined,

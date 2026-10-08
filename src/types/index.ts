@@ -105,6 +105,31 @@ export interface StyleProps {
   outlineColor?: string;
   outlineWidth?: number;
   outlinePad?: number;
+  // Size limits, margins and gaps
+  minWidth?: number;
+  maxWidth?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
+  padRow?: number;
+  padColumn?: number;
+  // Offsets (translate in px, skew in degrees)
+  translateX?: number;
+  translateY?: number;
+  skewX?: number;
+  skewY?: number;
+  // Opacity of single parts (0..255) and corner clipping
+  bgOpa?: number;
+  borderOpa?: number;
+  outlineOpa?: number;
+  textOpa?: number;
+  clipCorner?: boolean;
+  // Text outline
+  textOutlineWidth?: number;
+  textOutlineColor?: string;
   // Text decoration
   textDecor?: 'none' | 'underline' | 'strikethrough';
   // Blend mode

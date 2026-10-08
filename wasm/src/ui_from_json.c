@@ -83,6 +83,44 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
     s = cjson_get_string(style, "textColor");
     if (s) lv_obj_set_style_text_color(obj, hex_to_color(s), sel);
 
+    /* size limits, margins, gaps, offsets, per-part opacity, clipping */
+    {
+        static const struct { const char *key; int kind; } extra[] = {
+            {"minWidth", 0}, {"maxWidth", 1}, {"minHeight", 2}, {"maxHeight", 3},
+            {"marginTop", 4}, {"marginBottom", 5}, {"marginLeft", 6}, {"marginRight", 7},
+            {"padRow", 8}, {"padColumn", 9}, {"translateX", 10}, {"translateY", 11}, {"skewX", 12}, {"skewY", 13},
+            {"bgOpa", 14}, {"borderOpa", 15}, {"outlineOpa", 16}, {"textOpa", 17}, {"textOutlineWidth", 18},
+        };
+        for (unsigned k = 0; k < sizeof(extra) / sizeof(extra[0]); k++) {
+            cJSON *it2 = cJSON_GetObjectItemCaseSensitive(style, extra[k].key);
+            if (!cJSON_IsNumber(it2)) continue;
+            int n = it2->valueint;
+            lv_opa_t opa = (lv_opa_t)(n < 0 ? 0 : n > 255 ? 255 : n);
+            switch (extra[k].kind) {
+                case 0: lv_obj_set_style_min_width(obj, n, sel); break;
+                case 1: lv_obj_set_style_max_width(obj, n, sel); break;
+                case 2: lv_obj_set_style_min_height(obj, n, sel); break;
+                case 3: lv_obj_set_style_max_height(obj, n, sel); break;
+                case 4: lv_obj_set_style_margin_top(obj, n, sel); break;
+                case 5: lv_obj_set_style_margin_bottom(obj, n, sel); break;
+                case 6: lv_obj_set_style_margin_left(obj, n, sel); break;
+                case 7: lv_obj_set_style_margin_right(obj, n, sel); break;
+                case 8: lv_obj_set_style_pad_row(obj, n, sel); break;
+                case 9: lv_obj_set_style_pad_column(obj, n, sel); break;
+                case 10: lv_obj_set_style_translate_x(obj, n, sel); break;
+                case 11: lv_obj_set_style_translate_y(obj, n, sel); break;
+                case 12: lv_obj_set_style_transform_skew_x(obj, n * 10, sel); break;
+                case 13: lv_obj_set_style_transform_skew_y(obj, n * 10, sel); break;
+                case 14: lv_obj_set_style_bg_opa(obj, opa, sel); break;
+                case 15: lv_obj_set_style_border_opa(obj, opa, sel); break;
+                case 16: lv_obj_set_style_outline_opa(obj, opa, sel); break;
+                case 17: lv_obj_set_style_text_opa(obj, opa, sel); break;
+                case 18: break; /* text outline: not in LVGL 9.2 (preview only) */
+            }
+        }
+        if (cjson_get_bool(style, "clipCorner", 0)) lv_obj_set_style_clip_corner(obj, true, sel);
+    }
+
     /* image recolor (library icons follow the theme text color) */
     s = cjson_get_string(style, "imageRecolor");
     if (s) {
