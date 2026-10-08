@@ -477,4 +477,16 @@ describe('extra widgets', () => {
     expect(src).toContain('(ui-bindings-update)')
     expectValid({ 'ui_logic.lisp': src })
   })
+
+  it('emits calendar header / shown month and table cell merge', () => {
+    const cal = createComponent('calendar', { id: 'c', name: 'cal', props: { year: 2026, month: 3, showToday: true, todayDay: 15, headerMode: 'arrow' } } as never)
+    const tbl = createComponent('table', { id: 't', name: 'grid', props: { rows: 2, cols: 3, mergeRight: ['0,0', ' 1 , 1 '], textCrop: true } } as never)
+    const src = generateCode([createPage({ components: [cal, tbl] } as never)], undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    expect(src).toContain('(lv-calendar-set-today-date ui-cal 2026 3 15)')
+    expect(src).toContain('(lv-calendar-set-month-shown ui-cal 2026 3)')
+    expect(src).toContain('(lv-calendar-add-header-arrow ui-cal)')
+    expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 0 0 LV_TABLE_CELL_CTRL_MERGE_RIGHT)')
+    expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 1 1 LV_TABLE_CELL_CTRL_MERGE_RIGHT)')
+    expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 1 2 LV_TABLE_CELL_CTRL_TEXT_CROP)')
+  })
 })

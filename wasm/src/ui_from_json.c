@@ -482,6 +482,20 @@ static lv_obj_t *create_table(lv_obj_t *parent, const cJSON *comp) {
                 ri++;
             }
         }
+        cJSON *mr = cJSON_GetObjectItemCaseSensitive(props, "mergeRight");
+        if (cJSON_IsArray(mr)) {
+            cJSON *m;
+            cJSON_ArrayForEach(m, mr) {
+                int mrow, mcol;
+                if (cJSON_IsString(m) && sscanf(m->valuestring, " %d , %d", &mrow, &mcol) == 2)
+                    lv_table_set_cell_ctrl(tbl, (uint32_t)mrow, (uint32_t)mcol, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+            }
+        }
+        if (cjson_get_bool(props, "textCrop", 0)) {
+            int nr = cjson_get_int(props, "rows", 3), nc = cjson_get_int(props, "cols", 3);
+            for (int r = 0; r < nr; r++)
+                for (int c = 0; c < nc; c++) lv_table_set_cell_ctrl(tbl, (uint32_t)r, (uint32_t)c, LV_TABLE_CELL_CTRL_TEXT_CROP);
+        }
     }
     return tbl;
 }
@@ -556,8 +570,11 @@ static lv_obj_t *create_calendar(lv_obj_t *parent, const cJSON *comp) {
     if (props) {
         int year = cjson_get_int(props, "year", 2026);
         int month = cjson_get_int(props, "month", 1);
-        lv_calendar_set_today_date(cal, (uint32_t)year, (uint32_t)month, 1);
-        lv_calendar_set_showed_date(cal, (uint32_t)year, (uint32_t)month);
+        lv_calendar_set_today_date(cal, (uint32_t)cjson_get_int(props, "todayYear", year), (uint32_t)cjson_get_int(props, "todayMonth", month), (uint32_t)cjson_get_int(props, "todayDay", 1));
+        lv_calendar_set_month_shown(cal, (uint32_t)year, (uint32_t)month);
+        const char *hm = cjson_get_string(props, "headerMode");
+        if (hm && strcmp(hm, "arrow") == 0) lv_calendar_add_header_arrow(cal);
+        else if (hm && strcmp(hm, "dropdown") == 0) lv_calendar_add_header_dropdown(cal);
     }
     return cal;
 }

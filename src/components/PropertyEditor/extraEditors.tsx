@@ -240,6 +240,27 @@ export function MoreWidgetProps({ type, props, onChange }: { type: string; props
           <Row label={t('Show last char for (ms)')}><Num value={props.passwordShowTime ?? 1500} min={0} onChange={(v) => onChange('passwordShowTime', Math.max(0, Math.round(v)))} /></Row>
         </Section>
       ) : null;
+    case 'calendar':
+      return (
+        <Section title={t('Calendar options')}>
+          <Select
+            label={t('Header')}
+            value={props.headerMode || 'none'}
+            options={[['none', t('None')], ['arrow', t('Arrows')], ['dropdown', t('Drop-downs')]]}
+            onChange={(v) => onChange('headerMode', v)}
+          />
+          <Row label={t('Today: year')}><Num value={props.todayYear ?? props.year ?? 2025} onChange={(v) => onChange('todayYear', Math.round(v))} /></Row>
+          <Row label={t('Today: month')}><Num value={props.todayMonth ?? props.month ?? 1} min={1} max={12} onChange={(v) => onChange('todayMonth', Math.max(1, Math.min(12, Math.round(v))))} /></Row>
+          <Row label={t('Today: day')}><Num value={props.todayDay ?? 1} min={1} max={31} onChange={(v) => onChange('todayDay', Math.max(1, Math.min(31, Math.round(v))))} /></Row>
+        </Section>
+      );
+    case 'table':
+      return (
+        <Section title={t('Table options')}>
+          <Lines label={t('Merge cell with the one on its right (row,column per line)')} value={props.mergeRight || []} onChange={(v) => onChange('mergeRight', v.filter((x, i, a) => x.trim() !== '' || i === a.length - 1))} />
+          <Check label={t('Crop long cell text')} value={props.textCrop === true} onChange={(v) => onChange('textCrop', v)} />
+        </Section>
+      );
     case 'chart': {
       const series: Array<{ name?: string; axis?: string }> = props.series || [];
       return (

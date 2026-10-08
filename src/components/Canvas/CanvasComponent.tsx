@@ -892,11 +892,22 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
           }}>
             {Array.from({ length: rows }).map((_, r) => (
               <div key={r} style={{ display: 'flex', height: rowH, boxSizing: 'border-box', borderBottom: `1px solid ${th.border}`, width: widths.reduce((a, w) => a + w, 0) }}>
-                {widths.map((w, c) => (
-                  <div key={c} style={{ width: w, flexShrink: 0, padding: '0 12px', display: 'flex', alignItems: 'center', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                    {props.cellData?.[r]?.[c] || ''}
-                  </div>
-                ))}
+                {(() => {
+                  const merged = new Set<string>(Array.isArray(props.mergeRight) ? props.mergeRight.map((x: string) => x.replace(/\s/g, '')) : []);
+                  const out: React.ReactNode[] = [];
+                  for (let c = 0; c < widths.length; c++) {
+                    let span = widths[c];
+                    let last = c;
+                    while (merged.has(`${r},${last}`) && last + 1 < widths.length) { last++; span += widths[last]; }
+                    out.push(
+                      <div key={c} style={{ width: span, flexShrink: 0, padding: '0 12px', display: 'flex', alignItems: 'center', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {props.cellData?.[r]?.[c] || ''}
+                      </div>
+                    );
+                    c = last;
+                  }
+                  return out;
+                })()}
               </div>
             ))}
             {overflowY && <div style={{ position: 'absolute', right: 4, top: 4, width: 4, height: '45%', borderRadius: 2, backgroundColor: th.border }} />}
@@ -932,12 +943,28 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             overflow: 'hidden',
             color: th.text,
           }}>
+            {(props.headerMode === 'arrow' || props.headerMode === 'dropdown') && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', gap: 8 }}>
+                {props.headerMode === 'arrow' ? (
+                  <>
+                    <span style={{ width: 24, height: 24, borderRadius: '50%', background: th.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</span>
+                    <span>{year} {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][(month - 1 + 12) % 12]}</span>
+                    <span style={{ width: 24, height: 24, borderRadius: '50%', background: th.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ flex: 1, border: `2px solid ${th.border}`, borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between' }}><span>{year}</span><span>⌄</span></span>
+                    <span style={{ flex: 1, border: `2px solid ${th.border}`, borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between' }}><span>{String(month).padStart(2, '0')}</span><span>⌄</span></span>
+                  </>
+                )}
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '1fr', gap: '1px', flex: 1, padding: '2px' }}>
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
                 <div key={d} style={{ textAlign: 'center', alignSelf: 'center' }}>{d}</div>
               ))}
               {cells.map((c, i) => {
-                const today = !c.other && props.showToday && c.n === 1;
+                const today = !c.other && props.showToday && c.n === Number(props.todayDay ?? 1) && Number(props.todayMonth ?? month) === month && Number(props.todayYear ?? year) === year;
                 return (
                   <div key={i} style={{
                     justifySelf: 'center', alignSelf: 'center',

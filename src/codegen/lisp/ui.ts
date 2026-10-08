@@ -423,6 +423,15 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
           if (w !== undefined) out.push(`(lv-table-set-column-width ${v} ${i} ${num(w)})`);
         });
       }
+      if (Array.isArray(props.mergeRight)) {
+        for (const cell of props.mergeRight as string[]) {
+          const m = /^\s*(\d+)\s*,\s*(\d+)\s*$/.exec(String(cell));
+          if (m) out.push(`(lv-table-set-cell-ctrl ${v} ${m[1]} ${m[2]} LV_TABLE_CELL_CTRL_MERGE_RIGHT)`);
+        }
+      }
+      if (props.textCrop === true) {
+        for (let r = 0; r < num(props.rows, 3); r++) for (let c = 0; c < num(props.cols, 3); c++) out.push(`(lv-table-set-cell-ctrl ${v} ${r} ${c} LV_TABLE_CELL_CTRL_TEXT_CROP)`);
+      }
       if (Array.isArray(props.cellData)) {
         props.cellData.forEach((row: unknown, r: number) => {
           if (!Array.isArray(row)) return;
@@ -434,7 +443,10 @@ function propsForms(comp: LvglComponent, v: string, ctx: UiContext): string[] {
       break;
     }
     case 'calendar': {
-      if (props.showToday) out.push(`(lv-calendar-set-today-date ${v} ${num(props.year, 2025)} ${num(props.month, 1)} 1)`);
+      if (props.showToday) out.push(`(lv-calendar-set-today-date ${v} ${num(props.todayYear ?? props.year, 2025)} ${num(props.todayMonth ?? props.month, 1)} ${num(props.todayDay, 1)})`);
+      if (props.year !== undefined || props.month !== undefined) out.push(`(lv-calendar-set-month-shown ${v} ${num(props.year, 2025)} ${num(props.month, 1)})`);
+      if (props.headerMode === 'arrow') out.push(`(lv-calendar-add-header-arrow ${v})`);
+      else if (props.headerMode === 'dropdown') out.push(`(lv-calendar-add-header-dropdown ${v})`);
       if (Array.isArray(props.highlightedDates) && props.highlightedDates.length > 0) {
         out.push(comment('highlighted dates are not exposed by the LVGL bridge'));
       }
