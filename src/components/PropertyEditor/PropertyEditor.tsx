@@ -9,7 +9,7 @@ import { useProjectStore } from '../../store/projectStore';
 import type { LvglComponent, StyleProps, LvglAlign, LvglFlags } from '../../types';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import { t } from '../../i18n';
-import { ExtraWidgetEditor } from './extraEditors';
+import { ExtraWidgetEditor, MoreWidgetProps } from './extraEditors';
 import ToolIcon from '../icons/ToolIcon';
 import './PropertyEditor.css';
 
@@ -1575,7 +1575,7 @@ function ContainerLayoutEditor({
 }
 
 // Render component-specific properties
-function renderComponentProps(
+function renderComponentPropsBase(
   component: LvglComponent,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (key: string, value: any) => void,
@@ -2185,6 +2185,21 @@ function renderComponentProps(
   }
 }
 
+function renderComponentProps(
+  component: LvglComponent,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onChange: (key: string, value: any) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onBatchChange?: (updates: Record<string, any>) => void
+): React.ReactNode {
+  return (
+    <>
+      {renderComponentPropsBase(component, onChange, onBatchChange)}
+      <MoreWidgetProps type={component.type} props={component.props} onChange={onChange} />
+    </>
+  );
+}
+
 // Image props editor with resource picker
 function ImagePropsEditor({
   props,
@@ -2599,6 +2614,8 @@ function ChartSeriesEditor({
           <option value="line">{t('Line chart')}</option>
           <option value="bar">{t('Bar chart')}</option>
           <option value="scatter">{t('Scatter chart')}</option>
+          <option value="curve">{t('Curve chart')}</option>
+          <option value="stacked">{t('Stacked bar chart')}</option>
         </select>
       </div>
 

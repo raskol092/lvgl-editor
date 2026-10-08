@@ -416,20 +416,23 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         );
       
       case 'img':
-        return <CanvasImageContent src={props.src} recolor={defaultStyle.imageRecolor} iconColor={th.text} />;
+        return <CanvasImageContent src={props.src} recolor={defaultStyle.imageRecolor} iconColor={th.text} view={{ innerAlign: props.innerAlign, scaleX: props.scaleX, scaleY: props.scaleY, pivotX: props.pivotX, pivotY: props.pivotY }} />;
       
       case 'line': {
         // lv_line draws a polyline through its points (object coordinates); default color = theme text
         const pts: number[][] = Array.isArray(props.points) && props.points.length >= 2 ? props.points : [[0, 0], [component.width, 0]];
+        const maxY = Math.max(...pts.map(pt => Number(pt?.[1]) || 0));
+        const ptY = (pt: number[]) => (props.yInvert === true ? maxY - (Number(pt?.[1]) || 0) : Number(pt?.[1]) || 0);
         return (
           <svg className="lvgl-line" style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}>
             <polyline
               fill="none"
-              points={pts.map(pt => `${Number(pt?.[0]) || 0},${Number(pt?.[1]) || 0}`).join(' ')}
+              points={pts.map(pt => `${Number(pt?.[0]) || 0},${ptY(pt)}`).join(' ')}
               stroke={props.lineColor || th.text}
               strokeWidth={props.lineWidth ?? 2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeLinecap={props.rounded === false ? 'butt' : 'round'}
+              strokeLinejoin={props.rounded === false ? 'miter' : 'round'}
+              strokeDasharray={Number(props.dashWidth) > 0 ? `${props.dashWidth} ${props.dashGap ?? 4}` : undefined}
             />
           </svg>
         );
@@ -530,15 +533,23 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         const sMin = props.min ?? 0;
         const sMax = props.max ?? 100;
         const sPct = sMax > sMin ? Math.max(0, Math.min(100, ((props.value ?? 50) - sMin) / (sMax - sMin) * 100)) : 0;
+        const [sLeft, sWidth] = indicatorSpan(props, 50);
+        const startKnob = props.mode === 'range';
+        const sStartPct = sMax > sMin ? Math.max(0, Math.min(100, (Number(props.startValue ?? sMin) - sMin) / (sMax - sMin) * 100)) : 0;
         const knob = component.height * 1.3;
         return (
           <div className="lvgl-slider" style={{ width: '100%', height: '100%', position: 'relative' }}>
             <div style={{
-              width: `${sPct}%`,
+              marginLeft: `${sLeft}%`,
+              width: `${sWidth}%`,
               height: '100%',
               backgroundColor: props.indicatorColor || th.primary,
               borderRadius: defaultStyle.borderRadius ?? 9999,
             }} />
+            {startKnob && <div style={{
+              position: 'absolute', top: '50%', left: `calc(${sStartPct}% - ${knob / 2}px)`, width: knob, height: knob,
+              transform: 'translateY(-50%)', borderRadius: '50%', backgroundColor: props.indicatorColor || th.primary,
+            }} />}
             <div style={{
               position: 'absolute',
               top: '50%',
@@ -685,6 +696,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         const barMax = props.max ?? 100;
         const barVal = props.value ?? 60;
         const barPercent = barMax > barMin ? Math.max(0, Math.min(100, (barVal - barMin) / (barMax - barMin) * 100)) : 0;
+        const [bLeft, bWidth] = indicatorSpan(props, 60);
         return (
           <div className="lvgl-bar" style={{
             width: '100%',
@@ -693,7 +705,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             overflow: 'hidden',
           }}>
             <div style={{
-              width: `${barPercent}%`,
+              marginLeft: `${bLeft}%`,
+              width: `${bWidth}%`,
               height: '100%',
               backgroundColor: props.indicatorColor || th.primary,
               borderRadius: defaultStyle.borderRadius,
@@ -709,8 +722,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
         const size = Math.max(1, Math.min(component.width, component.height));
         const stroke = Math.min(48, (arc.width * 100) / size);
         const r = 50 - stroke / 2;
-        const start = Number(props.startAngle ?? 135);
-        const end = Number(props.endAngle ?? 45);
+        const start = Number(props.startAngle ?? 135) + Number(props.rotation ?? 0);
+        const end = Number(props.endAngle ?? 45) + Number(props.rotation ?? 0);
         const total = (((end - start) % 360) + 360) % 360 || 360;
         const min = Number(props.min ?? 0);
         const max = Number(props.max ?? 100);
@@ -733,8 +746,8 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             justifyContent: 'center',
           }}>
             <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-              <path d={arcPath(total)} fill="none" stroke={arc.track} strokeWidth={stroke} strokeLinecap="round" />
-              {frac > 0 && <path d={arcPath(total * frac)} fill="none" stroke={arc.color} strokeWidth={stroke} strokeLinecap="round" />}
+              <path d={arcPath(total)} fill="none" stroke={arc.track} strokeWidth={stroke} strokeLinecap={props.rounded === false ? 'butt' : 'round'} />
+              {frac > 0 && <path d={arcPath(total * frac)} fill="none" stroke={arc.color} strokeWidth={stroke} strokeLinecap={props.rounded === false ? 'butt' : 'round'} />}
               {props.hideKnob !== true && <circle cx={kx} cy={ky} r={stroke * 0.7} fill={arc.color} />}
             </svg>
           </div>
@@ -774,15 +787,26 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
       
       case 'chart': {
         const series = props.series || (props.data ? [{ data: props.data, color: props.lineColor || th.primary }] : [{ data: [10, 20, 30, 25, 40], color: th.primary }]);
-        const isBar = props.type === 'bar';
+        const isStacked = props.type === 'stacked';
+        const isBar = props.type === 'bar' || isStacked;
+        const showDivs = props.horDivs !== undefined || props.verDivs !== undefined ? true : props.showGrid !== false;
+        const horDivs = Math.max(0, Math.round(Number(props.horDivs ?? (props.showGrid === false ? 0 : 3))));
+        const verDivs = Math.max(0, Math.round(Number(props.verDivs ?? (props.showGrid === false ? 0 : 5))));
+        const y2Min = Number(props.y2AxisMin ?? 0);
+        const y2Max = Number(props.y2AxisMax ?? 100);
         const yMin = Number(props.yAxisMin ?? 0);
         const yMax = Number(props.yAxisMax ?? 100);
         const span = yMax > yMin ? yMax - yMin : 1;
-        const pos = (v: number, i: number, n: number): [number, number] => [
-          isBar ? ((i + 0.5) / n) * 100 : n > 1 ? (i / (n - 1)) * 100 : 50,
-          100 - Math.max(0, Math.min(1, (v - yMin) / span)) * 100,
-        ];
-        type Ser = { data?: number[]; color?: string };
+        type Ser = { data?: number[]; color?: string; axis?: string };
+        const pos = (v: number, i: number, n: number, sr?: Ser): [number, number] => {
+          const sec = sr?.axis === 'secondary';
+          const lo = sec ? y2Min : yMin;
+          const sp = sec ? (y2Max > y2Min ? y2Max - y2Min : 1) : span;
+          return [
+            isBar ? ((i + 0.5) / n) * 100 : n > 1 ? (i / (n - 1)) * 100 : 50,
+            100 - Math.max(0, Math.min(1, (v - lo) / sp)) * 100,
+          ];
+        };
         return (
           <div className="lvgl-chart" style={{
             width: '100%',
@@ -797,11 +821,11 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
               {/* LVGL draws a 5 x 3 division grid */}
               <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}>
-                {[0, 1, 2, 3, 4, 5].map(i => (
-                  <line key={`v${i}`} x1={i * 20} y1="0" x2={i * 20} y2="100" stroke={th.border} strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                {showDivs && verDivs > 0 && Array.from({ length: verDivs + 1 }, (_, i) => (
+                  <line key={`v${i}`} x1={(i * 100) / verDivs} y1="0" x2={(i * 100) / verDivs} y2="100" stroke={th.border} strokeWidth="1" vectorEffect="non-scaling-stroke" />
                 ))}
-                {[0, 1, 2, 3].map(i => (
-                  <line key={`h${i}`} x1="0" y1={(i * 100) / 3} x2="100" y2={(i * 100) / 3} stroke={th.border} strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                {showDivs && horDivs > 0 && Array.from({ length: horDivs + 1 }, (_, i) => (
+                  <line key={`h${i}`} x1="0" y1={(i * 100) / horDivs} x2="100" y2={(i * 100) / horDivs} stroke={th.border} strokeWidth="1" vectorEffect="non-scaling-stroke" />
                 ))}
                 {!isBar && (series as Ser[]).map((sr, si) => {
                   const d = sr.data || [];
@@ -812,14 +836,20 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
                       stroke={sr.color || th.primary}
                       strokeWidth="2"
                       vectorEffect="non-scaling-stroke"
-                      points={d.map((v, i) => pos(v, i, d.length).join(',')).join(' ')}
+                      points={d.map((v, i) => pos(v, i, d.length, sr).join(',')).join(' ')}
                     />
                   );
                 })}
               </svg>
               {(series as Ser[]).map((sr, si) =>
                 (sr.data || []).map((v, i, arr) => {
-                  const [x, y] = pos(v, i, arr.length);
+                  const [x, y] = pos(v, i, arr.length, sr);
+                  if (isStacked) {
+                    const below = (series as Ser[]).slice(0, si).reduce((a, o) => a + (o.data?.[i] ?? 0), 0);
+                    const [, yTop] = pos(v + below, i, arr.length, sr);
+                    const [, yBot] = pos(below, i, arr.length, sr);
+                    return <div key={`${si}-${i}`} style={{ position: 'absolute', left: `${x}%`, width: `${Math.max(3, 60 / arr.length)}%`, top: `${yTop}%`, bottom: `${100 - yBot}%`, transform: 'translateX(-50%)', backgroundColor: sr.color || th.primary }} />;
+                  }
                   return isBar ? (
                     <div key={`${si}-${i}`} style={{
                       position: 'absolute', left: `${x}%`, width: `${Math.max(3, 60 / arr.length / series.length)}%`,
@@ -1005,7 +1035,46 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
 };
 
 // Separate component to subscribe to resource store only for img type
-const CanvasImageContent: React.FC<{ src?: string; recolor?: string; iconColor?: string }> = React.memo(({ src, recolor, iconColor }) => {
+/** indicator span (left %, width %) of slider / bar for normal, symmetrical and range modes */
+function indicatorSpan(props: Record<string, any>, def: number): [number, number] { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const mn = Number(props.min ?? 0);
+  const mx = Number(props.max ?? 100);
+  const pct = (v: number) => (mx > mn ? Math.max(0, Math.min(100, ((v - mn) / (mx - mn)) * 100)) : 0);
+  const val = pct(Number(props.value ?? def));
+  if (props.mode === 'range') {
+    const st = pct(Number(props.startValue ?? mn));
+    return [Math.min(st, val), Math.abs(val - st)];
+  }
+  if (props.mode === 'symmetrical') {
+    const zero = pct(mn < 0 && mx > 0 ? 0 : mn);
+    return [Math.min(zero, val), Math.abs(val - zero)];
+  }
+  return [0, val];
+}
+
+type ImgView = { innerAlign?: string; scaleX?: number; scaleY?: number; pivotX?: number; pivotY?: number };
+
+/** inner_align / scale / pivot of lv_image as CSS */
+function imageViewStyle(view?: ImgView): React.CSSProperties {
+  const st: React.CSSProperties = {};
+  switch (view?.innerAlign) {
+    case 'contain': st.backgroundSize = 'contain'; st.backgroundRepeat = 'no-repeat'; st.backgroundPosition = 'center'; break;
+    case 'cover': st.backgroundSize = 'cover'; st.backgroundRepeat = 'no-repeat'; st.backgroundPosition = 'center'; break;
+    case 'center': st.backgroundSize = 'auto'; st.backgroundRepeat = 'no-repeat'; st.backgroundPosition = 'center'; break;
+    case 'tile': st.backgroundSize = 'auto'; st.backgroundRepeat = 'repeat'; break;
+    case 'top_left': case 'default': st.backgroundSize = 'auto'; st.backgroundRepeat = 'no-repeat'; st.backgroundPosition = 'top left'; break;
+    default: st.backgroundSize = '100% 100%';
+  }
+  const sx = (Number(view?.scaleX ?? 256) || 0) / 256;
+  const sy = (Number(view?.scaleY ?? 256) || 0) / 256;
+  if (sx !== 1 || sy !== 1) {
+    st.transform = `scale(${sx}, ${sy})`;
+    st.transformOrigin = `${Number(view?.pivotX) || 0}px ${Number(view?.pivotY) || 0}px`;
+  }
+  return st;
+}
+
+const CanvasImageContent: React.FC<{ src?: string; recolor?: string; iconColor?: string; view?: ImgView }> = React.memo(({ src, recolor, iconColor, view }) => {
   const images = useResourceStore((s) => s.images);
   const matched = src
     ? images.find((img) => img.id === src || img.name === src)
@@ -1028,6 +1097,7 @@ const CanvasImageContent: React.FC<{ src?: string; recolor?: string; iconColor?:
             maskSize: '100% 100%',
             WebkitMaskRepeat: 'no-repeat',
             maskRepeat: 'no-repeat',
+            ...(view?.scaleX !== undefined || view?.scaleY !== undefined ? { transform: imageViewStyle(view).transform, transformOrigin: imageViewStyle(view).transformOrigin } : {}),
           }}
         />
       );
@@ -1039,7 +1109,7 @@ const CanvasImageContent: React.FC<{ src?: string; recolor?: string; iconColor?:
           width: '100%',
           height: '100%',
           backgroundImage: `url(${matched.data})`,
-          backgroundSize: '100% 100%',
+          ...imageViewStyle(view),
         }}
       />
     );

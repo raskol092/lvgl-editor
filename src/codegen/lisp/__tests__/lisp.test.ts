@@ -379,4 +379,31 @@ describe('extra widgets', () => {
     expect(src).toContain('(lv-obj-set-style-transform-skew-x ui-box 20 LV_PART_MAIN)')
     expect(src).toContain('(lv-obj-set-style-bg-opa ui-box 128 LV_PART_MAIN)')
   })
+
+  it('emits per-widget extra properties', () => {
+    const mk = (type: string, name: string, props: Record<string, unknown>) => createComponent(type, { id: name, name, props } as never)
+    const pages = [createPage({ components: [
+      mk('slider', 's', { mode: 'range', startValue: 20, value: 70 }),
+      mk('bar', 'b', { mode: 'symmetrical', min: -50, max: 50, value: 10 }),
+      mk('arc', 'a', { rotation: 90, changeRate: 300, rounded: false }),
+      mk('img', 'i', { innerAlign: 'cover', scaleX: 128, scaleY: 512, pivotX: 5, pivotY: 6 }),
+      mk('line', 'l', { points: [[0, 0], [10, 10], [20, 0]], yInvert: true, rounded: false, dashWidth: 6, dashGap: 3 }),
+      mk('label', 't', { text: 'x', longMode: 'scroll_circular', recolor: true }),
+      mk('switch', 'w', { orientation: 'vertical' }),
+      mk('textarea', 'x', { password: true, passwordShowTime: 500 }),
+      mk('chart', 'c', { type: 'stacked', updateMode: 'circular', horDivs: 4, verDivs: 2, y2AxisMin: 0, y2AxisMax: 500, pointCount: 20, series: [{ data: [1, 2], color: '#112233', axis: 'secondary' }] }),
+    ] } as never)]
+    const src = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
+    for (const frag of [
+      '(lv-slider-set-mode ui-s LV_SLIDER_MODE_RANGE)', '(lv-slider-set-start-value ui-s 20 LV_ANIM_OFF)',
+      '(lv-bar-set-mode ui-b LV_BAR_MODE_SYMMETRICAL)',
+      '(lv-arc-set-rotation ui-a 90)', '(lv-arc-set-change-rate ui-a 300)', '(lv-obj-set-style-arc-rounded ui-a nil LV_PART_MAIN)',
+      'LV_IMAGE_ALIGN_COVER', '(lv-image-set-scale-x ui-i 128)', '(lv-image-set-scale-y ui-i 512)', '(lv-image-set-pivot ui-i 5 6)',
+      '(lv-line-set-y-invert ui-l t)', '(lv-obj-set-style-line-rounded ui-l nil LV_PART_MAIN)', '(lv-obj-set-style-line-dash-width ui-l 6 LV_PART_MAIN)',
+      '(lv-label-set-long-mode ui-t LV_LABEL_LONG_MODE_SCROLL_CIRCULAR)', '(lv-label-set-recolor ui-t t)',
+      '(lv-switch-set-orientation ui-w LV_SWITCH_ORIENTATION_VERTICAL)', '(lv-textarea-set-password-show-time ui-x 500)',
+      'LV_CHART_TYPE_STACKED', '(lv-chart-set-update-mode ui-c LV_CHART_UPDATE_MODE_CIRCULAR)', '(lv-chart-set-div-line-count ui-c 4 2)',
+      '(lv-chart-set-axis-range ui-c LV_CHART_AXIS_SECONDARY_Y 0 500)', 'LV_CHART_AXIS_SECONDARY_Y))', '(lv-chart-set-point-count ui-c 20)',
+    ]) expect(src, frag).toContain(frag)
+  })
 })
