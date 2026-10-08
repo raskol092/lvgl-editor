@@ -30,4 +30,13 @@ describe('validateLinks', () => {
     expect(text).toContain('missing');
     expect(text).toContain('nope');
   });
+
+  it('reports two components with the same name on one screen', () => {
+    const a = createComponent('btn', { id: 'a', name: 'dup' } as never);
+    const b = createComponent('label', { id: 'b', name: 'dup' } as never);
+    const other = createPage({ name: 'two', components: [createComponent('btn', { id: 'c', name: 'dup' } as never)] } as never);
+    const issues = validateLinks([createPage({ name: 'one', components: [a, b] } as never), other], []);
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('dup');
+  });
 });

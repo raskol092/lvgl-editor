@@ -42,6 +42,11 @@ export function validateLinks(pages: Page[], graphs: LogicGraph[]): LinkIssue[] 
   }
 
   for (const page of pages) {
+    const seen = new Set<string>();
+    walk(page.components, (c) => {
+      if (seen.has(c.name)) issues.push({ where: t('Screen "{0}"', page.name), message: t('two components are named "{0}"; logic and events find components by name', c.name) });
+      seen.add(c.name);
+    });
     walk(page.components, (c) => {
       for (const ev of c.events || []) {
         const a = ev.action;

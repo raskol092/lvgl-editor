@@ -6,6 +6,8 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { LvglComponent } from '../../types';
 import { t } from '../../i18n';
+import { toast } from '../Toast';
+import { isNameTaken } from '../../utils/uniqueName';
 import './HierarchyPanel.css';
 import ToolIcon from '../icons/ToolIcon';
 
@@ -229,8 +231,14 @@ const HierarchyPanel: React.FC = () => {
   }, [updateComponent, saveToHistory]);
   
   const handleRename = useCallback((id: string, newName: string) => {
+    const page = useEditorStore.getState().getCurrentPage();
+    const name = newName.trim();
+    if (!name || (page && isNameTaken(page.components, name, id))) {
+      toast.error(name ? t('The name "{0}" is already used on this screen', name) : t('The name cannot be empty'));
+      return;
+    }
     saveToHistory();
-    updateComponent(id, { name: newName });
+    updateComponent(id, { name });
   }, [updateComponent, saveToHistory]);
   
   const handleDragStart = useCallback((id: string) => {

@@ -6,65 +6,12 @@ import { getComponentDefinition } from '../../utils/componentDefinitions';
 import CanvasComponent from './CanvasComponent';
 import AlignmentGuides from './AlignmentGuides';
 import ContextMenu, { type ContextMenuItem } from '../ContextMenu';
-import {
-  hasClipboard,
-  copySelectedComponents,
-  cutSelectedComponents,
-  pasteClipboardComponents,
-  pasteIntoContainer,
-  duplicateSelectedComponents,
-  selectAllComponents,
-} from '../../hooks/useKeyboardShortcuts';
 import { t } from '../../i18n';
+import { CanvasGrid } from './CanvasGrid';
+import { BoxSelectionRect, type BoxSelection } from './BoxSelectionRect';
+import { buildContextMenuItems } from './contextMenuItems';
+import { flattenComponents, findComponentInTree, getAbsolutePosition, PROPORTIONAL_TYPES } from './geometry';
 import './Canvas.css';
-
-interface BoxSelection {
-  isSelecting: boolean;
-  startX: number;
-  startY: number;
-  currentX: number;
-  currentY: number;
-}
-
-// Flatten components for box selection
-function flattenComponents(comps: LvglComponent[], offsetX = 0, offsetY = 0): Array<{ comp: LvglComponent; absX: number; absY: number }> {
-  const result: Array<{ comp: LvglComponent; absX: number; absY: number }> = [];
-  for (const comp of comps) {
-    const absX = comp.x + offsetX;
-    const absY = comp.y + offsetY;
-    result.push({ comp, absX, absY });
-    result.push(...flattenComponents(comp.children, absX, absY));
-  }
-  return result;
-}
-
-// Find component in tree by id
-function findComponentInTree(components: LvglComponent[], id: string): LvglComponent | undefined {
-  for (const comp of components) {
-    if (comp.id === id) return comp;
-    const found = findComponentInTree(comp.children, id);
-    if (found) return found;
-  }
-  return undefined;
-}
-
-// Calculate absolute position of a component
-function getAbsolutePosition(comp: LvglComponent, allComps: LvglComponent[]): { x: number; y: number } {
-  let absX = comp.x;
-  let absY = comp.y;
-  let pid = comp.parentId;
-  while (pid) {
-    const parent = findComponentInTree(allComps, pid);
-    if (!parent) break;
-    absX += parent.x;
-    absY += parent.y;
-    pid = parent.parentId;
-  }
-  return { x: absX, y: absY };
-}
-
-/** Visual (non-text) components that scale proportionally when dragged by a corner */
-const PROPORTIONAL_TYPES = new Set(['img', 'arc', 'spinner', 'switch', 'bar', 'slider', 'chart', 'calendar']);
 
 const Canvas: React.FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -104,8 +51,6 @@ const Canvas: React.FC = () => {
   // === Fine-grained store subscriptions ===
   // State that affects rendering
   const canvas = useEditorStore(s => s.canvas);
-  const selectedIds = useEditorStore(s => s.selection.selectedIds);
-  const hoveredId = useEditorStore(s => s.selection.hoveredId);
   const alignmentGuides = useEditorStore(s => s.alignmentGuides);
   const pages = useEditorStore(s => s.pages);
   const currentPageId = useEditorStore(s => s.currentPageId);
@@ -723,130 +668,11 @@ const Canvas: React.FC = () => {
     });
   }, [selectComponent]);
 
-  // Context menu items — read selection from getState inside onClick handlers
-  const getContextMenuItems = useCallback((): ContextMenuItem[] => {
-    const state = useEditorStore.getState();
-    const sIds = state.selection.selectedIds;
-    const hasSelection = sIds.length > 0;
-    const hasMultiple = sIds.length > 1;
-    
-    const items: ContextMenuItem[] = [
-      {
-        id: 'copy',
-        label: t('Copy'),
-        icon: '📋',
-        shortcut: 'Ctrl+C',
-        disabled: !hasSelection,
-        onClick: () => {
-          copySelectedComponents();
-        },
-      },
-      {
-        id: 'cut',
-        label: t('Cut'),
-        icon: '✂️',
-        shortcut: 'Ctrl+X',
-        disabled: !hasSelection,
-        onClick: () => {
-          cutSelectedComponents();
-        },
-      },
-      {
-        id: 'paste',
-        label: t('Paste'),
-        icon: '📄',
-        shortcut: 'Ctrl+V',
-        disabled: !hasClipboard(),
-        onClick: () => {
-          pasteClipboardComponents();
-        },
-      },
-      {
-        id: 'duplicate',
-        label: t('Duplicate'),
-        icon: '⧉',
-        shortcut: 'Ctrl+D',
-        disabled: !hasSelection,
-        onClick: () => {
-          duplicateSelectedComponents();
-        },
-      },
-      { id: 'divider1', label: '', divider: true },
-      {
-        id: 'delete',
-        label: t('Delete'),
-        icon: '🗑️',
-        shortcut: 'Delete',
-        disabled: !hasSelection,
-        onClick: () => {
-          const s = useEditorStore.getState();
-          saveToHistory();
-          deleteComponents(s.selection.selectedIds);
-        },
-      },
-      { id: 'divider2', label: '', divider: true },
-      {
-        id: 'bring-front',
-        label: t('Bring to front'),
-        icon: '⬆️',
-        disabled: !hasSelection || hasMultiple,
-        onClick: () => {
-          const s = useEditorStore.getState();
-          if (s.selection.selectedIds.length === 1) {
-            bringToFront(s.selection.selectedIds[0]);
-          }
-        },
-      },
-      {
-        id: 'bring-forward',
-        label: t('Move up one layer'),
-        icon: '↑',
-        disabled: !hasSelection || hasMultiple,
-        onClick: () => {
-          const s = useEditorStore.getState();
-          if (s.selection.selectedIds.length === 1) {
-            bringForward(s.selection.selectedIds[0]);
-          }
-        },
-      },
-      {
-        id: 'send-backward',
-        label: t('Move down one layer'),
-        icon: '↓',
-        disabled: !hasSelection || hasMultiple,
-        onClick: () => {
-          const s = useEditorStore.getState();
-          if (s.selection.selectedIds.length === 1) {
-            sendBackward(s.selection.selectedIds[0]);
-          }
-        },
-      },
-      {
-        id: 'send-back',
-        label: t('Send to back'),
-        icon: '⬇️',
-        disabled: !hasSelection || hasMultiple,
-        onClick: () => {
-          const s = useEditorStore.getState();
-          if (s.selection.selectedIds.length === 1) {
-            sendToBack(s.selection.selectedIds[0]);
-          }
-        },
-      },
-      { id: 'divider3', label: '', divider: true },
-      {
-        id: 'select-all',
-        label: t('Select all'),
-        icon: '☑️',
-        shortcut: 'Ctrl+A',
-        onClick: () => {
-          selectAllComponents();
-        },
-      },
-    ];
-    
-    return items;
-  }, [saveToHistory, deleteComponents, bringToFront, bringForward, sendBackward, sendToBack]);
+  // Context menu items (see contextMenuItems.ts)
+  const getContextMenuItems = useCallback(
+    (): ContextMenuItem[] => buildContextMenuItems({ saveToHistory, deleteComponents, bringToFront, bringForward, sendBackward, sendToBack }),
+    [saveToHistory, deleteComponents, bringToFront, bringForward, sendBackward, sendToBack]
+  );
 
   // Handle zoom controls
   const handleZoomIn = useCallback(() => {
@@ -862,52 +688,6 @@ const Canvas: React.FC = () => {
   const handleZoomReset = useCallback(() => {
     setZoom(1);
   }, [setZoom]);
-
-  // Render grid
-  const renderGrid = () => {
-    if (!canvas.showGrid) return null;
-
-    const gridSize = canvas.gridSize;
-    const pattern = `
-      <pattern id="grid" width="${gridSize}" height="${gridSize}" patternUnits="userSpaceOnUse">
-        <path d="M ${gridSize} 0 L 0 0 0 ${gridSize}" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
-      </pattern>
-    `;
-
-    return (
-      <svg
-        className="canvas-grid"
-        width={canvas.width}
-        height={canvas.height}
-        style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-      >
-        <defs dangerouslySetInnerHTML={{ __html: pattern }} />
-        <rect width="100%" height="100%" fill="url(#grid)" />
-      </svg>
-    );
-  };
-
-  // Render box selection
-  const renderBoxSelection = () => {
-    if (!boxSelection.isSelecting) return null;
-    
-    const minX = Math.min(boxSelection.startX, boxSelection.currentX);
-    const minY = Math.min(boxSelection.startY, boxSelection.currentY);
-    const width = Math.abs(boxSelection.currentX - boxSelection.startX);
-    const height = Math.abs(boxSelection.currentY - boxSelection.startY);
-    
-    return (
-      <div
-        className="box-selection"
-        style={{
-          left: minX,
-          top: minY,
-          width,
-          height,
-        }}
-      />
-    );
-  };
 
   // Stable callback ref for context menu per-component
   const handleComponentContextMenu = useCallback(
@@ -993,9 +773,9 @@ const Canvas: React.FC = () => {
             backgroundColor: pageBackgroundColor,
           }}
         >
-          {renderGrid()}
+          <CanvasGrid canvas={canvas} />
           {renderComponents(components)}
-          {renderBoxSelection()}
+          <BoxSelectionRect box={boxSelection} />
           <AlignmentGuides guides={alignmentGuides} />
         </div>
       </div>

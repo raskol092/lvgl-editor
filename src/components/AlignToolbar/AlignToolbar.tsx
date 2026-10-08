@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEditorStore } from '../../store/editorStore';
+import type { LvglComponent } from '../../types';
 import { t } from '../../i18n';
 import './AlignToolbar.css';
 
