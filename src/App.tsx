@@ -50,6 +50,7 @@ import { toast } from './components/Toast';
 import { getComponentDefinition } from './utils/componentDefinitions';
 import { t } from './i18n';
 import ToolIcon from './components/icons/ToolIcon';
+import ExportIssuesDialog from './components/ExportIssues/ExportIssuesDialog';
 import './App.css';
 
 type TabType = 'design' | 'logic' | 'code' | 'preview';
@@ -652,6 +653,7 @@ const EditorView: React.FC<EditorViewProps> = ({
 
       {/* Global modal dialogs */}
       <Modal />
+      <ExportIssuesDialog />
     </div>
   );
 };

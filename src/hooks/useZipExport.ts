@@ -6,6 +6,8 @@ import { useProjectStore } from '../store/projectStore';
 import { useResourceStore } from '../resources/resourceStore';
 import { useLogicEditorStore } from '../components/LogicEditor';
 import { downloadAsZip } from '../codegen/lisp';
+import { validateLinks } from '../codegen/lisp/validate';
+import { useExportIssuesStore } from '../components/ExportIssues/exportIssuesStore';
 import type { LispGenOptions } from '../codegen/lisp';
 import { toast } from '../components/Toast';
 import { t } from '../i18n';
@@ -21,6 +23,11 @@ export function useZipExport(options: Partial<LispGenOptions> = {}) {
       const { graphs } = useLogicEditorStore.getState();
       const { currentTheme } = useThemeStore.getState();
       const { images, fonts } = useResourceStore.getState();
+      const issues = validateLinks(pages, graphs);
+      if (issues.length > 0) {
+        useExportIssuesStore.getState().show(issues);
+        return;
+      }
       const { currentProjectId } = useAppStore.getState();
       const cfg = currentProjectId ? await useProjectStore.getState().getProjectConfig(currentProjectId) : undefined;
       const raw = (cfg?.name || '').replace(/[^\p{L}\p{N}._-]+/gu, '_');
