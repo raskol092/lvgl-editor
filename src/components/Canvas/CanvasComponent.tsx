@@ -369,6 +369,7 @@ const CanvasComponent: React.FC<CanvasComponentProps> = ({
     ...(defaultStyle.marginLeft !== undefined ? { marginLeft: defaultStyle.marginLeft } : {}),
     ...(defaultStyle.marginRight !== undefined ? { marginRight: defaultStyle.marginRight } : {}),
     ...(defaultStyle.clipCorner ? { overflow: 'hidden' } : {}),
+    ...(defaultStyle.blurRadius ? { backdropFilter: `blur(${defaultStyle.blurRadius}px)` } : {}),
     ...(defaultStyle.textOpa !== undefined && defaultStyle.textColor ? { color: `color-mix(in srgb, ${defaultStyle.textColor} ${Math.round((defaultStyle.textOpa / 255) * 100)}%, transparent)` } : {}),
     // Flex child properties when inside a flex container
     ...(parentLayout === 'flex' ? {

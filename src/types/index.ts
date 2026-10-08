@@ -127,6 +127,12 @@ export interface StyleProps {
   outlineOpa?: number;
   textOpa?: number;
   clipCorner?: boolean;
+  // More transforms and effects
+  transformWidth?: number;
+  transformHeight?: number;
+  bgMainStop?: number; // 0-255
+  borderPost?: boolean;
+  blurRadius?: number;
   // Text outline
   textOutlineWidth?: number;
   textOutlineColor?: string;
@@ -242,6 +248,16 @@ export interface LvglFlags {
   flexInNewTrack?: boolean;
 }
 
+/** Keeps a component property in sync with a logic variable (checked every 50 ms on the board) */
+export interface ComponentBinding {
+  id: string;
+  kind: 'text' | 'value' | 'hidden' | 'disabled' | 'checked';
+  variable: string;       // name of a logic variable
+  format?: string;        // text: printf format, e.g. "%.1f km/h" (empty = the value as it is)
+  op?: '' | '==' | '!=' | '>' | '<' | '>=' | '<='; // flag kinds: comparison (empty = value is non-zero)
+  compare?: number;
+}
+
 export interface LvglComponent {
   id: string;
   type: string; // 'btn', 'label', etc.
@@ -266,6 +282,7 @@ export interface LvglComponent {
     [partKey: string]: StyleProps | undefined;
   };
   events: EventBinding[];
+  bindings?: ComponentBinding[];
   animations: Animation[];
   parentId: string | null;
   // Phase 2: Lock and visibility

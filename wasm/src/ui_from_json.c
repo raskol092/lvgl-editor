@@ -90,6 +90,7 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
             {"marginTop", 4}, {"marginBottom", 5}, {"marginLeft", 6}, {"marginRight", 7},
             {"padRow", 8}, {"padColumn", 9}, {"translateX", 10}, {"translateY", 11}, {"skewX", 12}, {"skewY", 13},
             {"bgOpa", 14}, {"borderOpa", 15}, {"outlineOpa", 16}, {"textOpa", 17}, {"textOutlineWidth", 18},
+            {"transformWidth", 19}, {"transformHeight", 20}, {"bgMainStop", 21}, {"blurRadius", 22},
         };
         for (unsigned k = 0; k < sizeof(extra) / sizeof(extra[0]); k++) {
             cJSON *it2 = cJSON_GetObjectItemCaseSensitive(style, extra[k].key);
@@ -116,9 +117,14 @@ static void apply_style_state(lv_obj_t *obj, const cJSON *style, lv_style_select
                 case 16: lv_obj_set_style_outline_opa(obj, opa, sel); break;
                 case 17: lv_obj_set_style_text_opa(obj, opa, sel); break;
                 case 18: lv_obj_set_style_text_outline_stroke_width(obj, n, sel); break;
+                case 19: lv_obj_set_style_transform_width(obj, n, sel); break;
+                case 20: lv_obj_set_style_transform_height(obj, n, sel); break;
+                case 21: lv_obj_set_style_bg_main_stop(obj, n < 0 ? 0 : n > 255 ? 255 : n, sel); break;
+                case 22: lv_obj_set_style_blur_radius(obj, n, sel); break;
             }
         }
         if (cjson_get_bool(style, "clipCorner", 0)) lv_obj_set_style_clip_corner(obj, true, sel);
+        if (cjson_get_bool(style, "borderPost", 0)) lv_obj_set_style_border_post(obj, true, sel);
         s = cjson_get_string(style, "textOutlineColor");
         if (s) lv_obj_set_style_text_outline_stroke_color(obj, hex_to_color(s), sel);
     }

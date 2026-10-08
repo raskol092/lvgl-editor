@@ -369,7 +369,7 @@ describe('extra widgets', () => {
   })
 
   it('emits advanced common styles', () => {
-    const c = createComponent('obj', { id: 'o', name: 'box', styles: { default: { minWidth: 50, marginTop: 4, padRow: 3, translateX: 7, skewX: 2, bgOpa: 128, clipCorner: true } } as never })
+    const c = createComponent('obj', { id: 'o', name: 'box', styles: { default: { minWidth: 50, marginTop: 4, padRow: 3, translateX: 7, skewX: 2, bgOpa: 128, clipCorner: true, transformWidth: 6, bgMainStop: 40, borderPost: true, blurRadius: 5 } } as never })
     const pages = [createPage({ components: [c] } as never)]
     const src = generateCode(pages, undefined, [], undefined, [], [], '', 14)['ui/ui.lisp']
     expect(src).toContain('(lv-obj-set-style-min-width ui-box 50 LV_PART_MAIN)')
@@ -378,6 +378,10 @@ describe('extra widgets', () => {
     expect(src).toContain('(lv-obj-set-style-translate-x ui-box 7 LV_PART_MAIN)')
     expect(src).toContain('(lv-obj-set-style-transform-skew-x ui-box 20 LV_PART_MAIN)')
     expect(src).toContain('(lv-obj-set-style-bg-opa ui-box 128 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-transform-width ui-box 6 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-bg-main-stop ui-box 40 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-blur-radius ui-box 5 LV_PART_MAIN)')
+    expect(src).toContain('(lv-obj-set-style-border-post ui-box t LV_PART_MAIN)')
   })
 
   it('emits per-widget extra properties', () => {
@@ -456,6 +460,21 @@ describe('extra widgets', () => {
     expect(src).toContain('(str-from-n')
     expect(src).toContain('"%.1f"')
     expect(src).toContain('(if (= 10.0 0.0) 1 (- 10.0 0.0))')
+    expectValid({ 'ui_logic.lisp': src })
+  })
+
+  it('generates bindings of components to variables', () => {
+    const lbl = createComponent('label', { id: 'l', name: 'speed', bindings: [{ id: 'b1', kind: 'text', variable: 'kmh', format: '%d km/h' }, { id: 'b2', kind: 'hidden', variable: 'kmh', op: '<', compare: 1 }] } as never)
+    const bar = createComponent('bar', { id: 'b', name: 'level', bindings: [{ id: 'b3', kind: 'value', variable: 'kmh' }] } as never)
+    const pages = [createPage({ components: [lbl, bar] } as never)]
+    const g = createLogicGraph({ id: 'g1', name: 'x', nodes: [], connections: [], variables: [createLogicVariable({ id: 'v1', name: 'kmh', type: 'int', defaultValue: 5 } as never)] } as never)
+    const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
+    expect(src).toContain("(def ui-bind-0 'unset)")
+    expect(src).toContain('(defun ui-bindings-update ()')
+    expect(src).toContain('(lv-label-set-text ui-speed (str-from-n bv "%d km/h"))')
+    expect(src).toContain('(lv-obj-add-flag ui-speed LV_OBJ_FLAG_HIDDEN)')
+    expect(src).toContain('(lv-bar-set-value ui-level bv LV_ANIM_ON)')
+    expect(src).toContain('(ui-bindings-update)')
     expectValid({ 'ui_logic.lisp': src })
   })
 })

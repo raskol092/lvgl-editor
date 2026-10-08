@@ -1,5 +1,7 @@
 // ui/ui_logic.lisp generator: logic graphs -> Lisp functions, triggers and a tick function
 
+import { generateBindings } from './bindings';
+import type { Page } from '../../types';
 import type { LogicGraph, LogicNode, LogicPort, LogicVariable } from '../../components/LogicEditor/types';
 import type { LispGenOptions } from './types';
 import type { NameResolver } from './names';
@@ -416,7 +418,7 @@ function liveSources(g: LogicGraph, c: Ctx): string[] {
   return out;
 }
 
-export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, options: LispGenOptions): string {
+export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, options: LispGenOptions, pages: Page[] = []): string {
   const o = options;
   const i = indent(o);
   const L: string[] = [];
@@ -461,6 +463,7 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
       init.push(`(lv-obj-add-event-cb ${target} '${graphFn(g, o)}-on-event ${t.params.eventType || 'LV_EVENT_CLICKED'})`);
     }
   }
+  const bind = generateBindings(pages, vars, names, o);
   const timers: Array<{ fn: string; clock: string; done: string; seconds: string; once: boolean }> = [];
   for (const g of timerGraphs) {
     g.nodes.filter(n => n.subType === 'timer_trigger').forEach((t, idx) => {
@@ -522,6 +525,11 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
     '',
   );
 
+  if (bind.count > 0 || bind.update.length > 0) {
+    if (o.generateComments) L.push(...banner('Bindings (component <- variable)'));
+    L.push(...bind.defs, '(def ui-bind-t (systime))', '', '(defun ui-bindings-update ()', `${i}(progn`, ...shift(bind.update, o.indentSize * 2), `${i}${i}nil))`, '');
+  }
+
   if (liveBlock.length) {
     if (o.generateComments) L.push(...banner('Live graphs (no trigger)'));
     L.push(...liveBlock);
@@ -531,6 +539,7 @@ export function generateLogicLisp(graphs: LogicGraph[], names: NameResolver, opt
   if (live.length) {
     tick.push('(if (>= (secs-since ui-live-t) 0.05)', `    (progn (setq ui-live-t (systime)) ${live.join(' ')}))`);
   }
+  if (bind.count > 0) tick.push('(if (>= (secs-since ui-bind-t) 0.05)', '    (progn (setq ui-bind-t (systime)) (ui-bindings-update)))');
   for (const t of timers) {
     if (t.once) {
       tick.push(`(if (and (not ${t.done}) (>= (secs-since ${t.clock}) ${t.seconds}))`, `    (progn (setq ${t.done} t) (${t.fn})))`);

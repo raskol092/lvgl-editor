@@ -139,12 +139,15 @@ function styleForms(v: string, st: StyleProps, selector: string, ctx: UiContext)
     ['bgOpa', 'bg-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['borderOpa', 'border-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
     ['outlineOpa', 'outline-opa', n => Math.max(0, Math.min(255, Math.round(n)))], ['textOpa', 'text-opa', n => Math.max(0, Math.min(255, Math.round(n)))],
     ['textOutlineWidth', 'text-outline-stroke-width', n => n],
+    ['transformWidth', 'transform-width', n => n], ['transformHeight', 'transform-height', n => n],
+    ['bgMainStop', 'bg-main-stop', n => Math.max(0, Math.min(255, Math.round(n)))], ['blurRadius', 'blur-radius', n => Math.max(0, Math.round(n))],
   ];
   for (const [key, fn, conv] of opt) {
     const val = st[key];
     if (typeof val === 'number' && Number.isFinite(val)) set(fn, conv(val));
   }
   if (st.clipCorner === true) set('clip-corner', 't');
+  if (st.borderPost === true) set('border-post', 't');
   if (st.textOutlineWidth && st.textOutlineColor) set('text-outline-stroke-color', lcolor(st.textOutlineColor));
   if (st.padding !== undefined) {
     for (const side of ['top', 'bottom', 'left', 'right']) set(`pad-${side}`, st.padding);
