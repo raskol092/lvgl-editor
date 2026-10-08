@@ -4,6 +4,7 @@ import { useEditorStore } from '../store/editorStore';
 import type { LvglComponent } from '../types';
 import { getComponentDefinition } from '../utils/componentDefinitions';
 import { v4 as uuidv4 } from 'uuid';
+import { collectNames, renameUniquely } from '../utils/uniqueName';
 
 // Clipboard storage (in-memory for now)
 let clipboard: { components: LvglComponent[]; type: 'copy' | 'cut' } | null = null;
@@ -16,7 +17,7 @@ function cloneComponentWithNewIds(comp: LvglComponent, parentId: string | null =
   return {
     ...comp,
     id: newId,
-    name: `${comp.name}_copy`,
+    name: comp.name,
     parentId,
     props: { ...comp.props },
     styles: cloneStyles(comp.styles),
@@ -131,8 +132,9 @@ export function useKeyboardShortcuts() {
     }
     
     // Clone with new IDs and offset position
+    const taken = collectNames(currentPage?.components ?? []);
     const newComponents = clipboard.components.map(comp => {
-      const cloned = cloneComponentWithNewIds(comp, targetParentId);
+      const cloned = renameUniquely(cloneComponentWithNewIds(comp, targetParentId), taken);
       // Offset position slightly so pasted components are visible
       cloned.x += 20;
       cloned.y += 20;
@@ -381,8 +383,9 @@ export function pasteClipboardComponents(): void {
     }
   }
 
+  const taken = collectNames(currentPage?.components ?? []);
   const newComponents = clipboard.components.map(comp => {
-    const cloned = cloneComponentWithNewIds(comp, targetParentId);
+    const cloned = renameUniquely(cloneComponentWithNewIds(comp, targetParentId), taken);
     cloned.x += 20;
     cloned.y += 20;
     return cloned;
@@ -434,8 +437,9 @@ export function pasteIntoContainer(containerId: string): void {
 
   store.saveToHistory();
 
+  const taken = collectNames(currentPage?.components ?? []);
   const newComponents = clipboard.components.map(comp => {
-    const cloned = cloneComponentWithNewIds(comp, containerId);
+    const cloned = renameUniquely(cloneComponentWithNewIds(comp, containerId), taken);
     cloned.x += 20;
     cloned.y += 20;
     return cloned;

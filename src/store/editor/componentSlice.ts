@@ -6,6 +6,7 @@ import { useThemeStore, builtinThemes } from '../themeStore';
 import { themeNewComponent } from '../../utils/themeApply';
 import { getComponentDefinition } from '../../utils/componentDefinitions';
 import type { LvglComponent } from '../../types';
+import { isNameTaken } from '../../utils/uniqueName';
 import type { EditorState } from './types';
 
 export const createComponentSlice: StateCreator<EditorState, [], [], Pick<EditorState, 'addComponent' | 'updateComponent' | 'deleteComponents' | 'moveComponent' | 'resizeComponent' | 'reparentComponent' | 'setComponents' | 'setPages' | 'clearComponents' | 'bringToFront' | 'sendToBack' | 'bringForward' | 'sendBackward'>> = (set, get) => ({
@@ -88,6 +89,19 @@ export const createComponentSlice: StateCreator<EditorState, [], [], Pick<Editor
   },
   updateComponent: (id, updates) => {
     const { currentPageId } = get();
+    // names must stay unique on a screen: logic and events refer to components by name
+    if (updates.name !== undefined) {
+      const page = get().pages.find(p => p.id === currentPageId);
+      const name = updates.name.trim();
+      if (!name || (page && isNameTaken(page.components, name, id))) {
+        const { name: _dropped, ...rest } = updates;
+        void _dropped;
+        if (Object.keys(rest).length === 0) return;
+        updates = rest;
+      } else {
+        updates = { ...updates, name };
+      }
+    }
     get().saveToHistory();
     set(state => ({
       pages: state.pages.map(page => {

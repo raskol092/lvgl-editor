@@ -2,6 +2,7 @@ import React from 'react';
 import ToolIcon from '../../icons/ToolIcon';
 import { t } from '../../../i18n';
 import type { PropertyCtx } from './types';
+import { NameInput } from '../shared/NameInput';
 
 export function ComponentInfoSection({ ctx }: { ctx: PropertyCtx }): React.ReactElement {
   const { component, handlePropertyChange, definition } = ctx;
@@ -19,11 +20,7 @@ export function ComponentInfoSection({ ctx }: { ctx: PropertyCtx }): React.React
           </div>
           <div className="property-row">
             <label>{t('Name')}</label>
-            <input
-              type="text"
-              value={component.name}
-              onChange={(e) => handlePropertyChange('name', e.target.value)}
-            />
+            <NameInput id={component.id} name={component.name} onCommit={(name) => handlePropertyChange('name', name)} />
           </div>
         </div>
     </>
