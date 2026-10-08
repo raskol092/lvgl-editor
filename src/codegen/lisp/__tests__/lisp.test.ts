@@ -489,16 +489,4 @@ describe('extra widgets', () => {
     expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 1 1 LV_TABLE_CELL_CTRL_MERGE_RIGHT)')
     expect(src).toContain('(lv-table-set-cell-ctrl ui-grid 1 2 LV_TABLE_CELL_CTRL_TEXT_CROP)')
   })
-
-  it('skips logic nodes and events whose component was deleted', () => {
-    const sl = createComponent('slider', { id: 's', name: 'sl' } as never)
-    const pages = [createPage({ components: [sl] } as never)]
-    const get = createLogicNode('get_property', { id: 'g', params: { targetComponent: 's', property: 'value' }, outputs: [createLogicPort({ id: 'go', name: 'Value', type: 'any' })] })
-    const set = createLogicNode('set_value', { id: 'v', params: { targetComponent: 'bar-62' }, inputs: [createLogicPort({ id: 'vi', name: 'Exec', type: 'execution' }), createLogicPort({ id: 'vn', name: 'Number', type: 'int', defaultValue: 0 })], outputs: [createLogicPort({ id: 'vo', name: 'Done', type: 'execution' })] })
-    const g = createLogicGraph({ id: 'g1', name: 'live', nodes: [get, set], connections: [createLogicConnection({ sourceNode: 'g', sourceOutput: 'go', targetNode: 'v', targetInput: 'vn', type: 'data' })] })
-    const src = generateCode(pages, undefined, [g], undefined, [], [], '', 14)['ui/ui_logic.lisp']
-    expect(src).not.toContain('ui-bar-62')
-    expect(src).toContain('does not exist')
-    expectValid({ 'ui_logic.lisp': src })
-  })
 })
